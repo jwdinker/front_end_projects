@@ -1,0 +1,33 @@
+{
+  "name": "@jwdinker/use-event-listener",
+  "version": "3.0.3",
+  "main": "./dist/index.js",
+  "private": false,
+  "keywords": [
+    "react",
+    "hooks",
+    "useEventListener"
+  ],
+  "author": "Jack Dinker",
+  "description": "A react hook for simplifying creating and consolidating event listeners.",
+  "homepage": "https://github.com/jwdinker/use_event_listener",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js"
+  },
+  "peerDependencies": {
+    "react": "^16.12.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "@jwdinker/event-store": "1.0.0"
+  }
+}
