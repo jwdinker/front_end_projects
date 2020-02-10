@@ -37,7 +37,8 @@ const ContainerScrolling = () => {
               bottom={0}
               left={0}
               right={0}
-              bg="#7aa9f9" />
+              bg="#7aa9f9"
+            />
           </Box>
         </Centered>
       </Fixed>
