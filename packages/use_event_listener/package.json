@@ -28,6 +28,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@jwdinker/event-store": "1.0.0"
+    "@jwdinker/event-store": "1.0.0",
+    "tslib": "^1.10.0"
   }
 }

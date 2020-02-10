@@ -16,5 +16,7 @@
     "react": "^16.8.0"
   },
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
 }

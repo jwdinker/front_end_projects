@@ -32,7 +32,8 @@
     "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
   },
   "dependencies": {
-    "@jwdinker/watchtower": "1.0.1"
+    "@jwdinker/watchtower": "1.0.1",
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
     "webpack": "^4.41.5",
