@@ -8,10 +8,10 @@ import {
 import { useDispatch } from 'react-redux';
 import { useCallback } from 'react';
 
+import { ToastType } from './types';
+
 const ADD_TOAST_TO_QUEUE = 'ADD_TOAST_TO_QUEUE';
 const REMOVE_TOAST_FROM_QUEUE = 'REMOVE_TOAST_FROM_QUEUE';
-
-import { ToastType } from './types';
 
 function useToastActions() {
   const dispatch = useDispatch();

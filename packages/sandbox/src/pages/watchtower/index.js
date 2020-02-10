@@ -25,7 +25,7 @@ const Contents = () => {
             <Centered width={1} height="100%">
               {/* <Text>{`scrollTop:${scroll.top}`}</Text> */}
             </Centered>
-            <Absolute ref={ref} zIndex={-1} bottom={0} left={0} right={0} bg="#7aa9f9"></Absolute>
+            <Absolute ref={ref} zIndex={-1} bottom={0} left={0} right={0} bg="#7aa9f9" />
           </Box>
         </Centered>
       </Box>
@@ -41,7 +41,7 @@ WatchTower.getInitialProps = async (context) => {
 const Page = () => {
   const scroller = useRef();
   return (
-    <Box width={1} height={'100vh'}>
+    <Box width={1} height="100vh">
       <Box height="100%" width="100%" overflow="scroll" ref={scroller} id="scroller">
         <WatchTower ref={scroller}>
           <Contents />

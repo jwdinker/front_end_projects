@@ -1,6 +1,6 @@
-import useToastActions from './use_toast_actions';
 import { useMemo } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
+import useToastActions from './use_toast_actions';
 
 import { ToastState } from './types';
 import Store from '../store';

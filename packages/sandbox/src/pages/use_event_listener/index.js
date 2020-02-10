@@ -19,7 +19,7 @@ const ContainerScrolling = () => {
   });
 
   return (
-    <Box width={1} height={'100vh'}>
+    <Box width={1} height="100vh">
       <Fixed top={0} left={0} bottom={0} right={0} style={{ pointerEvents: 'none' }}>
         <Centered height="100%" width={1}>
           <Box
@@ -37,7 +37,7 @@ const ContainerScrolling = () => {
               bottom={0}
               left={0}
               right={0}
-              bg="#7aa9f9"></Absolute>
+              bg="#7aa9f9" />
           </Box>
         </Centered>
       </Fixed>
@@ -51,8 +51,8 @@ const ContainerScrolling = () => {
         onScroll={() => {
           console.log('SCROLLING');
         }}>
-        <Box bg="black" height="3000px" width="3000px"></Box>
-        <Box bg="red" height="3000px" width="3000px"></Box>
+        <Box bg="black" height="3000px" width="3000px" />
+        <Box bg="red" height="3000px" width="3000px" />
       </Box>
     </Box>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
-import Flex from './flex';
 import styled from 'styled-components';
+import Flex from './flex';
 
 const InputGroup = styled(Flex)`
   > input {

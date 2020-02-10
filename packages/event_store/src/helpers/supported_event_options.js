@@ -1,6 +1,6 @@
 const checkSupportedEventOptions = () => {
   const EVENT_OPTION_TYPES = ['passive', 'once', 'capture'];
-  let supportedEventOptions = {};
+  const supportedEventOptions = {};
   const isWindow = typeof window !== 'undefined' && typeof window.addEventListener === 'function';
 
   if (isWindow) {

@@ -1,8 +1,8 @@
-import Redux from '../redux';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
-import { primary } from '../themes';
 import { Box, InputGroup, Input, Column, Row, Text, NormalizeStyle } from '@jwdinker/styled-system';
+import { primary } from '../themes';
+import Redux from '../redux';
 import { Menu } from '../components';
 import { GlobalStyle } from '../css';
 

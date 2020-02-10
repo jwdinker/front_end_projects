@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { withCoreProviders } from '../hocs';
 import React, { useState, useRef } from 'react';
-import { Menu } from '../components';
 import { Box, InputGroup, Input, Column, Row, Text } from '@jwdinker/styled-system';
 import useSize from '@jwdinker/use-size';
 import styled, { withTheme } from 'styled-components';
+import { Menu } from '../components';
+import { withCoreProviders } from '../hocs';
 
 function Layout({ children, ...props }) {
   const [value, setValue] = useState('');

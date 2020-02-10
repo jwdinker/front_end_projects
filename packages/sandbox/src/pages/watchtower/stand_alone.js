@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Box, Row, Text, Centered, Fixed, Absolute, Relative } from '@jwdinker/styled-system';
 
 import { useWatchTower } from '@jwdinker/watchtower';
-import { withCoreProviders } from '../../hocs';
 import useElementVisibility from '@jwdinker/use-element-visibility';
+import { withCoreProviders } from '../../hocs';
 
 const Contents = () => {
   const ref = useRef();

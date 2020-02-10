@@ -7,8 +7,8 @@ function initialize(makeStore, etc) {
   if (!hasMakeStore) {
     throw new Error('In order to initialize the redux store, a makeStore function is required.');
   }
-  //On the server, the redux state is recreated everytime.
-  //On the client, the state is shared between request.
+  // On the server, the redux state is recreated everytime.
+  // On the client, the state is shared between request.
   const isServer = typeof window === 'undefined';
   if (isServer) {
     return makeStore(etc);
