@@ -1074,11 +1074,6 @@
   resolved "https://registry.yarnpkg.com/@emotion/unitless/-/unitless-0.7.5.tgz#77211291c1900a700b8a78cfafda3160d76949ed"
   integrity sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==
 
-"@jwdinker/use-animation-frame@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@jwdinker/use-animation-frame/-/use-animation-frame-1.0.1.tgz#da0ed203caef27049279034afaf477089d455eb8"
-  integrity sha512-+a/vIl0fJH4orbOYuuhRZ9q3HKQojobUJ6K/zFRI87fmxx5cO5MyU7+35wmLzuICHpep9kM0Y/PjZIFP3NLTxQ==
-
 "@jwdinker/use-event-listener@3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@jwdinker/use-event-listener/-/use-event-listener-3.0.2.tgz#919fd6953e84b5fe80fcd881c4986cbc2addad4f"

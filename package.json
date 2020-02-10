@@ -2,6 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "build": "tsc -b",
+    "watch": "tsc -b --watch",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --ignore-path ./.eslintignore",
     "prettier:all": "yarn prettier '**/*.{js,jsx,ts,tsx,md,graphql}'",

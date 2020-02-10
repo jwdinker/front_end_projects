@@ -8,7 +8,7 @@
   "dependencies": {
     "@jwdinker/event-store": "1.0.0",
     "@jwdinker/styled-system": "2.0.0",
-    "@jwdinker/use-animation-frame": "1.0.1",
+    "@jwdinker/use-animation-frame": "1.0.3",
     "@jwdinker/use-element-visibility": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.2",
     "@jwdinker/use-popover": "1.0.0",
