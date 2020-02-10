@@ -8,7 +8,7 @@ function useAnimationFrame({
   toggable = false,
 } = {}) {
   const raf = useRef();
-  const callbacks = useRef();
+  const callbacks = useRef({});
   const startTime = useRef();
 
   useEffect(() => {
@@ -17,9 +17,17 @@ function useAnimationFrame({
       onFrame,
       onCancel,
     };
+    return () => {
+      callbacks.current = {
+        onStart: null,
+        onFrame: null,
+        onCancel: null,
+      };
+    };
   }, [onCancel, onFrame, onStart]);
 
   const start = useCallback(() => {
+    raf.current = null;
     if (callbacks.current) {
       const currentTime = Date.now();
       startTime.current = !startTime.current ? currentTime : startTime.current;
@@ -35,9 +43,11 @@ function useAnimationFrame({
   }, [delay]);
 
   const stop = useCallback(() => {
-    cancelAnimationFrame(raf.current);
+    if (raf.current) {
+      cancelAnimationFrame(raf.current);
+    }
 
-    if (callbacks.current && toggable) {
+    if (callbacks.current.onCancel && toggable) {
       callbacks.current.onCancel();
     }
   }, [toggable]);
@@ -48,12 +58,6 @@ function useAnimationFrame({
       return stop;
     }
   }, [start, stop, toggable]);
-
-  useEffect(() => {
-    return () => {
-      if (raf.current) cancelAnimationFrame(raf.current);
-    };
-  }, []);
 
   return [start, stop];
 }
