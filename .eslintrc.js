@@ -47,6 +47,7 @@ module.exports = {
     'react/prop-types': 0,
     'spaced-comment': ['error', 'always', { markers: ['/', '!'] }],
     'no-underscore-dangle': 'off',
+    'no-nested-ternary': 'off',
   },
   overrides: [
     {
