@@ -39,7 +39,11 @@ const WatchTower = forwardRef(({ children, interval }, element) => {
   */
 
   useEffect(() => {
-    target.current = element ? (element === window || element.current === window ? window : element.current) : null;
+    target.current = element
+      ? element === window || element.current === window
+        ? window
+        : element.current
+      : null;
   }, [element]);
 
   /*

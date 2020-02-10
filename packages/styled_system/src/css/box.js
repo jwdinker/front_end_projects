@@ -1,5 +1,15 @@
 import { css } from 'styled-components';
-import { space, color, layout, background, position, flexbox, border, shadow, compose } from 'styled-system';
+import {
+  space,
+  color,
+  layout,
+  background,
+  position,
+  flexbox,
+  border,
+  shadow,
+  compose,
+} from 'styled-system';
 import overflow from './overflow';
 
 const box = css`

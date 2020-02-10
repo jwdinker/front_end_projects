@@ -9,11 +9,6 @@ const color = system({
   },
 });
 
-const text = compose(
-  box,
-  typography,
-  whiteSpace,
-  color
-);
+const text = compose(box, typography, whiteSpace, color);
 
 export default text;

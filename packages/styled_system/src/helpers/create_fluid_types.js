@@ -10,7 +10,9 @@ function injectThemeValues(theme, fluidProps) {
     const isValidRange = Array.isArray(range) && range.length === 2;
 
     if (!isValidRange) {
-      throw new Error(`\n\nThe property '${key}' is a fluid css property and requires an array of 2 values.\n\n`);
+      throw new Error(
+        `\n\nThe property '${key}' is a fluid css property and requires an array of 2 values.\n\n`
+      );
     }
 
     return {
@@ -38,10 +40,14 @@ those values.  Instead of creating a bunch of media queries for each single
 property, I decided to group them together.
 */
 function createFluidTypes(types) {
-  const hasRequiredKeys = Object.values(types).every((type) => has(type, 'themeKey') || has(type, 'cssProperty'));
+  const hasRequiredKeys = Object.values(types).every(
+    (type) => has(type, 'themeKey') || has(type, 'cssProperty')
+  );
 
   if (!hasRequiredKeys) {
-    throw new Error('\n\nCreating fluid types requires each property has a themeKey and a cssProperty\n\n');
+    throw new Error(
+      '\n\nCreating fluid types requires each property has a themeKey and a cssProperty\n\n'
+    );
   }
 
   return ({ theme, ...props }) => {

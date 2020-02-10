@@ -1,5 +1,9 @@
 import { useRef, useEffect, useCallback } from 'react';
-import EventStore, { createConsolidatedEventStore, EVENT_STORE, getSupportedEventOptions } from '@jwdinker/event-store';
+import EventStore, {
+  createConsolidatedEventStore,
+  EVENT_STORE,
+  getSupportedEventOptions,
+} from '@jwdinker/event-store';
 
 function useEventListener({
   target = null,
@@ -77,7 +81,9 @@ function useEventListener({
         saved.current.handler(payload);
       };
 
-      const store = consolidate ? createConsolidatedEventStore(_target, storeName) : new EventStore(_target);
+      const store = consolidate
+        ? createConsolidatedEventStore(_target, storeName)
+        : new EventStore(_target);
       listener.current = store.subscribe(type, _handler, options);
 
       return () => {

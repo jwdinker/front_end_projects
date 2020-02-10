@@ -12,37 +12,36 @@ the position of an element relative to its container, including:
 </br>
 </br>
 
-
 ## Install
 
 **yarn**
 
-``` yarn add @jwdinker/use-element-visibility```
+`yarn add @jwdinker/use-element-visibility`
 
 **npm**
 
-``` npm install @jwdinker/use-element-visibility```
+`npm install @jwdinker/use-element-visibility`
 
 </br>
 </br>
 
 ## Usage
+
 ```javascript
 // Pass in the element and container's top, left, height, width offsets.
-const { visible, at, entering, exiting, overflowing, pct, px } = useElementVisibility(elementOffsets,containerOffsets); 
+const { visible, at, entering, exiting, overflowing, pct, px } = useElementVisibility(
+  elementOffsets,
+  containerOffsets
+);
 ```
 
-
 </br>
 </br>
-
-
-
 
 ## Example
 
-```javascript 
-import React, { useEffect, useState, useRef} from 'react';
+```javascript
+import React, { useEffect, useState, useRef } from 'react';
 import useElementVisibility from '@jwdinker/use-element-visibility';
 import exampleStyles from './examples.css';
 

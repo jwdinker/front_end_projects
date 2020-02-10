@@ -20,13 +20,14 @@ A collection of react components and hooks for monitoring the size and positions
 
 ## Usage
 
-For the best performance, combine `WatchTower` and `useBeacon`. 
+For the best performance, combine `WatchTower` and `useBeacon`.
 
 `WatchTower` plays the role of provider.
+
 1. It monitors changes of scroll width and height in order to notify elements they need to resize, avoiding onload callbacks
-in order to remeasure elements.
+   in order to remeasure elements.
 2. It functions as a single source of truth, providing the scroll top and left values in order to update cached offsets so elements
-don't need to use an interval to remeasure.
+   don't need to use an interval to remeasure.
 
 `useBeacon` consumes the scroll values from the `WatchTower` provider and updates the cached offets.
 
@@ -37,15 +38,15 @@ into a a single hook but has a higher performance cost as a relies on interval c
 <br/>
 
 ```javascript
-import React, { useRef, useMemo } from "react";
-import { WatchTower, useBeacon } from "@jwdinker/use-watch-tower";
+import React, { useRef, useMemo } from 'react';
+import { WatchTower, useBeacon } from '@jwdinker/use-watch-tower';
 
 const Item = ({ index }) => {
   const ref = useRef();
   // 2. Pass any nested ref to useOffsets.
   const measurements = useBeacon(ref);
 
-  const {element, container, scroll} = measurements
+  const { element, container, scroll } = measurements;
 
   // 3.  Do stuff with measurements.
 
@@ -54,21 +55,18 @@ const Item = ({ index }) => {
     return (
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
-      >
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}>
         <div
           ref={ref}
           style={{
-            minHeight: "300px",
-            minWidth: "300px",
-            boxShadow:
-              "0px 5px 15px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1)",
-            borderRadius: "10px"
-          }}
-        ></div>
+            minHeight: '300px',
+            minWidth: '300px',
+            boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1)',
+            borderRadius: '10px',
+          }}></div>
       </div>
     );
   }, []);
@@ -82,11 +80,10 @@ function Example() {
       <div
         ref={scrollableElementRef}
         style={{
-          height: "100%",
-          width: "100%",
-          overflow: "scroll"
-        }}
-      >
+          height: '100%',
+          width: '100%',
+          overflow: 'scroll',
+        }}>
         <Item />
         <Item />
         <Item />
@@ -153,7 +150,6 @@ const { element, container, scroll } = measurements;
 - left
 - height
 - width
-- delta 
+- delta
   - top
   - left
-

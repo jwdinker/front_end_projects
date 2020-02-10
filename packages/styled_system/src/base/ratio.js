@@ -2,8 +2,7 @@ import styled from 'styled-components';
 import { box } from '../css';
 
 const Ratio = styled('div')`
-  ${box}
-  ::before {
+  ${box} ::before {
     content: '';
     width: 1px;
     margin-left: -1px;

@@ -5,7 +5,7 @@
 useAnimationFrame will run on every frame unless the toggable option is set to `true`.
 
 ```javascript
-import useAnimationFrame from "@jwdinker/use-animation-frame";
+import useAnimationFrame from '@jwdinker/use-animation-frame';
 
 function MyComponent() {
   const [start, stop] = useAnimationFrame({
@@ -13,7 +13,7 @@ function MyComponent() {
     onFrame: () => {},
     onCancel: () => {},
     delay: 0,
-    toggable: false
+    toggable: false,
   });
 
   return <div />;

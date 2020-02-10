@@ -1,7 +1,14 @@
 import { useRef, useMemo } from 'react';
 import { INITIAL_MEASUREMENTS, DEFAULTS } from './constants';
 
-import { getStages, getDirection, makeBoundaryCallback, filterEdges, conditionals, getVisibleAmount } from './helpers';
+import {
+  getStages,
+  getDirection,
+  makeBoundaryCallback,
+  filterEdges,
+  conditionals,
+  getVisibleAmount,
+} from './helpers';
 
 const _inBoundaries = makeBoundaryCallback(conditionals.inBoundaries);
 const _isOverflowing = makeBoundaryCallback(conditionals.isOverflowing);
