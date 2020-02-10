@@ -12,12 +12,12 @@ WatchTower
 -------------
 The roles of WatchTower is to:
   1. Notify context consumers that their scrollable ancestor's scroll or
-       container dimensions have changed.  Consequently, consumers should
-       remeasure their offsets. 
+       container dimensions have changed.  Consequently, consumers should
+       remeasure their offsets. 
   2. Provide the consumers with:
      - the scroll top and left offsets so the consumers can dynamically
-         calculate their offsets (avoids performance overhead of
-         getBoundingClientRect). 
+         calculate their offsets (avoids performance overhead of
+         getBoundingClientRect). 
      - scrollable dimensions. 
      - ancestor dimensions. 
 
@@ -32,11 +32,11 @@ const WatchTower = forwardRef(({ children, interval }, element) => {
   const target = useRef();
 
   /*
-  UNIFIES WINDOW & ELEMENTS INTO SINGLE REF
-  -----------------------------------------
-  target.current is used to unify window and element refs into a single
-  'current' property since useEffect will only pick up changes to 'current'.
-  */
+  UNIFIES WINDOW & ELEMENTS INTO SINGLE REF
+  -----------------------------------------
+  target.current is used to unify window and element refs into a single
+  'current' property since useEffect will only pick up changes to 'current'.
+  */
 
   useEffect(() => {
     target.current = element
@@ -47,12 +47,12 @@ const WatchTower = forwardRef(({ children, interval }, element) => {
   }, [element]);
 
   /*
-  RESETS CHANGED TOGGLE IF TRUE
-  -----------------------------
-  Instead of doing potentially hundreds of equality checks inside the useOffset
-  hook to check if the scroll dimension size matches the previous scroll
-  dimension size, I decided to just reset the boolean on the next render.  
-  */
+RESETS CHANGED TOGGLE IF TRUE
+-----------------------------
+Instead of doing potentially hundreds of equality checks inside the useOffset
+hook to check if the scroll dimension size matches the previous scroll
+dimension size, I decided to just reset the boolean on the next render.
+*/
   useEffect(() => {
     if (changed) {
       setChanged(false);
@@ -60,13 +60,13 @@ const WatchTower = forwardRef(({ children, interval }, element) => {
   }, [changed]);
 
   /*
-  SETS INITIAL MEASUREMENTS OF SCROLL ANCESTOR
-  --------------------------------------------
-  Instead of doing potentially hundreds of equality checks inside the useOffset
-  hook to check if the scroll dimension size matches the previous scroll
-  dimension size, I decided to just reset the boolean on the next render if it's
-  set to true.  
-  */
+  SETS INITIAL MEASUREMENTS OF SCROLL ANCESTOR
+  --------------------------------------------
+  Instead of doing potentially hundreds of equality checks inside the useOffset
+  hook to check if the scroll dimension size matches the previous scroll
+  dimension size, I decided to just reset the boolean on the next render if it's
+  set to true.
+  */
   useEffect(() => {
     if (target.current) {
       setMeasurements(getMeasurements(target.current));
@@ -74,22 +74,21 @@ const WatchTower = forwardRef(({ children, interval }, element) => {
   }, []);
 
   /*
-  handleFrame
-  -----------
-  Using a recursive requestAnimationFrame, handleFrame continuously
-  checks the scroll area.  A simple
-  boolean is used to notify context consumers of when the size has changed so
-  the beacon children know to remeasure their offsets.  Having tried all
-  sorts of hacks, this is by far the best way to handle dynamic sizing elements
-  because it: 
-  1.   Avoids special classnames for onload elements. 
-  2.   Avoids recursively cloning children and checking for onload tag elements
-       and subsequently adding onLoad callbacks.
+  handleFrame
+  -----------
+  Using a recursive requestAnimationFrame, handleFrame continuously checks the
+  scroll area.  A simple boolean is used to notify context consumers of when the
+  size has changed so the beacon children know to remeasure their offsets.
+  Having tried all sorts of hacks, this is by far the best way to handle dynamic
+  sizing elements because it: 
+  1. Avoids special classnames for onload elements. 
+  2. Avoids recursively cloning children and checking for onload tag elements
+       and subsequently adding onLoad callbacks.
 
-  Besides a complete reduction in complexity, the performance is way better than
-  the methods above.The only downside is a there can be several re-renders on
-  initial document load. 
-  */
+  Besides a complete reduction in complexity, the performance is way better than
+  the methods above.The only downside is a there can be several re-renders on
+  initial document load. 
+  */
   const handleFrame = useCallback(() => {
     const nextScrollDimensions = getScrollDimensions(target.current);
     if (hasChanged({ height, width }, nextScrollDimensions)) {

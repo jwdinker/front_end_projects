@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
 import useEventListener from '@jwdinker/use-event-listener';
 
