@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "declarationDir": "dist",
+    "lib": ["es2018", "esnext.asynciterable"],
+    "target": "es2018",
+    "module": "commonjs"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../event_store" },
+    { "path": "../styled_system" },
+    { "path": "../use_animation_frame" },
+    { "path": "../use_element_visibility" },
+    { "path": "../use_event_listener" },
+    { "path": "../use_popover" },
+    { "path": "../use_size" },
+    { "path": "../use_timeout" },
+    { "path": "../watchtower" }
+  ]
+}
