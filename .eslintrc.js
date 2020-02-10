@@ -45,7 +45,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     'react/prop-types': 0,
-    'spaced-comment': ['error', 'always', { markers: ['/'] }],
+    'spaced-comment': ['error', 'always', { markers: ['/', '!'] }],
   },
   overrides: [
     {
