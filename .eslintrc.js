@@ -28,8 +28,8 @@
 // };
 
 module.exports = {
-  extends: ['airbnb', 'airbnb/hooks', 'prettier'],
-  plugins: [],
+  extends: ['airbnb', 'airbnb/hooks', 'prettier', 'prettier/@typescript-eslint', 'prettier/react'],
+  plugins: ['@typescript-eslint'],
   parser: 'babel-eslint',
   env: {
     browser: true,
@@ -46,4 +46,10 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react/prop-types': 0,
   },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parser: '@typescript-eslint/parser',
+    },
+  ],
 };
