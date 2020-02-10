@@ -29,7 +29,7 @@
 
 module.exports = {
   extends: ['airbnb', 'airbnb/hooks', 'prettier'],
-  plugins: ['prettier'],
+  plugins: [],
   parser: 'babel-eslint',
   env: {
     browser: true,
@@ -42,7 +42,6 @@ module.exports = {
     sourceType: 'module', //Prevents import and export linting errors
   },
   rules: {
-    'prettier/prettier': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     'react/prop-types': 0,
