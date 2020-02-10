@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useCallback } from 'react';
 import { useWatchTower } from '@jwdinker/watchtower';
-import { INITIAL_DIMENSIONS, ELEMENT_TYPES, STYLE_KEYS, SIDES } from './constants';
+import { INITIAL_DIMENSIONS, ELEMENT_TYPES, STYLE_KEYS } from './constants';
 import getDimensions from './get_dimensions';
 import makeOffsets from './make_offsets';
 import formatStyles from './format_styles';
@@ -43,8 +43,6 @@ function usePopover({
    */
   const offsets = getOffsets(preference);
 
-  console.log('OFFSETS: ', measurements);
-
   /*
    * makeOffsets returns a function so I don't have to constantly pass the
    * measurements as a parameter.
@@ -85,7 +83,6 @@ function usePopover({
       alignment: preference,
       ...offsets,
       styles: formatStyles(offsets),
-      formatStyles,
       applyStyles,
     }),
     [applyStyles, getOffsets, measurements, offsets, preference]
