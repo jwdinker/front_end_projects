@@ -37,15 +37,7 @@
   },
   "workspaces": {
     "packages": [
-      "packages/sandbox",
-      "packages/styled_system",
-      "packages/use_animation_frame",
-      "packages/use_size",
-      "packages/event_store",
-      "packages/use_event_listener",
-      "packages/watchtower",
-      "packages/use_element_visibility",
-      "packages/use_popover"
+      "packages/*"
     ]
   },
   "dependencies": {

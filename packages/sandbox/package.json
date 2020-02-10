@@ -30,7 +30,7 @@
     "tslib": "^1.10.0"
   },
   "scripts": {
-    "dev": "rm -rf .next & build & NODE_OPTIONS='inspect' NODE_ENV='development' node node_modules/.bin/next dev --hostname 192.168.1.4",
+    "dev": "rm -rf .next && NODE_OPTIONS='inspect' NODE_ENV='development' node node_modules/.bin/next dev --hostname 192.168.1.4",
     "build": "next build",
     "start": "next start"
   },
