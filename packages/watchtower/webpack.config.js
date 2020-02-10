@@ -1,6 +1,7 @@
 const path = require('path');
-const RULES = require('../../webpack/rules');
 const TerserJSPlugin = require('terser-webpack-plugin');
+const RULES = require('../../webpack/rules');
+
 const { BABEL } = RULES;
 
 const isProduction = process.env.NODE_ENV === 'production';

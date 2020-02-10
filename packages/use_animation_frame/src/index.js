@@ -13,9 +13,9 @@ function useAnimationFrame({
 
   useEffect(() => {
     callbacks.current = {
-      onStart: onStart,
-      onFrame: onFrame,
-      onCancel: onCancel,
+      onStart,
+      onFrame,
+      onCancel,
     };
   }, [onCancel, onFrame, onStart]);
 

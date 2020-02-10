@@ -1,5 +1,5 @@
-import Context from './context';
 import { useContext } from 'react';
+import Context from './context';
 
 function useWatchTowerContext() {
   const context = useContext(Context);

@@ -23,7 +23,7 @@ function useSize(target, { onResize = () => {}, initialState = defaultState } = 
 
   useEffect(() => {
     callbacks.current = {
-      onResize: onResize,
+      onResize,
     };
   }, [onResize]);
 

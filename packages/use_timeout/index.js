@@ -6,7 +6,7 @@ function useTimeout(callback = () => {}, milliseconds = 0) {
 
   useEffect(() => {
     saved.current = {
-      callback: callback,
+      callback,
     };
   }, [callback]);
 

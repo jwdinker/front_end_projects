@@ -1,7 +1,7 @@
 const path = require('path');
+const fs = require('fs');
 const RULES = require('./rules');
 const HTML_PLUGIN = require('./html_plugin');
-const fs = require('fs');
 
 module.exports = {
   entry: './src/index.js',

@@ -26,8 +26,8 @@ const createFluidStyle = ({ properties, viewport = { min: 100, max: 1600 } }) =>
       const minimumValue = `calc(${min} + (${maxRangeNum} - ${minRangeNum}) * ((100vw - ${minViewportPx}) / (${viewport.max} - ${viewport.min})));`;
 
       return {
-        min: accumulator.min + `${property}:${minimumValue};`,
-        max: accumulator.max + `${property}:${max};`,
+        min: `${accumulator.min  }${property}:${minimumValue};`,
+        max: `${accumulator.max  }${property}:${max};`,
       };
     },
     { min: '', max: '' }
