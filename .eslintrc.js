@@ -46,6 +46,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react/prop-types': 0,
     'spaced-comment': ['error', 'always', { markers: ['/', '!'] }],
+    'no-underscore-dangle': 'off',
   },
   overrides: [
     {

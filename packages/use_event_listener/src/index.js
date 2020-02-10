@@ -64,9 +64,24 @@ function useEventListener({
   }, [target]);
 
   /*
-  -------
-  | add |
-  -------
+  ----------
+  | detach |
+  ----------
+    Removes the event listener from the event store.  If there are no handlers
+    remaining on the event, the event key is removed.
+  */
+  const detach = useCallback(() => {
+    if (listener.current) {
+      saved.current.onRemove();
+      listener.current.unsubscribe();
+      listener.current = null;
+    }
+  }, []);
+
+  /*
+  ----------
+  | attach |
+  ----------
     Adds the listener to the target if it exists.
   */
   const attach = useCallback(() => {
@@ -91,21 +106,6 @@ function useEventListener({
       };
     }
   }, [consolidate, detach, getOptions, getTarget, storeName, target, type]);
-
-  /*
-  ----------
-  | remove |
-  ----------
-    Removes the event listener from the event store.  If there are no handlers
-    remaining on the event, the event key is removed.
-  */
-  const detach = useCallback(() => {
-    if (listener.current) {
-      saved.current.onRemove();
-      listener.current.unsubscribe();
-      listener.current = null;
-    }
-  }, []);
 
   /*
   Since events can be toggled, if the listener is toggled on, there needs to be
