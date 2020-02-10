@@ -1,6 +1,11 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "prettier": "prettier --ignore-path ./.eslintignore",
+    "prettier:all": "yarn prettier '**/*.{js,jsx,ts,tsx,md,graphql}'",
+    "prettier:fix": "yarn prettier:all --write"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.3",
     "@babel/core": "^7.8.3",
