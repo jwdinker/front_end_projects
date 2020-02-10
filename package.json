@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --ignore-path ./.eslintignore",
     "prettier:all": "yarn prettier '**/*.{js,jsx,ts,tsx,md,graphql}'",
     "prettier:fix": "yarn prettier:all --write"
