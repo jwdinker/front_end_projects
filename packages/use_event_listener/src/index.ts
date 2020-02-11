@@ -81,8 +81,8 @@ function useEventListener(options: EventListenerOptions) {
     Checks which addEventListener options are supported by the browser.
   */
   const getOptions = useCallback(() => {
-    const options = { capture, passive, once };
-    return getSupportedEventOptions(options);
+    const _options = { capture, passive, once };
+    return getSupportedEventOptions(_options);
   }, [capture, once, passive]);
 
   /*
@@ -128,7 +128,6 @@ function useEventListener(options: EventListenerOptions) {
 
     if (_target) {
       saved.current.onAdd();
-      const options = getOptions();
 
       const _handler = (payload: Event) => {
         saved.current.handler(payload);
@@ -137,7 +136,7 @@ function useEventListener(options: EventListenerOptions) {
       const store = consolidate
         ? createConsolidatedEventStore(_target, storeName)
         : new EventStore(_target);
-      listener.current = store.subscribe(type, _handler, options);
+      listener.current = store.subscribe(type, _handler, getOptions());
 
       return () => {
         detach();
