@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Row, Text, Centered, Fixed, Absolute, Relative } from '@jwdinker/styled-system';
-
+// @ts-check
 import useEventListener from '@jwdinker/use-event-listener';
 import { withCoreProviders } from '../../hocs';
 
