@@ -6,17 +6,13 @@
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "declarationDir": "dist",
-    "lib": [
-      "es2018",
-      "esnext.asynciterable"
-    ],
+    "lib": ["es2018", "esnext.asynciterable"],
     "target": "es2018",
     "module": "esnext",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "jsx": "preserve"
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "references": [
     {
       "path": "../event_store"
@@ -44,6 +40,9 @@
     },
     {
       "path": "../watchtower"
+    },
+    {
+      "path": "../mapkit"
     }
   ]
 }
