@@ -1,0 +1,31 @@
+{
+  "name": "@jwdinker/react-mapkitjs",
+  "version": "2.0.0",
+  "main": "./dist/index.js",
+  "private": false,
+  "keywords": [
+    "mapkitjs",
+    "maps",
+    "apple",
+    "react",
+    "map hooks"
+  ],
+  "author": "Jack Dinker",
+  "description": "A collection of hooks and components for destructing/reducing the API surface of Apple MapkitJS and allowing for composition with react components.",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js"
+  },
+  "peerDependencies": {
+    "react": "^16.12.0"
+  },
+  "devDependencies": {
+    "tslib": "^1.10.0"
+  },
+  "dependencies": {}
+}
