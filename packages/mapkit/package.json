@@ -1,6 +1,6 @@
 {
   "name": "@jwdinker/react-mapkitjs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "./dist/index.js",
   "private": false,
   "keywords": [
@@ -22,10 +22,11 @@
     "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js"
   },
   "peerDependencies": {
-    "react": "^16.12.0"
+    "react": "^16.8.0"
   },
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
+    "@jwdinker/use-event-listener": "^3.0.3",
     "tslib": "^1.10.0"
-  },
-  "dependencies": {}
+  }
 }
