@@ -1,0 +1,24 @@
+{
+  "name": "@jwdinker/use-drag",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "NODE_ENV=production webpack --config ./webpack.config.js"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {
+    "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/use-interactivity": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}
