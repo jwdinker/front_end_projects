@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getOffsets } from './helpers';
 
 export const INITIAL_OFFSETS = {
@@ -11,7 +11,6 @@ export const INITIAL_OFFSETS = {
 };
 
 function useOffsets(element) {
-  const measured = useRef(false);
   const [offsets, setOffsets] = useState(() => {
     return INITIAL_OFFSETS;
   });
@@ -21,11 +20,9 @@ function useOffsets(element) {
     setOffsets(nextOffsets);
   }, [element]);
 
-  // Initial Measurement on first render
   useEffect(() => {
-    if (!measured.current && element.current) {
+    if (element && element.current) {
       remeasure();
-      measured.current = true;
     }
   }, [element, remeasure]);
 
