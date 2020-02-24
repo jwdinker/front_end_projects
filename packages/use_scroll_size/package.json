@@ -1,0 +1,38 @@
+{
+  "name": "@jwdinker/use-scroll-size",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "description": "A react hook for monitoring the scroll dimensions size.",
+  "keywords": [
+    "react",
+    "measurements",
+    "size",
+    "scroll",
+    "hooks"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x",
+    "react-dom": "^16.8.x"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
+    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
+    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
+  },
+  "dependencies": {
+    "@jwdinker/use-animation-frame": "1.0.3",
+    "tslib": "^1.10.0"
+  }
+}
