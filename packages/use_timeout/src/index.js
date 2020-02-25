@@ -23,6 +23,12 @@ function useTimeout(callback = () => {}, milliseconds = 0) {
     }, milliseconds);
   }, [clear, milliseconds]);
 
+  useEffect(() => {
+    return () => {
+      clear();
+    };
+  }, [clear]);
+
   return [start, clear];
 }
 
