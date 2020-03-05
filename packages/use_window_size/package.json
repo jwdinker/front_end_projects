@@ -1,0 +1,39 @@
+{
+  "name": "@jwdinker/use-window-size",
+  "version": "2.0.1",
+  "main": "./dist/index.js",
+  "description": "A react hook for monitoring the size of the window.",
+  "keywords": [
+    "react",
+    "window",
+    "size",
+    "hooks"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x",
+    "react-dom": "^16.8.x"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
+    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
+    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
+  },
+  "dependencies": {
+    "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/use-ssr": "1.0.0",
+    "@jwdinker/use-timeout": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}
