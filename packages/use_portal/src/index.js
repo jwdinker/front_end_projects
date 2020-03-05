@@ -4,7 +4,7 @@ import useSSR from '@jwdinker/use-ssr';
 
 function usePortal(applyStyle = () => {}, parent = null) {
   // protect prevents functions from executing if the window or document is not present
-  const [protect] = useSSR();
+  const { protect } = useSSR();
   const portal = useRef();
   const host = useRef();
   const [isOpen, setOpen] = useState(false);
