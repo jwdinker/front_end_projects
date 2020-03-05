@@ -81,7 +81,7 @@ function usePortal(applyStyle = () => {}, parent = null) {
     return null;
   }, []);
 
-  return [Portal, { open, close, toggle, isOpen, isClosed: !isOpen }];
+  return [Portal, { open, close, toggle, isOpen, isClosed: !isOpen, reference: portal.current }];
 }
 
 export default usePortal;
