@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react';
-import { SIDES, ELEMENT_TYPES } from './constants';
-import getOverflowingSides from './get_overflowing_sides';
+import { ELEMENT_TYPES } from './constants';
+import { useCustomBoundaries, useOverflowing } from './internal';
 
-function useHideable(props, { untilFirstSeen = true } = {}) {
-  const { styles, element, container } = props;
+function useHideable(props, { boundary = null, hideUntilSeen = true } = {}) {
+  const { styles, offsets, viewport } = props;
+
   const [seen, setSeen] = useState(() => {
     return false;
   });
 
+  const boundaries = useCustomBoundaries(boundary, viewport);
+
+  const overflowing = useOverflowing(offsets.total, boundaries);
+
   useEffect(() => {
-    if (!seen && untilFirstSeen) {
-      const overflowing = getOverflowingSides(element, container);
-      const inBounds = SIDES.every((side) => !overflowing[side]);
-      if (inBounds) {
+    if (!seen) {
+      if (!overflowing.isOverflowing) {
         setSeen(true);
       }
     }
-  }, [container, element, seen, untilFirstSeen]);
+  }, [boundaries, overflowing.isOverflowing, seen]);
 
-  if (!seen) {
+  if (!seen && overflowing.isOverflowing && hideUntilSeen) {
     ELEMENT_TYPES.forEach((type) => {
       styles[type].visibility = 'hidden';
     });
@@ -26,6 +29,7 @@ function useHideable(props, { untilFirstSeen = true } = {}) {
 
   return {
     seen,
+    isVisible: !overflowing.isOverflowing,
   };
 }
 

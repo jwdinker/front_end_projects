@@ -1,70 +1,55 @@
-import { useMemo, useEffect, useState, useCallback } from 'react';
-import { useWatchTower } from '@jwdinker/watchtower';
-import { INITIAL_DIMENSIONS, ELEMENT_TYPES, STYLE_KEYS } from './constants';
-import getDimensions from './get_dimensions';
-import makeOffsets from './make_offsets';
-import formatStyles from './format_styles';
-import convertTransformToString from './convert_transform_to_string';
+import { useMemo, useEffect, useState, useCallback, useRef } from 'react';
+import usePortal from '@jwdinker/use-portal';
+import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
+import useDimensions from '@jwdinker/use-dimensions';
 
-function usePopover({
-  popover = null,
-  element = null,
-  triangle = null,
-  preference = 'bottom',
-} = {}) {
-  /*
-   * 1. useWatchTower continously updates the positions of the element and it's
-   *    scrollable ancestor via a recursive requestAnimationFrame. It contains
-   *    coordinates and dimensions values for the:
-   * - element
-   * - container (the scrollable ancestor)
-   * - scroll (This is uncesssary here, but it is part of a unified api for WatchTower/useBeacon)
-   */
-  const dependencies = useWatchTower(element, { interval: 0 });
-  const [dimensions, setDimensions] = useState(() => ({
-    triangle: INITIAL_DIMENSIONS,
-    popover: INITIAL_DIMENSIONS,
-  }));
+import { ELEMENT_TYPES, STYLE_KEYS } from './constants';
+import { useViewportBoundaries } from './internal';
 
-  const measurements = useMemo(
-    () => ({ element: dependencies.element, container: dependencies.container, ...dimensions }),
-    [dependencies, dimensions]
-  );
+import { getOffsets, convertTransformToString, formatStyles } from './helpers';
 
-  /*
-   * makeOffsets returns a function so I don't have to constantly pass the
-   * measurements as a parameter.
-   */
-  const getOffsets = makeOffsets(measurements);
+function usePopover(_element, { preference = 'bottom' } = {}) {
+  const [alignment, align] = useState(preference);
 
-  /*
-   * 2. The offsets are calculated based on the preference parameter. getOffsets
-   *    returns an object {popover, triangle, total}
-   */
-  const offsets = getOffsets(preference);
+  const _popover = useRef();
+  const _triangle = useRef();
+  const [Portal, { open, isOpen, reference }] = usePortal();
 
-  /*
-   * makeOffsets returns a function so I don't have to constantly pass the
-   * measurements as a parameter.
-   */
+  const viewport = useViewportBoundaries();
+  const [element] = useBoundingClientRect(_element, { addPageOffsets: true });
+
+  const [popoverDimensions] = useDimensions(_popover);
+  const [triangleDimensions] = useDimensions(_triangle);
+
+  const setDependents = useCallback(() => {
+    const count = reference.childElementCount;
+    const isBoth = count > 1;
+    _popover.current = reference.children[isBoth ? 1 : 0];
+    _triangle.current = isBoth ? reference.children[0] : null;
+  }, [reference]);
+
   useEffect(() => {
-    if (popover.current) {
-      setDimensions({
-        popover: getDimensions(popover.current),
-        triangle: triangle.current ? getDimensions(triangle.current) : INITIAL_DIMENSIONS,
-      });
+    const isElement = _element && _element.current;
+    if (isElement) {
+      open();
     }
-  }, [popover, triangle]);
+  }, [_element, element, open]);
 
-  const stylable = useMemo(() => {
-    return { popover, triangle };
-  }, [popover, triangle]);
+  useEffect(() => {
+    if (isOpen) {
+      setDependents();
+    }
+  }, [isOpen, reference, setDependents]);
 
-  const applyStyles = useCallback(
+  const styleable = useMemo(() => {
+    return { popover: _popover, triangle: _triangle };
+  }, []);
+
+  const applyStylesToElement = useCallback(
     (styles) => {
       ELEMENT_TYPES.forEach((type) => {
-        const item = stylable[type];
-        if (item.current) {
+        const item = styleable[type];
+        if (item && item.current) {
           const values = styles[type];
           STYLE_KEYS.forEach((key) => {
             item.current.style[key] = values[key];
@@ -73,22 +58,29 @@ function usePopover({
         }
       });
     },
-    [stylable]
+    [styleable]
   );
 
-  const props = useMemo(
+  const offsets = getOffsets(alignment, {
+    popover: popoverDimensions,
+    element,
+    triangle: triangleDimensions,
+  });
+
+  const value = useMemo(
     () => ({
-      ...measurements,
-      getOffsets,
-      alignment: preference,
-      ...offsets,
+      preference,
+      viewport,
+      alignment,
+      offsets,
+      align,
+      applyStylesToElement,
       styles: formatStyles(offsets),
-      applyStyles,
     }),
-    [applyStyles, getOffsets, measurements, offsets, preference]
+    [alignment, applyStylesToElement, offsets, preference, viewport]
   );
 
-  return props;
+  return [Portal, value];
 }
 
 export default usePopover;

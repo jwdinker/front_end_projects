@@ -56,4 +56,6 @@ export const DEFAULT_STYLES = {
 };
 
 export const ELEMENT_TYPES = ['popover', 'triangle'];
+
 export const STYLE_KEYS = ['position', 'top', 'left', 'visibility'];
+

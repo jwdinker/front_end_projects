@@ -1,4 +1,78 @@
-import { TRIANGLE_ROTATIONS } from './constants';
+import { OPPOSITES, SHARED_STYLES, TRIANGLE_ROTATIONS, SIDES } from './constants';
+
+export const adjustForViewport = (element, scroll, operator = 1) => {
+  const { height, width } = element;
+  const top = element.top + scroll.top * operator;
+  const left = element.left + scroll.left * operator;
+  return {
+    height,
+    width,
+    top,
+    left,
+    bottom: top + height,
+    right: left + width,
+  };
+};
+
+export const getOverflowingSides = (element, boundaries) => {
+  const intersecting = {};
+  for (let index = 0; index <= SIDES.length - 1; index += 1) {
+    const side = SIDES[index];
+    const opposite = OPPOSITES[side];
+
+    const isIntersecting =
+      index % 2 === 0
+        ? element[side] <= boundaries[side] || element[opposite] <= boundaries[side]
+        : element[side] >= boundaries[side] || element[opposite] >= boundaries[side];
+
+    if (isIntersecting) {
+      intersecting[side] = true;
+    } else {
+      intersecting[side] = false;
+    }
+  }
+  return intersecting;
+};
+
+export const getOffsetTotal = (alignment, popover, triangle) => {
+  const operator = alignment === 'top' || alignment === 'left' ? 1 : -1;
+  const oppositeSide = OPPOSITES[alignment];
+  const dimensionType = alignment === 'top' || alignment === 'bottom' ? 'height' : 'width';
+
+  // The triangle height is either added or substracted to the popover offset
+  // opposite the current alignment
+  return {
+    ...popover,
+    [oppositeSide]: popover[oppositeSide] + triangle.height * operator,
+    [dimensionType]: popover[dimensionType] + triangle.height,
+  };
+};
+
+export const convertTransformToString = ({ translateX, translateY, rotate }) => {
+  const translateStyle = `translate3d(${translateX}px,${translateY}px,0)`;
+  return typeof rotate === 'number' ? `${translateStyle} rotate(${rotate}deg)` : translateStyle;
+};
+
+export const formatStyles = ({ popover, triangle }) => {
+  return {
+    popover: {
+      ...SHARED_STYLES,
+      transform: {
+        translateX: popover.left,
+        translateY: popover.top,
+      },
+    },
+    triangle: {
+      ...SHARED_STYLES,
+      transform: {
+        translateX: triangle.left,
+        translateY: triangle.top,
+        rotate: triangle.rotate,
+      },
+    },
+  };
+};
+
 /*
  *-----------------------------------------------------------------------------
  * styles
@@ -106,21 +180,40 @@ const styles = {
   },
 };
 
+export const getOffsetPerimeter = (element, popover, triangle) => {
+  const { top, left, bottom, right } = element;
+  const height = triangle.height + popover.height;
+  const width = triangle.height + popover.width;
+  return {
+    top: top - height,
+    left: left - width,
+    right: right + width,
+    bottom: bottom + height,
+  };
+};
+
 /*
  *-----------------------------------------------------------------------------
- *  makeOffsets
+ *  getOffsets
  *-----------------------------------------------------------------------------
- *  Generates the offsets for the popover, triangle and creates the total
+ *  Generates the offsets for the popover, triangle and perimeter and creates the total
  *  offsets of the popover with the triangle measurements included.
  *
  */
-function makeOffsets(props) {
-  return (alignment) => {
-    return {
-      popover: styles.popover[alignment](props),
-      triangle: styles.triangle[alignment](props),
-    };
+export const getOffsets = (alignment, measurements) => {
+  const popover = styles.popover[alignment](measurements);
+  const triangle = styles.triangle[alignment](measurements);
+  const { element } = measurements;
+  return {
+    element,
+    popover,
+    triangle,
+    perimeter: getOffsetPerimeter(element, popover, triangle),
+    total: getOffsetTotal(alignment, popover, triangle),
   };
-}
+};
 
-export default makeOffsets;
+const makeHasChanged = (props) => (previous, current) =>
+  props.some((prop) => previous[prop] !== current[prop]);
+
+export const hasSidesChanged = makeHasChanged(SIDES);

@@ -32,11 +32,14 @@
     "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
   },
   "dependencies": {
-    "@jwdinker/watchtower": "1.0.1",
+    "@jwdinker/use-bounding-client-rect": "1.0.0",
+    "@jwdinker/use-dimensions": "1.0.0",
+    "@jwdinker/use-portal": "1.0.0",
+    "@jwdinker/use-previous": "1.0.0",
+    "@jwdinker/use-scroll": "4.0.1",
+    "@jwdinker/use-ssr": "1.0.0",
+    "@jwdinker/use-window-size": "2.0.1",
     "tslib": "^1.10.0"
   },
-  "devDependencies": {
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
-  }
+  "devDependencies": {}
 }

@@ -1,7 +1,5 @@
 import { SIDES, OPPOSITES, TRIANGLE_ROTATIONS } from './constants';
-
-import getOverflowingSides from './get_overflowing_sides';
-import getOffsetTotal from './get_offset_total';
+import { useCustomBoundaries, useOverflowing } from './internal';
 
 /*
  *-----------------------------------------------------------------------------
@@ -42,52 +40,51 @@ const triangleAdjustments = {
 
 function usePreventOverflow(
   props = {},
-  { sides = SIDES, boundary = null, flipArrow = false } = {}
+  { sides = SIDES, flipArrow = false, boundary = null } = {}
 ) {
-  const { alignment, container, element, popover, triangle, styles } = props;
+  const { alignment, offsets, styles, viewport } = props;
+  const { element, popover, triangle, total } = offsets;
+
+  const boundaries = useCustomBoundaries(boundary, viewport);
 
   /*
-   * 1. The overflowing sides are calculated against the boundary using the total offset.
+   * 1. The overflowing sides are calculated against the boundary using the
+   *    total offset (popover dimension + triangle height).  Unnecessary prevent
+   *    overflow checks are avoided by checking if the popover is even in an
+   *    overflow state.
    */
-  const overflowing = getOverflowingSides(getOffsetTotal(alignment, popover, triangle), container);
-  const inBounds = SIDES.every((side) => !overflowing[side]);
-
-  /*
-   *2.  If nothing is overflowing, I don't bother to adjust the styles.
-   */
-  if (!inBounds) {
+  const overflowing = useOverflowing(total, boundaries);
+  if (overflowing.isOverflowing) {
     /*
-
-     * 3.  The side params are checked against the intersecting sides. 
+     * 2.  The side params are checked against the intersecting sides.
      */
     sides.forEach((side) => {
-      /*
-       * 4.  Some helper variables are created to avoid deeply nested
-       *     conditionals where there can be an insane amount of states. Knowing
-       *     the side the arrow is located helps cut down immensly on the
-       *     conditionals for the popover.
-       *
-       *     - operator is used to flip styles on opposites sides.
-       *
-       *     - translateAxis matches the position properties to an axis so we can set
-       *       the styles[key].
-       *
-       *    - didArrowReachSideFirst helps decide which side of the popover will have the triangle height applied to it.
-       */
-      const isTopOrLeftSide = side === 'top' || side === 'left';
-      const oppositeSide = OPPOSITES[side];
-      const operator = isTopOrLeftSide ? 1 : -1;
-      const isY = side === 'top' || side === 'bottom';
-      const translateAxis = isY ? 'translateY' : 'translateX';
-      const dimensionType = isY ? 'height' : 'width';
-      const didArrowReachSideFirst = side === OPPOSITES[alignment];
-
-      const popoverAdjustment = didArrowReachSideFirst ? triangle.height : 0;
-      const triangleAdjustment = triangleAdjustments[alignment][side](triangle, popover);
-
-      if (overflowing[side]) {
+      if (overflowing.sides[side]) {
         /*
-         * 5.  If the popover is overflowing TOP or LEFT, I take the MAX value
+         * 3.  Some helper variables are created to avoid deeply nested
+         *     conditionals where there can be an insane amount of states. Knowing
+         *     the side the arrow is located helps cut down immensly on the
+         *     conditionals for the popover.
+         *
+         *     - operator is used to flip styles on opposites sides.
+         *
+         *     - translateAxis matches the position properties to an axis so we can set
+         *       the styles[key].
+         *
+         *    - didArrowReachSideFirst helps decide which side of the popover will have the triangle height applied to it.
+         */
+        const isTopOrLeftSide = side === 'top' || side === 'left';
+        const oppositeSide = OPPOSITES[side];
+        const operator = isTopOrLeftSide ? 1 : -1;
+        const isY = side === 'top' || side === 'bottom';
+        const translateAxis = isY ? 'translateY' : 'translateX';
+        const dimensionType = isY ? 'height' : 'width';
+        const didArrowReachSideFirst = side === OPPOSITES[alignment];
+
+        const popoverAdjustment = didArrowReachSideFirst ? triangle.height : 0;
+        const triangleAdjustment = triangleAdjustments[alignment][side](triangle, popover);
+        /*
+         * 4.  If the popover is overflowing TOP or LEFT, I take the MAX value
          *     of the corresponding boundaries OR just continue to use the
          *     corresponding offset of the popover and/or triangle.
          *
@@ -101,15 +98,15 @@ function usePreventOverflow(
          */
 
         styles.popover.transform[translateAxis] = isTopOrLeftSide
-          ? Math.max(container[side] + popoverAdjustment, popover[side])
-          : Math.min(container[side] - popover[dimensionType] - popoverAdjustment, popover[side]);
+          ? Math.max(boundaries[side] + popoverAdjustment, popover[side])
+          : Math.min(boundaries[side] - popover[dimensionType] - popoverAdjustment, popover[side]);
 
         styles.triangle.transform[translateAxis] = isTopOrLeftSide
-          ? Math.max(container[side] + triangleAdjustment, triangle[side])
-          : Math.min(container[side] + triangleAdjustment, triangle[oppositeSide]);
+          ? Math.max(boundaries[side] + triangleAdjustment, triangle[side])
+          : Math.min(boundaries[side] + triangleAdjustment, triangle[oppositeSide]);
 
         /*
-         *  6. The arrow flips under the following conditions:
+         *  5. The arrow flips under the following conditions:
          *
          *  - When that boundary is the same side as the alignment, meaning the
          *    arrow is on the opposite of the breached boundary hence the reason
@@ -133,8 +130,8 @@ function usePreventOverflow(
            *   greater than a boundary that matches the side its aligned on.
            */
           const isElementCenterAlignedWithPopoverOffset = isTopOrLeftSide
-            ? arrowFlipBoundaryAdjustment <= container[side]
-            : arrowFlipBoundaryAdjustment >= container[side];
+            ? arrowFlipBoundaryAdjustment <= boundaries[side]
+            : arrowFlipBoundaryAdjustment >= boundaries[side];
 
           /*
            * If all those conditions are met, the triangle is flipped, and the
@@ -142,8 +139,8 @@ function usePreventOverflow(
            */
           if (isElementCenterAlignedWithPopoverOffset) {
             styles.triangle.transform[translateAxis] = isTopOrLeftSide
-              ? container[side] + triangleAdjustments[oppositeAlignment][side](triangle, popover)
-              : container[side] + triangleAdjustments[oppositeAlignment][side](triangle, popover);
+              ? boundaries[side] + triangleAdjustments[oppositeAlignment][side](triangle, popover)
+              : boundaries[side] + triangleAdjustments[oppositeAlignment][side](triangle, popover);
 
             styles.triangle.transform.rotate = TRIANGLE_ROTATIONS[oppositeAlignment];
             styles.popover.transform[translateAxis] += triangle.height * operator;
