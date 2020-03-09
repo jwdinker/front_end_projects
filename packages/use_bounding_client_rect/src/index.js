@@ -15,19 +15,38 @@ const MEASURABLE_PROPERTIES = ['top', 'left', 'height', 'width'];
 const hasChanged = (previous, current) =>
   MEASURABLE_PROPERTIES.some((property) => previous[property] !== current[property]);
 
-function useBoundingClientRect(element, { toggable = false } = {}) {
+function useBoundingClientRect(_element, { toggable = false, addPageOffsets = false } = {}) {
   const [measurements, setMeasurements] = useState(() => INITIAL_STATE);
 
   const handler = useCallback(() => {
-    const isElement = element && element.current;
-    if (isElement) {
-      const nextMeasurements = element.current.getBoundingClientRect();
+    const element = _element && _element.current;
+    if (element) {
+      const { top, bottom, left, right, height, width, x, y } = element.getBoundingClientRect();
+      const rect = {
+        top,
+        bottom,
+        left,
+        right,
+        height,
+        width,
+        x,
+        y,
+      };
 
-      if (hasChanged(measurements, nextMeasurements)) {
-        setMeasurements(nextMeasurements);
+      if (addPageOffsets) {
+        const scrollLeft = window.pageXOffset;
+        const scrollTop = window.pageYOffset;
+        rect.top += scrollTop;
+        rect.bottom += scrollTop;
+        rect.left += scrollLeft;
+        rect.right += scrollLeft;
+      }
+
+      if (hasChanged(measurements, rect)) {
+        setMeasurements(rect);
       }
     }
-  }, [element, measurements]);
+  }, [_element, addPageOffsets, measurements]);
 
   const [watch, unwatch] = useAnimationFrame(
     useMemo(
