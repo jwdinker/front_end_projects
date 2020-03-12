@@ -5,7 +5,9 @@ import EventStore, {
   getSupportedEventOptions,
 } from '@jwdinker/event-store';
 
-type Handler = (event?: Event) => void;
+type Handler = (event: Event) => void;
+
+type ToggleHandler = (event?: Event) => void;
 
 function isRefObject<T = any>(target: unknown): target is React.RefObject<T> {
   return target && Object.hasOwnProperty.call(target, 'current');
@@ -22,8 +24,8 @@ interface EventListenerOptions {
 
   /** This is the main thing we care about - what to do when the event is triggered */
   handler?: Handler;
-  onAdd?: Handler;
-  onRemove?: Handler;
+  onAdd?: ToggleHandler;
+  onRemove?: ToggleHandler;
   togglable?: boolean;
   consolidate?: boolean;
   storeName?: string;
