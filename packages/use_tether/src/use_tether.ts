@@ -11,14 +11,14 @@ function useTether(
   element: React.RefObject<HTMLElement | undefined> | null,
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
 ): UseTetherReturnValue {
-  const anchorRef = anchor && 'current' in anchor ? anchor : null;
-  const [_anchor] = useBoundingClientRect(anchorRef, {
+  const anchorReference = anchor && 'current' in anchor ? anchor : null;
+  const [_anchor] = useBoundingClientRect(anchorReference, {
     addPageOffsets: true,
   });
 
   const [dimensions] = useDimensions(element);
 
-  const coordinates = anchor && 'current' in anchor ? _anchor : (anchor as AbbreviatedRectangle);
+  const coordinates = anchorReference ? _anchor : (anchor as AbbreviatedRectangle);
 
   const [x, y] = ALIGNMENTS_KEYS[alignment];
 
