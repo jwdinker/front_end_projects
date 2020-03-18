@@ -21,8 +21,7 @@
     }
   ],
   "peerDependencies": {
-    "react": "^16.8.x",
-    "react-dom": "^16.8.x"
+    "react": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
   "scripts": {
@@ -32,14 +31,7 @@
     "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
   },
   "dependencies": {
-    "@jwdinker/use-bounding-client-rect": "1.0.0",
-    "@jwdinker/use-dimensions": "1.0.0",
-    "@jwdinker/use-portal": "1.0.0",
-    "@jwdinker/use-previous": "1.0.0",
-    "@jwdinker/use-scroll": "4.0.1",
-    "@jwdinker/use-ssr": "1.0.0",
-    "@jwdinker/use-window-size": "2.0.1",
-    "tslib": "^1.10.0"
+    "@jwdinker/use-tether": "1.0.0"
   },
   "devDependencies": {}
 }
