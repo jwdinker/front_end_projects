@@ -38,3 +38,8 @@ export type ScrollElement =
   | Window
   | null
   | HTMLElement;
+
+export interface PreviousScrollValues {
+  top: number;
+  left: number;
+}

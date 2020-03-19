@@ -28,7 +28,6 @@ export const getDirection = (
   currentLeft: number,
   currentTop: number
 ): Direction => {
-  console.log('PREVIOUS DUDE', previousLeft, previousTop, currentLeft, currentTop);
   const isSameX = previousLeft === currentLeft;
   const isSameY = previousTop === currentTop;
   if (isSameY && isSameX) return 'none';
