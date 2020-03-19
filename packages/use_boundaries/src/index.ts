@@ -42,7 +42,7 @@ function useBoundaries(element: BoundaryElement = null, useOverflowAncestor = tr
 
   const [scroll] = useScroll(_window);
 
-  const [rectangle, watch] = useBoundingClientRect(
+  const [rectangle, watch, unwatch] = useBoundingClientRect(
     _element,
     useMemo(() => ({ addPageOffsets: true, toggable: true }), [])
   );
@@ -50,8 +50,11 @@ function useBoundaries(element: BoundaryElement = null, useOverflowAncestor = tr
   useEffect(() => {
     if (_element.current) {
       watch();
+      return (): void => {
+        unwatch();
+      };
     }
-  }, [watch]);
+  }, [unwatch, watch]);
 
   return _element.current ? rectangle : mergeViewportScrollWithWindowRect(windowRectangle, scroll);
 }
