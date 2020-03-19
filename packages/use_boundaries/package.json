@@ -1,0 +1,33 @@
+{
+  "name": "@jwdinker/use-boundaries",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "description": "A react hook for generating the overflow boundary values given an HTML Element",
+  "keywords": [
+    "react",
+    "boundaries",
+    "overflow",
+    "hooks"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "dependencies": {
+    "@jwdinker/use-bounding-client-rect": "1.0.0",
+    "@jwdinker/use-scroll": "^4.0.1",
+    "@jwdinker/use-window-size": "2.0.1"
+  },
+  "devDependencies": {}
+}
