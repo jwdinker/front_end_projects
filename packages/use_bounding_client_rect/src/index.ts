@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
 
 const INITIAL_STATE = {
