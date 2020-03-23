@@ -1,12 +1,24 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
-import useSSR from '@jwdinker/use-ssr';
 
-function usePortal(applyStyle = () => {}, parent = null) {
-  // protect prevents functions from executing if the window or document is not present
-  const { protect } = useSSR();
-  const portal = useRef();
-  const host = useRef();
+export interface UsePortalProps {
+  applyStyle?(element?: HTMLDivElement): void;
+  parent?: React.RefObject<HTMLElement> | null;
+}
+
+export interface UsePortalHelpers {
+  /** Function that opens the portal */
+  open(): void;
+  close(): void;
+  toggle(): void;
+  isOpen: boolean;
+  isClosed: boolean;
+  reference: HTMLDivElement | null;
+}
+
+function usePortal({ applyStyle = () => {}, parent = null }: UsePortalProps = {}) {
+  const portal = useRef<HTMLDivElement | null>(null);
+  const host = useRef<HTMLElement>();
   const [isOpen, setOpen] = useState(false);
 
   // host is either a custom ref or it is the document body
@@ -19,11 +31,13 @@ function usePortal(applyStyle = () => {}, parent = null) {
   const onClosed = useCallback((fn) => !portal.current && fn(), []);
 
   const remove = useCallback(() => {
-    return protect(() => {
-      host.current.removeChild(portal.current);
-      portal.current = null;
-    });
-  }, [host, protect]);
+    /* eslint-disable no-unused-expressions */
+
+    host.current?.removeChild(portal.current as HTMLDivElement);
+
+    /* eslint-enable  no-unused-expressions */
+    portal.current = null;
+  }, []);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -31,21 +45,17 @@ function usePortal(applyStyle = () => {}, parent = null) {
   }, [onOpened, remove]);
 
   const attach = useCallback(() => {
-    protect(() => {
-      return host.current.appendChild(portal.current);
-    });
-  }, [host, protect]);
+    return host.current?.appendChild(portal.current as HTMLDivElement);
+  }, [host]);
 
   // Only basic styles can be applied as the portal is treated as a container so
   // we really don't want to be imperatively setting styles.  If I really want
   // to change up the styles I can nested a styled-components container in there
   // or some other kind of component.
   const create = useCallback(() => {
-    protect(() => {
-      portal.current = document.createElement('div');
-      applyStyle(portal.current);
-    });
-  }, [applyStyle, protect]);
+    portal.current = document.createElement('div');
+    applyStyle(portal.current);
+  }, [applyStyle]);
 
   const open = useCallback(() => {
     onClosed(() => {
@@ -62,26 +72,34 @@ function usePortal(applyStyle = () => {}, parent = null) {
   }, [close, open]);
 
   useEffect(() => {
-    if (portal.current && isOpen) {
+    if (portal.current instanceof HTMLDivElement && isOpen) {
       attach();
     }
   }, [attach, isOpen]);
 
   // When the component unmounts, the portal element is removed
   useEffect(() => {
-    return () => {
-      onOpened(remove);
-    };
+    return remove;
   }, [onOpened, remove]);
 
-  const Portal = useCallback(({ children }) => {
+  const Portal = useCallback(({ children }: { children: React.ReactNode }) => {
     if (portal.current) {
       return createPortal(children, portal.current);
     }
     return null;
   }, []);
 
-  return [Portal, { open, close, toggle, isOpen, isClosed: !isOpen, reference: portal.current }];
+  return [
+    Portal,
+    {
+      open,
+      close,
+      toggle,
+      isOpen,
+      isClosed: !isOpen,
+      reference: portal.current,
+    },
+  ];
 }
 
 export default usePortal;
