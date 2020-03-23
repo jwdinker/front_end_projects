@@ -23,9 +23,17 @@ function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): Use
     }
   }, [changed, element]);
 
+  const getElement = useCallback(() => {
+    return element && 'current' in element && element.current instanceof HTMLElement
+      ? element.current
+      : element instanceof HTMLElement
+      ? element
+      : null;
+  }, [element]);
+
   const { height, width } = dimensions;
   const handler = useCallback(() => {
-    const _element = element && 'current' in element ? element.current : element;
+    const _element = getElement();
 
     if (_element) {
       const current = getDimensions(_element);
@@ -34,14 +42,17 @@ function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): Use
         setChanged(true);
       }
     }
-  }, [element, height, width]);
+  }, [getElement, height, width]);
 
   const [observe, unobserve] = useAnimationFrame(handler, interval);
 
   useEffect(() => {
-    observe();
-    return unobserve;
-  }, [observe, unobserve]);
+    const _element = getElement();
+    if (_element) {
+      observe();
+      return unobserve;
+    }
+  }, [element, getElement, observe, unobserve]);
 
   return [dimensions, changed];
 }

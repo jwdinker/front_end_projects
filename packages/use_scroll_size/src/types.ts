@@ -9,9 +9,10 @@ export interface ScrollDimensions {
 export type GetDimensionsTarget = Document | Window | HTMLElement;
 
 export type ScrollableElement =
-  | React.RefObject<Document | Window | HTMLElement | undefined>
+  | React.RefObject<Document | Window | HTMLElement | undefined | null>
   | Document
   | Window
+  | null
   | HTMLElement;
 
 /**
