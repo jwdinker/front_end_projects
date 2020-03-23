@@ -34,10 +34,9 @@ export type UseScrollStateReturn = [ScrollState, Event | null];
 export type ElementOrWindow = HTMLElement | Window;
 
 export type ScrollElement =
-  | React.RefObject<HTMLElement | Window | undefined>
+  | React.RefObject<HTMLElement | Window | undefined | null>
   | Window
-  | null
-  | HTMLElement;
+  | null;
 
 export interface PreviousScrollValues {
   top: number;
