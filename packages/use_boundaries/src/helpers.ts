@@ -21,11 +21,12 @@ export function isOverflowable(element: HTMLElement | Window): boolean {
 
 export const getScrollableAncestor = (reference: HTMLElement | Window): HTMLElement | Window => {
   if (reference !== window) {
-    const parent = (reference as HTMLElement).parentElement;
+    const parent = (reference as HTMLElement).parentNode as HTMLElement;
+
     const isBody = parent === document.body;
-    return parent && !isBody && isOverflowable(parent)
-      ? parent
-      : getScrollableAncestor(parent as HTMLElement);
+    if (!isBody) {
+      return isOverflowable(parent) ? parent : getScrollableAncestor(parent);
+    }
   }
   return window;
 };
