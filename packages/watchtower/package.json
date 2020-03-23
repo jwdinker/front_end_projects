@@ -2,12 +2,11 @@
   "name": "@jwdinker/watchtower",
   "version": "1.0.1",
   "main": "./dist/index.js",
-  "description": "A collection of react components and hooks for monitoring the size and positions of an element within a container.",
+  "description": "A collection of react components and hooks for monitoring and dynamically calculating the offsets of child elements within a container for optimizing performance.",
   "keywords": [
     "react",
     "measurements",
     "size",
-    "visibility",
     "hooks"
   ],
   "files": [
@@ -25,19 +24,14 @@
     "react-dom": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
-  "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
-    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
-    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
-  },
-  "devDependencies": {
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
-  },
+  "scripts": {},
+  "devDependencies": {},
   "dependencies": {
-    "@jwdinker/use-animation-frame": "1.0.3",
-    "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/use-offsets": "1.0.5",
+    "@jwdinker/use-scroll": "4.0.1",
+    "@jwdinker/use-scroll-size": "1.0.0",
+    "@jwdinker/use-ssr": "1.0.0",
+    "@jwdinker/use-window-size": "2.0.1",
     "tslib": "^1.10.0"
   }
 }
