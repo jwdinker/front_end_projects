@@ -3,7 +3,19 @@ import useEventListener from '@jwdinker/use-event-listener';
 import useTimeout from '@jwdinker/use-timeout';
 import useSSR from '@jwdinker/use-ssr';
 
-const getWindowMeasurements = () => {
+/**
+ * The normalized measurements of the viewport.
+ */
+export interface WindowRectangle {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  height: number;
+  width: number;
+}
+
+const getWindowMeasurements = (): WindowRectangle => {
   if (typeof window !== 'undefined') {
     const width =
       window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -28,9 +40,15 @@ const getWindowMeasurements = () => {
   };
 };
 
-function useWindowSize(endDelay = 200) {
-  const [protect, { isBrowser }] = useSSR();
+/**
+ *
+ * @param endDelay The duration of time waited between window resize events before the end is set to end.
+ *
+ */
+function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
+  const { isBrowser } = useSSR();
   const [resized, setResized] = useState(false);
+
   const [size, setSize] = useState(() => {
     return getWindowMeasurements();
   });
