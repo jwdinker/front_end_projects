@@ -1,5 +1,7 @@
 // recursively combines offsets of all the parents
-export const getPosition = (node) => {
+import { GetPositionReturn, Offsets } from './types';
+
+export const getPosition = (node: HTMLElement): GetPositionReturn => {
   let top = 0;
   let left = 0;
 
@@ -8,7 +10,7 @@ export const getPosition = (node) => {
     const { offsetTop, offsetLeft, clientLeft, clientTop } = element;
     top += offsetTop + clientTop;
     left += offsetLeft + clientLeft;
-    element = element.offsetParent;
+    element = element.offsetParent as HTMLElement;
   }
   return {
     top,
@@ -16,7 +18,7 @@ export const getPosition = (node) => {
   };
 };
 
-export const getOffsets = (element) => {
+export const getOffsets = (element: HTMLElement): Offsets => {
   const { top, left } = getPosition(element);
   const { offsetHeight, offsetWidth } = element;
   const height = offsetHeight;
