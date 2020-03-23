@@ -26,7 +26,7 @@ function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): Use
   const getElement = useCallback(() => {
     return element && 'current' in element && element.current instanceof HTMLElement
       ? element.current
-      : element instanceof HTMLElement
+      : element instanceof HTMLElement || element === window
       ? element
       : null;
   }, [element]);
@@ -48,6 +48,7 @@ function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): Use
 
   useEffect(() => {
     const _element = getElement();
+
     if (_element) {
       observe();
       return unobserve;
