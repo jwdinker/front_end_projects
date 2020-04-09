@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import useScrollSize from '@jwdinker/use-scroll-size';
 import useScroll from '@jwdinker/use-scroll';
 import useWindowSize from '@jwdinker/use-window-size';
@@ -24,7 +24,11 @@ The roles of WatchTower is to:
   Essentially, the WatchTower has a one to many relationship with useOffsets hooks.
 */
 
-function WatchTower({ children = null, interval = 500, scrollable = null }: WatchTowerProps = {}) {
+function WatchTower({
+  children = null,
+  interval = 500,
+  scrollable = null,
+}: WatchTowerProps = {}): ReactNode {
   const { isBrowser } = useSSR();
 
   const getTarget = useCallback(() => {
@@ -38,7 +42,7 @@ function WatchTower({ children = null, interval = 500, scrollable = null }: Watc
   const target = useRef<Target>(null);
   useEffect(() => {
     target.current = getTarget();
-  }, [scrollable, isBrowser]);
+  }, [scrollable, isBrowser, getTarget]);
 
   const [container, remeasure] = useOffsets(target);
 
