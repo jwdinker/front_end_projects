@@ -1,43 +1,17 @@
-import { RefObject } from 'react';
-import { Direction } from '@jwdinker/use-direction';
-
-export type Point = [number, number];
-
-export interface UseRotatableOptions {
-  initialAngle?: number;
-}
-
-export interface UseRotatableState {
-  angle: number;
-  total: number;
-}
-
-export type GetElementReturn = HTMLElement | null;
-
-export type RotatableElement = RefObject<HTMLElement | undefined>;
-
-export type RotationEvent = globalThis.TouchEvent | globalThis.MouseEvent;
-
-export type SetRotationHandler = Function;
-
-export interface UseRotatableHandlers {
-  start(point: Point, center: Point): void;
-  move(point: Point, center: Point): void;
-  end(): void;
-}
-
-export interface UseRotatableReturn extends UseRotatableState, UseRotatableHandlers {
-  direction: Direction;
-}
+import { UseRotatableReturnState, Point } from '@jwdinker/use-rotatable';
 
 export interface UseRotationOptions {
   initialAngle?: number;
-  multiTouch?: boolean;
   mouse?: boolean;
-  touch?: boolean;
+  touch?: number;
 }
 
-export interface UseRotationReturn extends UseRotatableState {
+export type Rotate = (point: Point, center: Point) => void;
+
+export interface UseRotationReturn extends UseRotatableReturnState {
+  /** Boolean indicating whether the rotation is active or inactive. */
   active: boolean;
-  direction: Direction;
+
+  /** Handler for manually computing the rotation value given a 2 points.  */
+  rotate: Rotate;
 }

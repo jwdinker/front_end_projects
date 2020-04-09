@@ -2,90 +2,117 @@ import useEventListener from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
 import { useMemo, useCallback } from 'react';
 import useToggle from '@jwdinker/use-toggle';
-import {
-  is,
-  getElement,
-  getSingleTouchCoordinates,
-  getMultiTouchCoordinates,
-  getMouseCoordinates,
-} from './helpers';
-import useRotatable from './use_rotatable';
-import { UseRotationOptions, RotatableElement, Point, UseRotationReturn } from './types';
-import { MOUSE_EVENTS, TOUCH_EVENTS } from './constants';
+import useRotatable, { Point } from '@jwdinker/use-rotatable';
+import getElementOrReference, { ElementOrReference } from '@jwdinker/get-element-or-reference';
+import makeGetInteractionType, {
+  INTERACTION_TYPES,
+  InteractionType,
+  InteractionEvent,
+} from '@jwdinker/make-get-interaction-type';
+
+import useOffsets, { Offsets } from '@jwdinker/use-offsets';
+
+import { getMouseCoordinates } from '@jwdinker/mouse-helpers';
+import { get1Touch, get2Touches } from '@jwdinker/touch-helpers';
+import { isStart, isMove, isEnd } from '@jwdinker/phase-helpers';
+
+import { UseRotationOptions, UseRotationReturn, Rotate } from './types';
+
+function makeCenterPoint(offsets: Offsets): Point {
+  const y = offsets.top + offsets.height / 2;
+  const x = offsets.left + offsets.width / 2;
+  return [x, y];
+}
+
+const { MOUSE, TOUCH, TOUCHES } = INTERACTION_TYPES;
 
 /**
  *
- * @param element The react ref of the rotatable element.
+ * @param element The react ref or an HTMLElement used as the rotatable element.
  * @param options Configuration options for the rotation.
  * @param options.initialAngle The initial angle of the rotation.
- * @param options.multiTouch Rotation is triggered only if there are 2 touch points on the element.
- * @param options.mouse Rotation can be triggered with the mouse pointer.
- * @param options.touch Rotation can be triggered with a single touch.
+ * @param options.mouse Boolean indicating rotation can be triggered by the mouse.
+ * @param options.touch A number indicating the amount of touches before the rotation is recognized.
  */
 function useRotation(
-  element: RotatableElement,
-  { initialAngle = 0, multiTouch = false, mouse = false, touch = false }: UseRotationOptions = {}
+  element: ElementOrReference,
+  { initialAngle = 0, mouse = false, touch = 2 }: UseRotationOptions = {}
 ): UseRotationReturn {
   const { isBrowser } = useSSR();
   const [active, { activate, deactivate }] = useToggle();
   const options = useMemo(() => ({ initialAngle }), [initialAngle]);
 
-  const rotation = useRotatable(options);
+  // useOffsets is used to make the center point
+  const [offsets] = useOffsets(element);
+  const getInteractionType = makeGetInteractionType(mouse, touch);
 
-  const handler = useCallback(
-    (event) => {
-      const _element = getElement(element);
-      if (_element) {
-        const touches = !!event && event instanceof TouchEvent ? event.touches : null;
+  const [rotation, set] = useRotatable(options);
 
-        const isSingleTouch = !multiTouch && touches && touches.length === 1;
-        const isMultiTouch = multiTouch && touches && touches.length > 1;
-        const isMouse = !!event && event instanceof MouseEvent;
+  const rotate = useCallback<Rotate>(
+    (point, center) => {
+      set.move(point, center);
+    },
+    [set]
+  );
 
-        // active is used to prevent mousemove overriding mouseup
-        const isStart = is.start(event.type) && !active;
-        const isMove = is.move(event.type) && active;
-        const isEnd = is.end(event.type) && active;
-
-        const isRotating = isSingleTouch || isMultiTouch || isMouse;
-
-        // coordinates are only updated only if there are mouse or touch coordinates present.
-        if (isRotating) {
-          const [point, center] = isMultiTouch
-            ? getMultiTouchCoordinates(touches as TouchList)
-            : isSingleTouch
-            ? getSingleTouchCoordinates(touches as TouchList, _element)
-            : isMouse
-            ? getMouseCoordinates(event as MouseEvent, _element)
-            : ([
-                [0, 0],
-                [0, 0],
-              ] as Point[]);
-
-          if (isStart) {
-            activate();
-            rotation.start(point, center);
-          }
-
-          if (isMove) {
-            rotation.move(point, center);
-          }
+  const getCoordinates = useCallback(
+    (type: InteractionType, event: InteractionEvent): Point[] => {
+      switch (type) {
+        case MOUSE: {
+          return [getMouseCoordinates(event as MouseEvent), makeCenterPoint(offsets)];
         }
-
-        if (isEnd) {
-          deactivate();
-          rotation.end();
+        case TOUCH: {
+          return [get1Touch(event as TouchEvent), makeCenterPoint(offsets)];
+        }
+        case TOUCHES: {
+          return get2Touches(event as TouchEvent);
+        }
+        default: {
+          return [
+            [0, 0],
+            [0, 0],
+          ];
         }
       }
     },
-    [activate, active, deactivate, element, multiTouch, rotation]
+    [offsets]
+  );
+
+  const handler = useCallback(
+    (event) => {
+      const _element = getElementOrReference(element);
+      if (_element) {
+        const interactionType = getInteractionType(event);
+        const isInteracting = interactionType !== INTERACTION_TYPES.NONE;
+
+        if (isInteracting) {
+          const [point, center] = getCoordinates(interactionType, event);
+
+          // active is used to prevent mousemove overriding mouseup
+          if (isStart(event.type, !active)) {
+            activate();
+            set.start(point, center);
+          }
+
+          if (isMove(event.type, active)) {
+            set.move(point, center);
+          }
+        }
+
+        if (isEnd(event.type, active)) {
+          deactivate();
+          set.end();
+        }
+      }
+    },
+    [activate, active, deactivate, element, getCoordinates, getInteractionType, set]
   );
 
   useEventListener(
     useMemo(
       () => ({
         target: isBrowser && mouse ? window : null,
-        type: MOUSE_EVENTS,
+        type: 'mousedown mouseup mousemove',
         handler,
         consolidate: true,
       }),
@@ -96,22 +123,23 @@ function useRotation(
   useEventListener(
     useMemo(
       () => ({
-        target: touch || multiTouch ? element : null,
-        type: TOUCH_EVENTS,
+        target: touch > 0 ? element : null,
+        type: 'touchstart touchmove touchend touchcancel',
         handler,
         consolidate: true,
       }),
-      [element, handler, multiTouch, touch]
+      [element, handler, touch]
     )
   );
 
-  const { direction, angle, total } = rotation;
+  const { direction, angle, radians } = rotation;
 
-  const value = useMemo((): UseRotationReturn => ({ active, direction, angle, total }), [
+  const value = useMemo((): UseRotationReturn => ({ active, direction, angle, radians, rotate }), [
     active,
     angle,
     direction,
-    total,
+    radians,
+    rotate,
   ]);
 
   return value;
