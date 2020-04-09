@@ -1,0 +1,18 @@
+{
+  "name": "@jwdinker/use-scalable",
+  "description": "A react hook for handling the phases, calculations, and state of scalabling object.",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {}
+}
