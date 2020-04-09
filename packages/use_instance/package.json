@@ -1,0 +1,20 @@
+{
+  "name": "@jwdinker/use-instance",
+  "main": "dist/index.js",
+  "version": "1.0.0",
+  "private": false,
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x",
+    "react-dom": "^16.8.x"
+  },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
