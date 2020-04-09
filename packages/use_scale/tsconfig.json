@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "declarationDir": "dist",
+    "lib": ["es2018", "esnext.asynciterable", "dom"],
+    "target": "es2018",
+    "module": "commonjs"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../use_toggle" },
+    { "path": "../use_ssr" },
+    { "path": "../use_event_listener" },
+    { "path": "../use_rotatable" },
+    { "path": "../../utilities/get_element_or_reference" },
+    { "path": "../../utilities/touch_helpers" },
+    { "path": "../../utilities/make_get_interaction_type" },
+    { "path": "../../utilities/mouse_helpers" },
+    { "path": "../../utilities/phase_helpers" },
+    { "path": "../use_offsets" }
+  ]
+}
