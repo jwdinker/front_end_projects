@@ -1,0 +1,15 @@
+{
+  "name": "@jwdinker/get-distance-from-points",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
