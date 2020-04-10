@@ -1,22 +1,20 @@
-export type Point = [number, number, number];
+import { Direction } from '@jwdinker/get-directions';
 
-export type CoordinateDirection = 1 | -1 | 0;
-
-export type CoordinateDirections = [CoordinateDirection, CoordinateDirection, CoordinateDirection];
+export type Point = [number, number];
 
 export interface UseCoordinatesState {
   /**
-   * The x,y,z coordinates at the start phase.
+   * The x,y coordinates at the start phase.
    */
   origin: Point;
 
   /**
-   * The current x,y,z coordinates of the start and move phase.
+   * The current x,y coordinates of the start and move phase.
    */
   current: Point;
 
   /**
-   * The x,y,z coordinates derived from the total distance traveled since the initial coordinate.  These coordinates
+   * The x,y coordinates derived from the total distance traveled since the initial coordinate.  These coordinates
    * persist between coordinate events.
    *
    * distance = previous distance - previous coordinates - current coordinates
@@ -26,7 +24,7 @@ export interface UseCoordinatesState {
   /**
    * The difference between the current and origin coordinates.
    */
-  change: Point;
+  move: Point;
 
   /**
    * The current direction.
@@ -44,20 +42,15 @@ export interface UseCoordinatesState {
    *  1 for ↓.
    *  0 for no change.
    *
-   * index 2 (z axis):
-   * -----------------
-   * -1 ↘ backwards.
-   *  1 ↖ forwards.
-   *  0 for no change.
    */
-  direction: CoordinateDirections;
+  direction: Direction[];
 }
 
-export type UseCoordinateHandler = (x: number, y: number, z?: number) => void;
+export type UseCoordinateHandler = (x: number, y: number) => void;
 
 export interface UseCoordinateHandlers {
-  start(x: number, y: number, z?: number): void;
-  move(x: number, y: number, z?: number): void;
+  start: UseCoordinateHandler;
+  move: UseCoordinateHandler;
   end(): void;
 }
 

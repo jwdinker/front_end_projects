@@ -13,5 +13,7 @@
   "peerDependencies": {
     "react": "^16.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jwdinker/get-directions": "1.0.0"
+  }
 }

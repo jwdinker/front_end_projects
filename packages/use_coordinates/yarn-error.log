@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/jwdinker/.nvm/versions/node/v11.13.0/bin/node /usr/local/Cellar/yarn/1.21.1/libexec/bin/yarn.js add @jwdinker/useSSR@1.0.0
+  /Users/jwdinker/.nvm/versions/node/v11.13.0/bin/node /usr/local/Cellar/yarn/1.21.1/libexec/bin/yarn.js add @jwdinker/get_direction@1.0.0
 
 PATH: 
   /Users/jwdinker/.nvm/versions/node/v11.13.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/jwdinker/google-cloud-sdk/bin:/Users/jwdinker/.nvm/versions/node/v11.13.0/bin:/Users/jwdinker/npm/bin:/Library/PostgreSQL/11/bin:/Users/jwdinker/npm/bin:/Library/PostgreSQL/11/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@jwdinker%2fuseSSR: Not found
+  Error: https://registry.yarnpkg.com/@jwdinker%2fget_direction: Not found
       at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.21.1/libexec/lib/cli.js:66947:18)
       at Request.self.callback (/usr/local/Cellar/yarn/1.21.1/libexec/lib/cli.js:140665:22)
       at Request.emit (events.js:193:13)
@@ -28,7 +28,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "@jwdinker/use-rotation",
+    "name": "@jwdinker/use-coordinates",
     "version": "1.0.0",
     "private": false,
     "author": "Jack Dinker",
@@ -42,10 +42,7 @@ npm manifest:
     "peerDependencies": {
       "react": "^16.8.0"
     },
-    "dependencies": {
-      "@jwdinker/use-event-listener": "3.0.3",
-      "tslib": "^1.10.0"
-    }
+    "dependencies": {}
   }
 
 yarn manifest: 
