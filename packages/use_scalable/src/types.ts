@@ -1,4 +1,4 @@
-export type Point = number[];
+export type Point = [number, number];
 
 export type Dimensions = [number, number];
 

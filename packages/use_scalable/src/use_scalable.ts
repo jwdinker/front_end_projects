@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 
+import getDistanceFromPoints from '@jwdinker/get-distance-from-points';
 import {
   UseScalableState,
   UseScalableHandler,
@@ -8,7 +9,7 @@ import {
   Point,
   Dimensions,
 } from './types';
-import { getDistance, getScale, constrain, makeCenterPoint } from './helpers';
+import { getScale, constrain, makeCenterPoint } from './helpers';
 import { DEFAULTS } from './constants';
 
 /**
@@ -47,7 +48,7 @@ function useScalable({
     (point, center) => {
       const _center = center || makeCenterPoint(dimensions, coordinates);
       setScale((previous) => {
-        const distance = getDistance(point, _center);
+        const distance = getDistanceFromPoints(point, _center);
 
         return {
           ...previous,
@@ -64,7 +65,7 @@ function useScalable({
       setScale((state) => {
         const { distance: lastDistance, vector } = state;
 
-        const distance = getDistance(point, _center);
+        const distance = getDistanceFromPoints(point, _center);
 
         const _vector = vector.map((value, index) => {
           return constrain(

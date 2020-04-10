@@ -14,5 +14,7 @@
   "peerDependencies": {
     "react": "^16.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@jwdinker/get-distance-from-points": "1.0.0"
+  }
 }
