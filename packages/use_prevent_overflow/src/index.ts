@@ -18,7 +18,7 @@ import { DEFAULT_SIDES } from './constants';
  * is prevented and the optional padding that is applied to the boundary.
  */
 function usePreventOverflow(
-  element: Rectangle | AbbreviatedRectangle,
+  { top = 0, left = 0, height = 0, width = 0 }: AbbreviatedRectangle,
   boundaries: Rectangle,
   { sides = DEFAULT_SIDES, padding = {} }: UsePreventOverflowOptions = {}
 ): UsePreventOverflowReturn {
@@ -37,38 +37,32 @@ function usePreventOverflow(
     bottom: false,
   };
 
-  let { top, left } = element;
+  let topReplacement = top;
+  let leftReplacement = left;
 
-  if (prevent.top && element.top <= boundaries.top + _padding.top) {
-    top = boundaries.top + _padding.top;
+  if (prevent.top && top <= boundaries.top + _padding.top) {
+    topReplacement = boundaries.top + _padding.top;
     overflowing.top = true;
   }
 
-  if (prevent.bottom && element.top >= boundaries.bottom - element.height + _padding.bottom) {
-    top = boundaries.bottom - element.height + _padding.bottom;
+  if (prevent.bottom && top >= boundaries.bottom - height + _padding.bottom) {
+    topReplacement = boundaries.bottom - height + _padding.bottom;
     overflowing.bottom = true;
   }
 
-  if (prevent.left && element.left <= boundaries.left + _padding.left) {
-    left = boundaries.left + _padding.left;
+  if (prevent.left && left <= boundaries.left + _padding.left) {
+    leftReplacement = boundaries.left + _padding.left;
     overflowing.left = true;
   }
 
-  if (prevent.right && element.left >= boundaries.right - element.width + _padding.right) {
-    left = boundaries.right - element.width + _padding.right;
+  if (prevent.right && left >= boundaries.right - width + _padding.right) {
+    leftReplacement = boundaries.right - width + _padding.right;
     overflowing.right = true;
   }
 
   const value = useMemo((): UsePreventOverflowReturn => {
-    return [
-      {
-        ...element,
-        top,
-        left,
-      },
-      overflowing,
-    ];
-  }, [element, left, overflowing, top]);
+    return [leftReplacement, topReplacement, overflowing];
+  }, [leftReplacement, overflowing, topReplacement]);
   return value;
 }
 

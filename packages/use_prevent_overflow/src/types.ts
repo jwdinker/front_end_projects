@@ -14,8 +14,8 @@ export interface Rectangle {
 export interface AbbreviatedRectangle {
   top: number;
   left: number;
-  height: number;
-  width: number;
+  height?: number;
+  width?: number;
 }
 
 export interface PaddingOptions {
@@ -51,4 +51,4 @@ export interface UsePreventOverflowOptions {
   sides?: Side[];
 }
 
-export type UsePreventOverflowReturn = [AbbreviatedRectangle | Rectangle, Overflowing];
+export type UsePreventOverflowReturn = [number, number, Overflowing];

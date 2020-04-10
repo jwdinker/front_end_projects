@@ -1,6 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-
-import { Side, SideOptions } from './types';
+import { Side } from './types';
 
 export function reduceSides<T>(
   fn: (side: Side) => T
