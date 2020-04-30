@@ -24,3 +24,10 @@ export function makeCanUpdateTime(updateBy: UpdateByType) {
     return !isSameTime(previousTime, currentTime);
   };
 }
+
+export function convertTo12Hour(hour: number): number {
+  if (hour === 0) return 12;
+  if (hour < 12) return hour;
+  if (hour % 12 === 0) return 12;
+  return hour - 12;
+}

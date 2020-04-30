@@ -1,7 +1,9 @@
 import useAnimationFrame from '@jwdinker/use-animation-frame';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { UseClockProps, UseClockReturn } from './types';
+import { UseClockReturn, UpdateByType } from './types';
 import { makeCanUpdateTime } from './helpers';
+
+export { convertTo12Hour } from './helpers';
 
 const PROPERTIES = {
   seconds: 'getSeconds',
@@ -16,7 +18,7 @@ const PROPERTIES = {
 
 const PROPERTY_KEYS = Object.keys(PROPERTIES);
 
-function useClock({ updateBy = 'minute', interval = 100 }: UseClockProps = {}): UseClockReturn {
+function useClock(updateBy: UpdateByType = 'minute', interval = 100): UseClockReturn {
   const [time, setTime] = useState(() => new Date());
 
   const canUpdateTime = useMemo(() => {
@@ -39,15 +41,20 @@ function useClock({ updateBy = 'minute', interval = 100 }: UseClockProps = {}): 
     return clear;
   }, [clear, start]);
 
-  return PROPERTY_KEYS.reduce((accumulator, key, index) => {
+  const value = PROPERTY_KEYS.reduce((accumulator, key, index) => {
     const method = PROPERTIES[key];
 
     accumulator[key] = time[method]();
     if (index === 0) {
       accumulator.date = time;
     }
+
     return accumulator;
   }, {} as UseClockReturn);
+
+  value.period = value.hour > 11 ? 'pm' : 'am';
+
+  return value;
 }
 
 export default useClock;
