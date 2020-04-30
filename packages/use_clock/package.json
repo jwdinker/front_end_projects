@@ -1,0 +1,19 @@
+{
+  "name": "@jwdinker/use-clock",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {
+    "@jwdinker/use-animation-frame": "1.0.3",
+    "tslib": "^1.10.0"
+  }
+}
