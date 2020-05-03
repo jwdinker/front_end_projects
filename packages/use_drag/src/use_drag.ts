@@ -1,5 +1,5 @@
 // react
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 // core
 import useEventListener from '@jwdinker/use-event-listener';
@@ -21,6 +21,7 @@ function useDrag(
   element: ElementOrReference = null,
   { mouse = true, touch = 1, initial = [0, 0] }: UseDragOptions = {}
 ): UseDragReturn {
+  const _event = useRef<Event | undefined>();
   const [isDragging, { activate, deactivate }] = useToggle();
 
   const [{ velocity, duration }, setVelocity] = useVelocity();
@@ -32,6 +33,7 @@ function useDrag(
 
   const handler = useCallback(
     (event) => {
+      _event.current = event;
       const _element = getElement(element);
       if (_element) {
         const interactionType = getInteractionType(event);
@@ -99,16 +101,19 @@ function useDrag(
   );
 
   const value = useMemo(
-    (): UseDragReturn => ({
-      isDragging,
-      origin,
-      current,
-      move,
-      distance,
-      direction,
-      velocity,
-      duration,
-    }),
+    (): UseDragReturn => [
+      {
+        isDragging,
+        origin,
+        current,
+        move,
+        distance,
+        direction,
+        velocity,
+        duration,
+      },
+      _event.current,
+    ],
     [current, direction, distance, duration, isDragging, move, origin, velocity]
   );
 

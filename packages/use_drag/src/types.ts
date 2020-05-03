@@ -17,12 +17,11 @@ export interface UseDragOptions {
   initial?: [number, number];
 }
 
-export interface UseDragReturn extends UseCoordinatesState, UseVelocityState {
+export interface UseDragReturnState extends UseCoordinatesState, UseVelocityState {
   /**
    * Boolean indicating a drag is active.
    */
   isDragging: boolean;
-  /**
-   * Handler for manually setting the x,y coordinates of the rag.
-   */
 }
+
+export type UseDragReturn = [UseDragReturnState, Event | undefined];
