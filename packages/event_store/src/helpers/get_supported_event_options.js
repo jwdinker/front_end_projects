@@ -1,11 +1,10 @@
 import SUPPORTED_EVENT_OPTIONS from './supported_event_options';
 
 const getSupportedEventOptions = (options) => {
-  if (!options) {
+  if (typeof window === 'undefined' || !options) {
     return null;
   }
 
-  const { capture } = options;
   const supportedOptions = Object.keys(options).reduce((accumulator, option) => {
     const value = options[option];
 
@@ -18,6 +17,7 @@ const getSupportedEventOptions = (options) => {
     return accumulator;
   }, null);
 
+  const capture = 'capture' in options ? options.capture : null;
   const isUseCapture = !supportedOptions && capture;
   if (isUseCapture) {
     return true;
