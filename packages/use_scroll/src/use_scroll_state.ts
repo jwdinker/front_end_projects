@@ -16,7 +16,7 @@ import {
 
 function useScrollState(
   element: ScrollElement = null,
-  { endDelay = 100, passive = false }: ScrollStateOptions = {}
+  { endDelay = 100, passive = false, capture = false }: ScrollStateOptions = {}
 ): UseScrollStateReturn {
   const event = useRef<Event | null>(null);
   const [scroll, setScroll] = useState<ScrollState>(() => INITIAL_STATE);
@@ -94,18 +94,16 @@ function useScrollState(
     [clear, handleSetState, start]
   );
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: element,
-        type: 'scroll',
-        handler,
-        passive,
-        consolidate: true,
-      }),
-      [element, handler, passive]
-    )
-  );
+  const options = useMemo(() => {
+    return { consolidate: true, passive, capture };
+  }, [capture, passive]);
+
+  const { attach, detach } = useEventListener(element, 'scroll', handler, options);
+
+  useEffect(() => {
+    attach();
+    return detach;
+  }, [attach, detach]);
 
   return [scroll, event.current];
 }
