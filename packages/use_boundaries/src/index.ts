@@ -1,9 +1,9 @@
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useWindowSize from '@jwdinker/use-window-size';
-import useScroll from '@jwdinker/use-scroll';
+import { useSimpleScroll as useScroll, getScrollableAncestor } from '@jwdinker/use-scroll';
 import { useMemo, useEffect, useRef } from 'react';
 import { Boundaries, BoundaryElement } from './types';
-import { getScrollableAncestor, mergeViewportScrollWithWindowRect } from './helpers';
+import { mergeViewportScrollWithWindowRect } from './helpers';
 
 /**
  *
