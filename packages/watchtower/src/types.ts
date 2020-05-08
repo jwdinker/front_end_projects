@@ -1,5 +1,5 @@
 import { RefObject } from 'react';
-import { ScrollState } from '@jwdinker/use-scroll';
+import { SimpleScrollState } from '@jwdinker/use-scroll';
 
 export interface WatchTowerProps {
   children?: React.ReactNode;
@@ -20,7 +20,7 @@ export type Rectangle = {
 
 export interface WatchTowerContainer {
   container: Rectangle;
-  scroll: ScrollState;
+  scroll: SimpleScrollState;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface UseBeaconOptions {
 
 export interface BeaconDetails {
   element: Rectangle;
-  scroll: ScrollState;
+  scroll: SimpleScrollState;
   container: Rectangle;
 }
 

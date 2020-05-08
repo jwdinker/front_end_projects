@@ -1,4 +1,3 @@
-import { INITIAL_STATE as SCROLL_STATE } from '@jwdinker/use-scroll';
 import { WatchTowerContext } from './types';
 
 export const INITIAL_MEASUREMENTS = {
@@ -13,7 +12,12 @@ export const INITIAL_MEASUREMENTS = {
 export const INITIAL_CONTEXT: WatchTowerContext = [
   {
     container: INITIAL_MEASUREMENTS,
-    scroll: SCROLL_STATE,
+    scroll: {
+      isScrolling: false,
+      left: 0,
+      top: 0,
+      direction: [0, 0],
+    },
   },
   false,
 ];
