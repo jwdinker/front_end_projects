@@ -1,5 +1,4 @@
-export { default } from './use_scroll';
-export { default as ScrollBroadcast } from './scroll_broadcast';
-export { default as useScrollBeacon } from './use_scroll_beacon';
+export { default as useScroll } from './use_scroll';
 export * from './types';
-export { INITIAL_STATE } from './constants';
+export * from '@jwdinker/scroll-helpers';
+export { EASING_TYPES } from '@jwdinker/easing-fns';

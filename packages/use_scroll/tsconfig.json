@@ -14,6 +14,6 @@
   "references": [
     { "path": "../use_event_listener" },
     { "path": "../use_timeout" },
-    { "path": "../use_previous" }
+    { "path": "../../utilities/easing_fns" }
   ]
 }
