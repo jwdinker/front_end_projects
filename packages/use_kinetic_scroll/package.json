@@ -1,0 +1,22 @@
+{
+  "name": "@jwdinker/use-kinetic-scroll",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {
+    "@jwdinker/make-get-interaction-type": "1.0.0",
+    "@jwdinker/mouse-helpers": "1.0.0",
+    "@jwdinker/touch-helpers": "1.0.0",
+    "@jwdinker/use-drag-listener": "1.0.0"
+  }
+}
