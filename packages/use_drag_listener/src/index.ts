@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useMemo } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
 import { UseDragListenerProps, DragEvent, DragElement } from './types';
