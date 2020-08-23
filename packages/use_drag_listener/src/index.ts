@@ -74,8 +74,8 @@ function useDragListener(
   const keyable = useEventListener(_window, 'keyup keydown', key);
 
   const touchstart = useEventListener(_element, 'touchstart', start);
-  const touchmove = useEventListener(_window, 'touchmove', start);
-  const touchend = useEventListener(_window, 'touchend touchcancel', start);
+  const touchmove = useEventListener(_window, 'touchmove', move);
+  const touchend = useEventListener(_window, 'touchend touchcancel', end);
 
   const mousedown = useEventListener(_element, 'mousedown', start);
   const mousemove = useEventListener(_window, 'mousemove', move);
