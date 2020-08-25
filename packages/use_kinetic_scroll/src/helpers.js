@@ -1,6 +1,7 @@
 import { getInteractionType, INTERACTION_TYPES } from '@jwdinker/make-get-interaction-type';
 import { getMouseCoordinates } from '@jwdinker/mouse-helpers';
 import { get1Touch } from '@jwdinker/touch-helpers';
+import { Dispatch, Store } from '@jwdinker/use-reducer-with-middleware';
 import { SCROLL_TIME_CONSTANT, ONE_SECOND } from './constants';
 
 const { MOUSE, TOUCH } = INTERACTION_TYPES;
@@ -9,10 +10,10 @@ export function getCoordinatesByEventType(event) {
   const interaction = getInteractionType(event);
   switch (interaction) {
     case MOUSE: {
-      return getMouseCoordinates(event);
+      return getMouseCoordinates(event, 'page');
     }
     case TOUCH: {
-      return get1Touch(event);
+      return get1Touch(event, 'page');
     }
     default: {
       return [0, 0];
@@ -51,18 +52,18 @@ export function combineValues(v1, v2, operator = '+') {
 }
 
 export function makeOperator(operator = '+') {
-  return (sliceOfState, point1, point2) => {
-    return point1.reduce((accumulator, value1, index) => {
-      const value2 = Array.isArray(point2) ? point2[index] : point2;
-      accumulator[index] = combineValues(value1, value2, operator);
-      return accumulator;
-    }, sliceOfState);
+  return (value1, value2) => {
+    return value1.map((v1, index) => {
+      const v2 = Array.isArray(value2) ? value2[index] : value2;
+      return combineValues(v1, v2, operator);
+    });
   };
 }
 
 export const add = makeOperator('+');
 export const subtract = makeOperator('-');
 export const multiply = makeOperator('*');
+export const divide = makeOperator('/');
 
 export function preventOverflow(sliceOfState, boundaries, coordinates) {
   coordinates.reduce((accumulator, coordinate, index) => {
@@ -113,6 +114,17 @@ export function isOverflowing(boundaries, coordinates) {
   });
 }
 
-export function hasInertia(velocity) {
-  return velocity.some((value) => value > 10 || value < -10);
+export function hasMomentum(velocity) {
+  return velocity.some((value) => value !== 0 && (value > 10 || value < -10));
 }
+
+export const getVelocity = (velocity, delta, elapsed) => {
+  return velocity.map((previous, index) => {
+    const currentVelocity = (1000 * delta[index]) / (1 + elapsed); // 1 + elapsed to avoid dividing by zero
+    return 0.8 * currentVelocity + 0.2 * previous;
+  });
+};
+
+export const getDeltaFromWheel = (event) => {
+  return [event.deltaX, event.deltaY];
+};

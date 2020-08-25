@@ -14,9 +14,12 @@
     "react": "^16.8.0"
   },
   "dependencies": {
+    "@jwdinker/get-directions": "1.0.0",
     "@jwdinker/make-get-interaction-type": "1.0.0",
     "@jwdinker/mouse-helpers": "1.0.0",
     "@jwdinker/touch-helpers": "1.0.0",
-    "@jwdinker/use-drag-listener": "1.0.0"
+    "@jwdinker/use-drag-listener": "1.0.0",
+    "@jwdinker/use-phaseable-listener": "1.0.0",
+    "@jwdinker/use-reducer-with-middleware": "1.0.0"
   }
 }
