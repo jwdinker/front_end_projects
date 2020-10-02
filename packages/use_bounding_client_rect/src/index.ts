@@ -1,5 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
+import getElement from '@jwdinker/get-element-or-reference';
+import { HasChanged, UseBoundingClientRect } from './types';
+
+export * from './types';
 
 const INITIAL_STATE = {
   top: 0,
@@ -12,42 +16,16 @@ const INITIAL_STATE = {
   y: 0,
 };
 
-export interface Rectangle {
-  top: number;
-  left: number;
-  right: number;
-  bottom: number;
-  height: number;
-  width: number;
-  x?: number;
-  y?: number;
-}
-
 const MEASURABLE_PROPERTIES = ['top', 'left', 'height', 'width'] as const;
 
-const hasChanged = (previous: Rectangle, current: Rectangle): boolean =>
+const hasChanged: HasChanged = (previous, current) =>
   MEASURABLE_PROPERTIES.some((property) => previous[property] !== current[property]);
 
-type UseBoundingClientRectReturnValue = [Rectangle, () => void, () => void];
-
-function useBoundingClientRect(
-  element: React.RefObject<HTMLElement | undefined> | HTMLElement | null,
-  { addPageOffsets = false } = {}
-): UseBoundingClientRectReturnValue {
+const useBoundingClientRect: UseBoundingClientRect = (element, { addPageOffsets = false } = {}) => {
   const [measurements, setMeasurements] = useState(() => INITIAL_STATE);
 
-  const getElement = useCallback(() => {
-    if (element) {
-      if ('current' in element) {
-        return element.current;
-      }
-      return element;
-    }
-    return null;
-  }, [element]);
-
-  const handler = useCallback(() => {
-    const _element = getElement();
+  const handler = (): void => {
+    const _element = getElement(element);
 
     if (_element) {
       const { top, bottom, left, right, height, width, x, y } = _element.getBoundingClientRect();
@@ -75,11 +53,11 @@ function useBoundingClientRect(
         setMeasurements(rect);
       }
     }
-  }, [addPageOffsets, getElement, measurements]);
+  };
 
   const [watch, unwatch] = useAnimationFrame(handler);
 
   return [measurements, watch, unwatch];
-}
+};
 
 export default useBoundingClientRect;

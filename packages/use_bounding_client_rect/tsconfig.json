@@ -11,5 +11,8 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [{ "path": "../use_animation_frame" }]
+  "references": [
+    { "path": "../use_animation_frame" },
+    { "path": "../../utilities/get_element_or_reference" }
+  ]
 }
