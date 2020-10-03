@@ -1,0 +1,22 @@
+{
+  "name": "@jwdinker/use-hold",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {
+    "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/use-ssr": "1.0.0",
+    "@jwdinker/use-timeout": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}
