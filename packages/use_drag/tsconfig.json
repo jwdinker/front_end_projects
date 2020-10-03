@@ -38,6 +38,9 @@
     },
     {
       "path": "../use_velocity"
+    },
+    {
+      "path": "../use_drag_listener"
     }
   ]
 }

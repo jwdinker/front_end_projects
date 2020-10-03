@@ -14,15 +14,18 @@
     "build": "NODE_ENV=production webpack --config ./webpack.config.js"
   },
   "peerDependencies": {
-    "react": "^16.8.0"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
   },
   "dependencies": {
     "@jwdinker/get-element-or-reference": "1.0.0",
     "@jwdinker/make-get-interaction-type": "1.0.0",
     "@jwdinker/mouse-helpers": "1.0.0",
     "@jwdinker/phase-helpers": "1.0.0",
+    "@jwdinker/scroll-helpers": "1.0.0",
     "@jwdinker/touch-helpers": "1.0.0",
     "@jwdinker/use-coordinates": "1.0.0",
+    "@jwdinker/use-drag-listener": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",
     "@jwdinker/use-ssr": "1.0.0",
     "@jwdinker/use-toggle": "1.0.0",

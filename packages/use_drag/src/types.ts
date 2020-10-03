@@ -1,27 +1,64 @@
-import { UseCoordinatesState } from '@jwdinker/use-coordinates/src';
-import { UseVelocityState } from '@jwdinker/use-velocity/src';
+import { DragEvent } from '@jwdinker/use-drag-listener';
+import { PHASES } from './constants';
 
-export interface UseDragOptions {
-  /**
-   * Boolean indicating whether the mouse can trigger a drag event.
-   */
+export type DragPhase = typeof PHASES[keyof typeof PHASES];
+
+export type Coordinates = [number, number];
+export type Direction = 1 | 0 | -1;
+export type Directions = [Direction, Direction];
+export type Velocity = [number, number];
+
+export interface UseDragProps {
+  touch?: 0 | 1 | 2;
   mouse?: boolean;
-  /**
-   * Number of touches that trigger a drag event.
-   */
-  touch?: number;
-
-  /**
-   * Initial x, y coordinates of the drag.
-   */
-  initial?: [number, number];
+  canDrag?: (event: DragEvent) => boolean;
+  initialCoordinates?: Coordinates;
+  passive?: boolean;
+  capture?: boolean;
 }
 
-export interface UseDragReturnState extends UseCoordinatesState, UseVelocityState {
-  /**
-   * Boolean indicating a drag is active.
-   */
-  isDragging: boolean;
+export interface DragState {
+  active: boolean;
+  phase: DragPhase;
+  coordinates: {
+    initial: Coordinates;
+    origin: Coordinates;
+    last: Coordinates;
+    delta: Coordinates;
+    current: Coordinates;
+  };
+  xy: Coordinates;
+  move: Coordinates;
+  pressure: number;
+  direction: Directions;
+  velocity: Velocity;
+  duration: number;
+  timestamp: number;
 }
 
-export type UseDragReturn = [UseDragReturnState, Event | undefined];
+export interface DragStart {
+  type: 'DRAG_START';
+  payload: {
+    currentXY: Coordinates;
+    timestamp: number;
+  };
+}
+
+export interface DragMove {
+  type: 'DRAG_MOVE';
+  payload: {
+    currentXY: Coordinates;
+    pressure: number;
+    duration: number;
+    timestamp: number;
+  };
+}
+
+export interface DragEnd {
+  type: 'DRAG_END';
+  payload: {
+    duration: number;
+  };
+}
+
+export type DragAction = DragStart | DragMove | DragEnd;
