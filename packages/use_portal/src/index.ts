@@ -20,6 +20,11 @@ function usePortal({ applyStyle = () => {}, parent = null }: UsePortalProps = {}
   const portal = useRef<HTMLDivElement | null>(null);
   const host = useRef<HTMLElement>();
   const [isOpen, setOpen] = useState(false);
+  const _applyStyle = useRef(applyStyle);
+
+  useEffect(() => {
+    _applyStyle.current = applyStyle;
+  }, [applyStyle]);
 
   // host is either a custom ref or it is the document body
   useEffect(() => {
@@ -54,8 +59,8 @@ function usePortal({ applyStyle = () => {}, parent = null }: UsePortalProps = {}
   // or some other kind of component.
   const create = useCallback(() => {
     portal.current = document.createElement('div');
-    applyStyle(portal.current);
-  }, [applyStyle]);
+    _applyStyle.current(portal.current);
+  }, []);
 
   const open = useCallback(() => {
     onClosed(() => {
