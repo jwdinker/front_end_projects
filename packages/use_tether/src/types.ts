@@ -26,6 +26,11 @@ export interface AbbreviatedRectangle {
   width: number;
 }
 
+export interface TetherTogglers {
+  watch(): void;
+  unwatch(): void;
+}
+
 type CoordinateFromPositionFn = (
   coordinates: AbbreviatedRectangle,
   dimensions: Dimensions
@@ -42,7 +47,8 @@ export interface CoordinateFromPosition {
 
 export type UseTetherReturnValue = [
   AbbreviatedRectangle | Rectangle,
-  AbbreviatedRectangle | Rectangle
+  AbbreviatedRectangle | Rectangle,
+  TetherTogglers
 ];
 
 export type Anchor =

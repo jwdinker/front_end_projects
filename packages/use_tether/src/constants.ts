@@ -9,19 +9,19 @@ export const ALIGNMENTS_KEYS = {
 
 export const SIDES: Alignment[] = ['top', 'bottom', 'left', 'right'];
 
-export const ALIGNMENTS_TYPES: AlignmentTypes = {
+export const ALIGNMENTS_TYPES = {
   top: 'top',
   bottom: 'bottom',
   left: 'left',
   right: 'right',
-};
+} as const;
 
-export const ALIGNMENT_OPPOSITE_TYPES: AlignmentOppositeTypes = {
+export const ALIGNMENT_OPPOSITE_TYPES = {
   top: 'bottom',
   bottom: 'top',
   left: 'right',
   right: 'left',
-};
+} as const;
 
 export const DEFAULT_ANCHOR_MEASUEMENTS = {
   top: 0,

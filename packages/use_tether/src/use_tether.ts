@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useDimensions from '@jwdinker/use-dimensions';
 import { Alignment, UseTetherReturnValue, Anchor, AbbreviatedRectangle } from './types';
@@ -12,11 +12,11 @@ function useTether(
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
 ): UseTetherReturnValue {
   const anchorReference = anchor && 'current' in anchor ? anchor : null;
-  const [_anchor] = useBoundingClientRect(anchorReference, {
+  const [_anchor, watchAnchor, unwatchAnchor] = useBoundingClientRect(anchorReference, {
     addPageOffsets: true,
   });
 
-  const [dimensions] = useDimensions(element);
+  const [dimensions, watchDimensions, unwatchDimensions] = useDimensions(element);
 
   const coordinates = anchorReference ? _anchor : (anchor as AbbreviatedRectangle);
 
@@ -25,16 +25,22 @@ function useTether(
   const top = coordinateFromPosition[y](coordinates, dimensions);
   const left = coordinateFromPosition[x](coordinates, dimensions);
 
-  const value: UseTetherReturnValue = useMemo(() => {
-    const _element = {
-      top,
-      left,
-      ...dimensions,
-    };
-    return [_element, coordinates];
-  }, [coordinates, dimensions, left, top]);
+  const watch = useCallback(() => {
+    watchAnchor();
+    watchDimensions();
+  }, [watchAnchor, watchDimensions]);
 
-  return value;
+  const unwatch = useCallback(() => {
+    unwatchAnchor();
+    unwatchDimensions();
+  }, [unwatchAnchor, unwatchDimensions]);
+
+  const togglers = {
+    watch,
+    unwatch,
+  };
+
+  return [{ top, left, ...dimensions }, coordinates, togglers];
 }
 
 export default useTether;
