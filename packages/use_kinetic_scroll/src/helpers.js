@@ -1,19 +1,31 @@
-import { getInteractionType, INTERACTION_TYPES } from '@jwdinker/make-get-interaction-type';
+import {
+  getInteractionType as _getInteractionType,
+  INTERACTION_TYPES,
+} from '@jwdinker/make-get-interaction-type';
 import { getMouseCoordinates } from '@jwdinker/mouse-helpers';
 import { get1Touch } from '@jwdinker/touch-helpers';
-import { Dispatch, Store } from '@jwdinker/use-reducer-with-middleware';
-import { SCROLL_TIME_CONSTANT, ONE_SECOND } from './constants';
+import upTo from '@jwdinker/up-to';
 
-const { MOUSE, TOUCH } = INTERACTION_TYPES;
+import { SCROLL_TIME_CONSTANT, ONE_SECOND, DEVICE_PIXEL_RATIO, FRAME_RATE } from './constants';
+
+const { MOUSE, TOUCH, WHEEL, DORMANT } = INTERACTION_TYPES;
+
+export function getInteractionType(event) {
+  const type = _getInteractionType(event);
+  if (type === TOUCH || type === MOUSE || type === WHEEL) {
+    return type;
+  }
+  return DORMANT;
+}
 
 export function getCoordinatesByEventType(event) {
   const interaction = getInteractionType(event);
   switch (interaction) {
     case MOUSE: {
-      return getMouseCoordinates(event, 'page');
+      return getMouseCoordinates(event, 'client');
     }
     case TOUCH: {
-      return get1Touch(event, 'page');
+      return get1Touch(event, 'client');
     }
     default: {
       return [0, 0];
@@ -73,20 +85,14 @@ export function preventOverflow(sliceOfState, boundaries, coordinates) {
   }, sliceOfState);
 }
 
-export function round(xy) {
-  return xy.reduce((accumulator, coordinate, index) => {
-    accumulator[index] = Math.round(coordinate);
-    return accumulator;
-  }, xy);
-}
-
-export function canThrust(decay, threshold = 0.5) {
-  return decay.some((value) => value >= threshold || value <= threshold * -1);
+export function canThrust(decay, threshold = 1) {
+  return decay.some((value) => Math.abs(value) >= threshold);
 }
 
 export function getDecay(amplitude, elapsed) {
   return amplitude.map((value) => {
-    return -value * Math.exp(-elapsed / SCROLL_TIME_CONSTANT);
+    const result = -value * Math.exp(-elapsed / SCROLL_TIME_CONSTANT);
+    return result;
   });
 }
 
@@ -114,17 +120,52 @@ export function isOverflowing(boundaries, coordinates) {
   });
 }
 
-export function hasMomentum(velocity) {
-  return velocity.some((value) => value !== 0 && (value > 10 || value < -10));
+export function hasMetThreshold(values, threshold = 10) {
+  return values.some((value) => value !== 0 && (value > threshold || value < threshold * -1));
 }
 
+/*
+The velocity of an object is the rate at which it moves from one position to
+another. The average velocity is the difference between the starting and ending
+positions, divided by the difference between the starting and ending times.
+Velocity has a magnitude (a value) and a direction.
+*/
+
 export const getVelocity = (velocity, delta, elapsed) => {
-  return velocity.map((previous, index) => {
-    const currentVelocity = (1000 * delta[index]) / (1 + elapsed); // 1 + elapsed to avoid dividing by zero
-    return 0.8 * currentVelocity + 0.2 * previous;
+  return velocity.map((previousVelocity, index) => {
+    const amount = DEVICE_PIXEL_RATIO === 3 ? 1125 : 640;
+
+    const currentVelocity = (ONE_SECOND * delta[index]) / Math.max(16.7, elapsed); // 1 + elapsed to avoid dividing by zero
+
+    return 0.8 * currentVelocity + 0.2 * previousVelocity;
   });
 };
 
-export const getDeltaFromWheel = (event) => {
-  return [event.deltaX, event.deltaY];
-};
+export function updateHistory(_history, timestamp, coordinates) {
+  const history = _history;
+  if (history.length >= 5) {
+    history.shift();
+  }
+  history.push([timestamp, coordinates]);
+  return history;
+}
+
+export function getPointerVelocity(_history) {
+  const history = _history;
+  const lastIndex = history.length - 1;
+  const latestPoint = history[lastIndex];
+  let oldestPoint = history[0];
+
+  for (let i; i < history.length; i += 1) {
+    const point = history[i];
+    if (latestPoint[0] - point[0] < FRAME_RATE) {
+      break;
+    }
+    oldestPoint = point;
+  }
+  const duration = latestPoint[0] - oldestPoint[0];
+  return upTo(0, 1, (index) => {
+    const distance = latestPoint[1][index] - oldestPoint[1][index];
+    return (-1000 * distance) / Math.max(duration, FRAME_RATE);
+  });
+}

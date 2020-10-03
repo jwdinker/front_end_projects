@@ -15,6 +15,7 @@
     { "path": "../../utilities/touch_helpers" },
     { "path": "../../utilities/mouse_helpers" },
     { "path": "../use_drag_listener" },
-    { "path": "../use_phaseable_listener" }
+    { "path": "../use_phaseable_listener" },
+    { "path": "../use_block_scroll" }
   ]
 }

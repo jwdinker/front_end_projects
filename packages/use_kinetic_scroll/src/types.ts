@@ -1,18 +1,22 @@
 import { RefObject } from 'react';
 import { DragEvent } from '@jwdinker/use-drag-listener';
-import { PHASES, AXIS_TYPES } from './constants';
+import { PHASES, AXIS_TYPES, EVENT_TYPES } from './constants';
 
 export type KineticScrollPhase = typeof PHASES[keyof typeof PHASES];
 
 export type AxisType = typeof AXIS_TYPES[keyof typeof AXIS_TYPES];
 
+export type EventType = typeof EVENT_TYPES[keyof typeof EVENT_TYPES];
+
 export type Coordinates = number[];
 export type Velocity = Coordinates;
 export type Amplitude = Coordinates;
+export type HistoryItem = [number, Coordinates];
 
 export interface KineticScrollState {
   active: boolean;
   interactionPhase: KineticScrollPhase;
+  type: EventType;
   momentumPhase: KineticScrollPhase;
   direction: Coordinates;
   origin: Coordinates;
@@ -24,22 +28,17 @@ export interface KineticScrollState {
   coordinates: Coordinates;
   destination: Coordinates;
   boundaries: number[][];
+  history: HistoryItem[];
 }
 
-export type OnScroll = (state: KineticScrollState) => void;
-export type OnSnap = (state: KineticScrollState) => undefined | number[];
 export type CanScroll = (event: DragEvent) => boolean;
-export type OnMount = (state: KineticScrollState) => void;
 
 export interface KineticScrollProps {
   animate?: boolean;
   axis?: AxisType;
   bounded?: boolean;
-  resistance?: number;
+  damping?: number;
   canScroll?: CanScroll;
-  onScroll?: OnScroll;
-  onSnap?: OnSnap;
-  onMount?: OnMount;
   mouse?: boolean;
   touch?: boolean;
   wheel?: boolean;
@@ -55,28 +54,21 @@ export interface EndPayload {
   timestamp: number;
 }
 
-export interface SnapPayload {
-  velocity: number[];
-  destination: number[];
-  timestamp: number;
-}
-
-export interface TouchStart {
-  type: 'TOUCH_START';
+export interface PointerStart {
+  type: 'POINTER_START';
   payload: {
     active: boolean;
+    type: EventType;
     interactionPhase: KineticScrollPhase;
     origin: number[];
     coordinates: number[];
-    velocity: number[];
     amplitude: number[];
-    delta: number[];
     destination: number[];
   };
 }
 
-export interface TouchMove {
-  type: 'TOUCH_MOVE';
+export interface PointerMove {
+  type: 'POINTER_MOVE';
   payload: {
     momentumPhase: KineticScrollPhase;
     interactionPhase: KineticScrollPhase;
@@ -84,39 +76,60 @@ export interface TouchMove {
   };
 }
 
-export interface TouchEnd {
-  type: 'TOUCH_END';
-  payload: EndPayload;
+export interface PointerEnd {
+  type: 'POINTER_END';
+  payload: {
+    damping: number;
+  };
 }
 
 export interface Snap {
   type: 'SNAP';
-  payload: SnapPayload;
+  payload: {
+    destination: number[];
+  };
 }
 
 export interface MomentumStart {
   type: 'MOMENTUM_START';
-  payload: EndPayload;
+  payload: {
+    active: boolean;
+    interactionPhase: KineticScrollPhase;
+    momentumPhase: KineticScrollPhase;
+    timestamp: number;
+  };
 }
 
 export interface MomentumMove {
   type: 'MOMENTUM_MOVE';
   payload: {
+    momentumPhase: KineticScrollPhase;
     decay: number[];
   };
 }
 
 export interface MomentumEnd {
   type: 'MOMENTUM_END';
-  payload: null;
+  payload: {
+    active: boolean;
+    momentumPhase: KineticScrollPhase;
+    velocity: number[];
+  };
 }
 
 export interface WheelStart {
   type: 'WHEEL_START';
   payload: {
     active: boolean;
+    type: EventType;
     delta: number[];
+    origin: number[];
+    coordinates: number[];
     interactionPhase: KineticScrollPhase;
+    velocity: number[];
+    amplitude: number[];
+    destination: number[];
+    timestamp: number;
   };
 }
 
@@ -133,6 +146,7 @@ export interface WheelEnd {
   payload: {
     active: boolean;
     interactionPhase: KineticScrollPhase;
+    damping: number;
   };
 }
 
@@ -145,12 +159,10 @@ export interface ScrollToCoordinates {
   };
 }
 
-export type SnapInterjector = (snap: Snap, resistance: number) => {};
-
 export type KineticScrollAction =
-  | TouchStart
-  | TouchMove
-  | TouchEnd
+  | PointerStart
+  | PointerMove
+  | PointerEnd
   | MomentumStart
   | Snap
   | MomentumMove
@@ -161,6 +173,8 @@ export type KineticScrollAction =
   | ScrollToCoordinates;
 
 export interface KineticScrollHandlers {
+  thrust(): void;
+  snapTo(x: number, y: number): void;
   scrollTo(x: number, y: number): void;
 }
 

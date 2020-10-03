@@ -1,28 +1,36 @@
 import getDirections from '@jwdinker/get-directions';
-import { Dispatch, Store, GetState } from '@jwdinker/use-reducer-with-middleware';
-import { PHASES } from './constants';
-import { add, subtract, divide, multiply, getVelocity, hasMomentum } from './helpers';
+
+import { InteractionType, INTERACTION_TYPES } from '@jwdinker/make-get-interaction-type';
+import { PHASES, EVENT_TYPES, DEVICE_PIXEL_RATIO, FRAME_RATE } from './constants';
+import {
+  add,
+  subtract,
+  multiply,
+  getVelocity,
+  divide,
+  updateHistory,
+  getPointerVelocity,
+} from './helpers';
 import {
   KineticScrollAction,
   KineticScrollState,
-  TouchStart,
-  TouchMove,
-  TouchEnd,
+  PointerStart,
+  PointerMove,
+  PointerEnd,
   MomentumStart,
   MomentumMove,
   MomentumEnd,
-  EndPayload,
-  SnapPayload,
   Snap,
-  OnSnap,
   WheelStart,
   WheelMove,
   WheelEnd,
   ScrollToCoordinates,
+  EventType,
 } from './types';
 
 export const INITIAL_STATE: KineticScrollState = {
   active: false,
+  type: INTERACTION_TYPES.DORMANT,
   interactionPhase: PHASES.IDLE,
   momentumPhase: PHASES.IDLE,
   direction: [0, 0],
@@ -38,11 +46,12 @@ export const INITIAL_STATE: KineticScrollState = {
     [0, 0],
     [0, 0],
   ],
+  history: [],
 };
 
-const TOUCH_START = 'TOUCH_START';
-const TOUCH_MOVE = 'TOUCH_MOVE';
-const TOUCH_END = 'TOUCH_END';
+const POINTER_START = 'POINTER_START';
+const POINTER_MOVE = 'POINTER_MOVE';
+const POINTER_END = 'POINTER_END';
 
 const MOMENTUM_START = 'MOMENTUM_START';
 const MOMENTUM_MOVE = 'MOMENTUM_MOVE';
@@ -58,25 +67,24 @@ const SCROLL_TO_COORDINATES = 'SCROLL_TO_COORDINATES';
 
 const COORDINATE_RESET = [0, 0];
 
-export const touchStart = (coordinates: number[]): TouchStart => {
+export const pointerStart = (coordinates: number[], type: EventType): PointerStart => {
   return {
-    type: TOUCH_START,
+    type: POINTER_START,
     payload: {
       active: true,
+      type,
       interactionPhase: PHASES.START,
       origin: coordinates,
       coordinates,
-      velocity: COORDINATE_RESET,
       amplitude: COORDINATE_RESET,
-      delta: COORDINATE_RESET,
       destination: COORDINATE_RESET,
     },
   };
 };
 
-export const touchMove = (coordinates: number[]): TouchMove => {
+export const pointerMove = (coordinates: number[]): PointerMove => {
   return {
-    type: TOUCH_MOVE,
+    type: POINTER_MOVE,
     payload: {
       coordinates,
       interactionPhase: PHASES.MOVE,
@@ -85,20 +93,32 @@ export const touchMove = (coordinates: number[]): TouchMove => {
   };
 };
 
-export const touchEnd = (payload: EndPayload): TouchEnd => {
+export const pointerEnd = (damping: number): PointerEnd => {
   return {
-    type: TOUCH_END,
-    payload,
+    type: POINTER_END,
+    payload: {
+      damping,
+    },
   };
 };
 
-export const wheelStart = (delta: number[]): WheelStart => {
+export const wheelStart = (event: WheelEvent): WheelStart => {
+  const { deltaX, deltaY, pageX, pageY } = event;
+  const coordinates = [pageX, pageY];
+  const delta = [deltaX, deltaY];
   return {
     type: WHEEL_START,
     payload: {
       active: true,
+      type: EVENT_TYPES.WHEEL,
       interactionPhase: PHASES.START,
+      coordinates,
+      origin: coordinates,
       delta,
+      velocity: COORDINATE_RESET,
+      amplitude: COORDINATE_RESET,
+      destination: COORDINATE_RESET,
+      timestamp: Date.now(),
     },
   };
 };
@@ -107,33 +127,41 @@ export const wheelMove = (delta: number[]): WheelMove => {
   return {
     type: WHEEL_MOVE,
     payload: {
-      interactionPhase: PHASES.MOVE,
       delta,
+      interactionPhase: PHASES.MOVE,
     },
   };
 };
 
-export const wheelEnd = (): WheelEnd => {
+export const wheelEnd = (damping: number): WheelEnd => {
   return {
     type: WHEEL_END,
     payload: {
       active: false,
       interactionPhase: PHASES.END,
+      damping,
     },
   };
 };
 
-export const momentumStart = (payload: EndPayload): MomentumStart => {
+export const snap = (destination: number[]): Snap => {
   return {
-    type: MOMENTUM_START,
-    payload,
+    type: SNAP,
+    payload: {
+      destination,
+    },
   };
 };
 
-export const snap = (payload: SnapPayload): Snap => {
+export const momentumStart = (): MomentumStart => {
   return {
-    type: SNAP,
-    payload,
+    type: MOMENTUM_START,
+    payload: {
+      active: true,
+      interactionPhase: PHASES.IDLE,
+      momentumPhase: PHASES.START,
+      timestamp: Date.now(),
+    },
   };
 };
 
@@ -141,6 +169,7 @@ export const momentumMove = (decay: number[]): MomentumMove => {
   return {
     type: MOMENTUM_MOVE,
     payload: {
+      momentumPhase: PHASES.MOVE,
       decay,
     },
   };
@@ -149,7 +178,11 @@ export const momentumMove = (decay: number[]): MomentumMove => {
 export const momentumEnd = (): MomentumEnd => {
   return {
     type: MOMENTUM_END,
-    payload: null,
+    payload: {
+      active: false,
+      momentumPhase: PHASES.END,
+      velocity: [0, 0],
+    },
   };
 };
 
@@ -164,91 +197,63 @@ export const scrollToCoordinates = (destination: number[]): ScrollToCoordinates 
   };
 };
 
-export const release = (onSnap: OnSnap, resistance: number) => {
-  return (
-    dispatch: Dispatch<KineticScrollAction>,
-    getState: GetState<KineticScrollState>
-  ): void => {
-    const state = getState();
-    const now = Date.now();
-
-    const velocity = getVelocity(state.velocity, state.delta, now - state.timestamp);
-    const amplitude = multiply(velocity, 1 - resistance);
-    const destination = add(state.xy, amplitude);
-
-    const payload = {
-      velocity,
-      amplitude,
-      destination,
-      timestamp: now,
-    };
-
-    const canThrust = hasMomentum(velocity);
-
-    const snapDestination = onSnap && onSnap({ ...state, ...payload });
-    const canSnap = canThrust && snapDestination;
-
-    if (canSnap) {
-      return dispatch(
-        snap({
-          velocity,
-          destination: snapDestination as number[],
-          timestamp: now,
-        })
-      );
-    }
-
-    if (canThrust) {
-      return dispatch(momentumStart(payload));
-    }
-
-    return dispatch(touchEnd(payload));
-  };
-};
-
 export function reducer(state = INITIAL_STATE, action: KineticScrollAction): KineticScrollState {
-  if (action.type === TOUCH_START) {
+  if (action.type === POINTER_START) {
     const now = Date.now();
     return {
       ...state,
       ...action.payload,
+      velocity: [0, 0],
       timestamp: now,
+      history: [[now, action.payload.coordinates]],
     };
   }
 
-  if (action.type === TOUCH_MOVE) {
+  if (action.type === POINTER_MOVE) {
     const now = Date.now();
     const delta = subtract(state.coordinates, action.payload.coordinates);
-    const velocity = getVelocity(state.velocity, delta, now - state.timestamp);
+    const xy = add(state.xy, delta);
 
     return {
       ...state,
       ...action.payload,
       delta,
-      velocity,
-      xy: add(state.xy, delta),
+      xy,
       direction: getDirections(state.coordinates, action.payload.coordinates),
       timestamp: now,
+      history: updateHistory(state.history, now, action.payload.coordinates),
     };
   }
 
-  if (action.type === TOUCH_END) {
+  if (action.type === POINTER_END) {
+    const { damping } = action.payload;
+    const now = Date.now();
+    const velocity = getPointerVelocity(state.history);
+    const amplitude = multiply(velocity, damping);
+    const destination = add(state.xy, amplitude);
+
     return {
       ...state,
-      ...action.payload,
       active: false,
       interactionPhase: PHASES.END,
+      velocity,
+      amplitude,
+      destination,
+      timestamp: now,
     };
   }
 
   if (action.type === SNAP) {
     const { destination } = action.payload;
+    const now = Date.now();
     return {
       ...state,
+      active: true,
+      interactionPhase: PHASES.IDLE,
+      momentumPhase: PHASES.START,
       destination,
       amplitude: subtract(destination, state.xy),
-      interactionPhase: PHASES.END,
-      momentumPhase: PHASES.START,
+      timestamp: now,
     };
   }
 
@@ -256,25 +261,25 @@ export function reducer(state = INITIAL_STATE, action: KineticScrollAction): Kin
     return {
       ...state,
       ...action.payload,
-      interactionPhase: PHASES.END,
-      momentumPhase: PHASES.START,
     };
   }
 
   if (action.type === MOMENTUM_MOVE) {
+    const { momentumPhase } = action.payload;
+    const xy = add(state.destination, action.payload.decay);
+
     return {
       ...state,
-      interactionPhase: PHASES.IDLE,
-      momentumPhase: PHASES.MOVE,
-      xy: add(state.destination, action.payload.decay),
+      momentumPhase,
+      xy: xy.map((value: number) => Math.floor(value * 100) / 100),
     };
   }
 
   if (action.type === MOMENTUM_END) {
     return {
       ...state,
-      active: false,
-      momentumPhase: PHASES.END,
+      ...action.payload,
+      velocity: [0, 0],
     };
   }
 
@@ -282,22 +287,45 @@ export function reducer(state = INITIAL_STATE, action: KineticScrollAction): Kin
     return {
       ...state,
       ...action.payload,
+      origin: action.payload.origin,
       xy: add(state.xy, action.payload.delta),
     };
   }
 
   if (action.type === WHEEL_MOVE) {
+    const now = Date.now();
+    const { coordinates } = state;
+    const { delta } = action.payload;
+    const velocity = getVelocity(state.velocity, state.delta, now - state.timestamp);
+    const xy = add(state.xy, action.payload.delta);
+    const newCoord = subtract(xy, state.xy);
+
     return {
       ...state,
-      ...action.payload,
-      xy: add(state.xy, action.payload.delta),
+      interactionPhase: PHASES.MOVE,
+      delta,
+      coordinates: add(coordinates, newCoord),
+      xy,
+      velocity,
+      timestamp: now,
     };
   }
 
   if (action.type === WHEEL_END) {
+    const { interactionPhase, active, damping } = action.payload;
+    const now = Date.now();
+    const velocity = getVelocity(state.velocity, state.delta, now - state.timestamp);
+    const amplitude = multiply(velocity, damping);
+    const destination = add(state.xy, amplitude);
+
     return {
       ...state,
-      ...action.payload,
+      active,
+      interactionPhase,
+      velocity,
+      amplitude,
+      destination,
+      timestamp: now,
     };
   }
 

@@ -18,8 +18,11 @@
     "@jwdinker/make-get-interaction-type": "1.0.0",
     "@jwdinker/mouse-helpers": "1.0.0",
     "@jwdinker/touch-helpers": "1.0.0",
+    "@jwdinker/up-to": "1.0.0",
+    "@jwdinker/use-block-scroll": "1.0.0",
     "@jwdinker/use-drag-listener": "1.0.0",
     "@jwdinker/use-phaseable-listener": "1.0.0",
-    "@jwdinker/use-reducer-with-middleware": "1.0.0"
+    "@jwdinker/use-reducer-with-middleware": "1.0.0",
+    "lodash.throttle": "^4.1.1"
   }
 }
