@@ -11,9 +11,5 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [
-    {
-      "path": "../use_previous"
-    }
-  ]
+  "references": []
 }
