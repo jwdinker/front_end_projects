@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { UseTimeoutCallback, UseTimeoutReturn } from './types';
 
 /**
@@ -13,15 +13,15 @@ function useTimeout(
   const timeout = useRef<number>();
   const saved = useRef<UseTimeoutCallback | undefined>();
 
-  useEffect(() => {
-    saved.current = callback;
-  }, [callback]);
-
   const clear = useCallback(() => {
     if (timeout.current) {
       clearTimeout(timeout.current);
     }
   }, []);
+
+  useEffect(() => {
+    saved.current = callback;
+  }, [callback]);
 
   const start = useCallback(() => {
     timeout.current = window.setTimeout(() => {
@@ -36,11 +36,7 @@ function useTimeout(
     return clear;
   }, [clear]);
 
-  const value = useMemo((): UseTimeoutReturn => {
-    return [start, clear];
-  }, [clear, start]);
-
-  return value;
+  return [start, clear];
 }
 
 export default useTimeout;
