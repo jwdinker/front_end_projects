@@ -1,6 +1,6 @@
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useWindowSize from '@jwdinker/use-window-size';
-import { useSimpleScroll as useScroll, getScrollableAncestor } from '@jwdinker/use-scroll';
+import { useScroll, getScrollableAncestor } from '@jwdinker/use-scroll';
 import { useMemo, useEffect, useRef } from 'react';
 import { Boundaries, BoundaryElement } from './types';
 import { mergeViewportScrollWithWindowRect } from './helpers';
@@ -44,7 +44,7 @@ function useBoundaries(element: BoundaryElement = null, useOverflowAncestor = tr
 
   const [rectangle, watch, unwatch] = useBoundingClientRect(
     _element,
-    useMemo(() => ({ addPageOffsets: true, toggable: true }), [])
+    useMemo(() => ({ addPageOffsets: true }), [])
   );
 
   useEffect(() => {
