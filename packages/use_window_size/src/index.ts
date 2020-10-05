@@ -50,7 +50,14 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
   const [resized, setResized] = useState(false);
 
   const [size, setSize] = useState(() => {
-    return getWindowMeasurements();
+    return {
+      height: 0,
+      width: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    };
   });
 
   const end = useCallback(() => {
@@ -65,29 +72,40 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
     setSize(getWindowMeasurements());
   }, [clear, start]);
 
+  useEffect(() => {
+    if (isBrowser) {
+      setSize(getWindowMeasurements());
+    }
+  }, [isBrowser]);
+
   /*
   Using 'resized' is safer than using a continuous resizing:true because using
   this boolean in a useEffect to trigger other calls to setState will result in
   a maximum call stack size exceeded error.  For that reason, setResized is set
   back to false when it is a true for ease of use. 
   */
+
   useEffect(() => {
     if (resized) {
       setResized(false);
     }
   }, [resized]);
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: isBrowser ? window : null,
-        type: 'resize',
-        handler,
-        consolidate: true,
-      }),
-      [handler, isBrowser]
-    )
+  const options = useMemo(() => {
+    return { consolidate: true };
+  }, []);
+
+  const { attach, detach } = useEventListener(
+    isBrowser ? window : null,
+    'resize',
+    handler,
+    options
   );
+
+  useEffect(() => {
+    attach();
+    return detach;
+  }, [attach, detach]);
 
   return [size, resized];
 }

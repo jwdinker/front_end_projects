@@ -24,12 +24,7 @@
     "react-dom": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
-  "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
-    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
-    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
-  },
+  "scripts": {},
   "dependencies": {
     "@jwdinker/use-event-listener": "3.0.3",
     "@jwdinker/use-ssr": "1.0.0",
