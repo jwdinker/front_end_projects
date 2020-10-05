@@ -11,8 +11,7 @@
     }
   ],
   "peerDependencies": {
-    "react": "^16.8.x",
-    "react-dom": "^16.8.x"
+    "react": "^16.8.x"
   },
   "dependencies": {
     "tslib": "^1.10.0"
