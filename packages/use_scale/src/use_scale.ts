@@ -1,6 +1,6 @@
 import useEventListener from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import useToggle from '@jwdinker/use-toggle';
 import useScalable, { DEFAULTS, Point } from '@jwdinker/use-scalable';
 import getElementOrReference, { ElementOrReference } from '@jwdinker/get-element-or-reference';
@@ -14,8 +14,12 @@ import { get1Touch, get2Touches } from '@jwdinker/touch-helpers';
 import { getMouseCoordinates } from '@jwdinker/mouse-helpers';
 import { isStart, isMove, isEnd } from '@jwdinker/phase-helpers';
 
+import { unstable_batchedUpdates as batch } from 'react-dom';
 import { UseScaleOptions, UseScaleReturn, Scale } from './types';
 
+const TOUCH_EVENTS = 'touchstart touchmove touchend touchcancel';
+const MOUSE_DOWN = 'mousedown';
+const WINDOW_MOUSE_EVENTS = 'mousemove mouseup';
 const { MOUSE, TOUCH, TOUCHES } = INTERACTION_TYPES;
 /**
  *
@@ -41,12 +45,12 @@ function useScale(
   const [isScaling, { activate, deactivate }] = useToggle();
   const [offsets] = useOffsets(element);
   const getInteractionType = useMemo(() => makeGetInteractionType(mouse, touch), [mouse, touch]);
-  const options = useMemo(() => {
+  const scaleOptions = useMemo(() => {
     const { height, width, top, left } = offsets;
     return { initialScale, max, min, height, width, top, left };
   }, [initialScale, max, min, offsets]);
 
-  const [_scale, set] = useScalable(options);
+  const [_scale, set] = useScalable(scaleOptions);
 
   const scale = useCallback<Scale>(
     (point, center) => {
@@ -86,8 +90,10 @@ function useScale(
           const [point, center] = getCoordinates(interactionType, event);
 
           if (isStart(event.type, !isScaling)) {
-            activate();
-            set.start(point, center);
+            batch(() => {
+              activate();
+              set.start(point, center);
+            });
           }
 
           if (isMove(event.type, isScaling)) {
@@ -96,57 +102,53 @@ function useScale(
         }
 
         if (isEnd(event.type, isScaling)) {
-          deactivate();
-          set.end();
+          batch(() => {
+            deactivate();
+            set.end();
+          });
         }
       }
     },
     [activate, deactivate, element, getCoordinates, getInteractionType, isScaling, set]
   );
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: element,
-        type: 'mousedown',
-        handler,
-        consolidate: true,
-      }),
-      [element, handler]
-    )
-  );
+  const options = useMemo(() => {
+    return { consolidate: true };
+  }, []);
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: isBrowser && mouse ? window : null,
-        type: 'mousemove mouseup',
-        handler,
-        consolidate: true,
-      }),
-      [handler, isBrowser, mouse]
-    )
-  );
+  const downable = useEventListener(element, MOUSE_DOWN, handler, options);
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: touch > 0 ? element : null,
-        type: 'touchstart touchmove touchend touchcancel',
-        handler,
-        consolidate: true,
-      }),
-      [element, handler, touch]
-    )
+  const moveable = useEventListener(
+    isBrowser ? window : null,
+    WINDOW_MOUSE_EVENTS,
+    handler,
+    options
   );
+  const touchable = useEventListener(element, TOUCH_EVENTS, handler, options);
 
-  const value = useMemo((): UseScaleReturn => ({ ..._scale, isScaling, scale }), [
-    _scale,
+  useEffect(() => {
+    if (mouse) {
+      downable.attach();
+      moveable.attach();
+      return (): void => {
+        downable.detach();
+        moveable.detach();
+      };
+    }
+  }, [downable, mouse, moveable]);
+
+  useEffect(() => {
+    if (touch > 0) {
+      touchable.attach();
+      return touchable.detach;
+    }
+  }, [touch, touchable]);
+
+  return {
+    ..._scale,
     isScaling,
     scale,
-  ]);
-
-  return value;
+  };
 }
 
 export default useScale;
