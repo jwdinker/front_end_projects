@@ -15,6 +15,10 @@ function useDragListener(
     onKeyDown = () => {},
     mouse = true,
     touch = true,
+    pointer = true,
+    once = false,
+    passive = true,
+    capture = false,
   }: UseDragListenerProps
 ): void {
   const { isBrowser } = useSSR();
@@ -73,15 +77,25 @@ function useDragListener(
   const _window = isBrowser ? window : null;
   const keyable = useEventListener(_window, 'keyup keydown', key);
 
-  const touchstart = useEventListener(_element, 'touchstart', start);
-  const touchmove = useEventListener(_window, 'touchmove', move);
-  const touchend = useEventListener(_window, 'touchend touchcancel', end);
+  const options = { once, passive, capture };
+
+  const touchstart = useEventListener(_element, 'touchstart', start, options);
+  const touchmove = useEventListener(_element, 'touchmove', move, options);
+  const touchend = useEventListener(_element, 'touchend touchcancel', end, options);
+
+  const pointerDown = useEventListener(_element, 'pointerdown', start, options);
+  const pointerMove = useEventListener(_element, 'pointermove', move, options);
+  const pointerUp = useEventListener(_element, 'pointerup', end, options);
 
   const mousedown = useEventListener(_element, 'mousedown', start);
   const mousemove = useEventListener(_window, 'mousemove', move);
-  const mouseup = useEventListener(_window, 'mouseup mouseout', end);
+  const mouseup = useEventListener(_window, 'mouseup', end);
 
   useEffect(() => {
+    if (pointer) {
+      listeners.current.push(pointerDown, pointerMove, pointerUp);
+    }
+
     if (mouse) {
       listeners.current.push(mousedown, mousemove, mouseup);
     }
@@ -94,7 +108,21 @@ function useDragListener(
     return () => {
       listeners.current.forEach((listener) => listener.detach());
     };
-  }, [keyable, mouse, mousedown, mousemove, mouseup, touch, touchend, touchmove, touchstart]);
+  }, [
+    keyable,
+    mouse,
+    mousedown,
+    mousemove,
+    mouseup,
+    pointer,
+    pointerDown,
+    pointerMove,
+    pointerUp,
+    touch,
+    touchend,
+    touchmove,
+    touchstart,
+  ]);
 }
 
 export default useDragListener;

@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
 
-export type DragEvent = globalThis.MouseEvent | globalThis.TouchEvent;
+export type DragEvent = globalThis.MouseEvent | globalThis.TouchEvent | globalThis.PointerEvent;
 
 export interface OnDragListenerHandlers {
   listen(): void;
@@ -18,6 +18,10 @@ export interface UseDragListenerProps {
   onKeyDown?: KeyboardCallback;
   mouse?: boolean;
   touch?: boolean;
+  pointer?: boolean;
+  once?: boolean;
+  passive?: boolean;
+  capture?: boolean;
 }
 
 export interface UseDragListenerReturn {
