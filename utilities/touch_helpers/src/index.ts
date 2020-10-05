@@ -43,3 +43,14 @@ export function get2Touches(event: TouchEvent, coordinateType = 'page'): TouchCo
   const coordinates = makeTouchCoordinates(touches, coordinateType);
   return [coordinates[0], getFarthestRightCoordinate(coordinates)];
 }
+
+export function getTouchForceAtIndex(event: Event, index = 0): number {
+  if (event instanceof TouchEvent) {
+    const { touches } = event;
+    if (touches.length >= index) {
+      const { force } = touches[index];
+      return force;
+    }
+  }
+  return 0;
+}
