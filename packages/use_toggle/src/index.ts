@@ -1,4 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
+
+/** TOGGLE COMMENT */
 
 interface ToggleHelpers {
   toggle: () => void;
@@ -6,7 +8,7 @@ interface ToggleHelpers {
   deactivate: () => void;
 }
 
-type ToggleReturnValue = [boolean, ToggleHelpers];
+type ToggleReturn = [boolean, ToggleHelpers];
 
 /**
  *useToggle
@@ -18,7 +20,7 @@ type ToggleReturnValue = [boolean, ToggleHelpers];
  * inactive
  *
  */
-function useToggle(initialValue = false): ToggleReturnValue {
+function useToggle(initialValue = false): ToggleReturn {
   const [active, setActive] = useState(() => initialValue);
 
   const activate = useCallback(() => {
@@ -35,13 +37,11 @@ function useToggle(initialValue = false): ToggleReturnValue {
     });
   }, []);
 
-  const helpers = useMemo(() => {
-    return {
-      activate,
-      deactivate,
-      toggle,
-    };
-  }, [activate, deactivate, toggle]);
+  const helpers = {
+    activate,
+    deactivate,
+    toggle,
+  };
 
   return [active, helpers];
 }
