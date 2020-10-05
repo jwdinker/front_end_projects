@@ -7,11 +7,14 @@ export type Element = React.RefObject<HTMLElement | undefined> | Window;
 
 export type ScrollPhase = typeof SCROLL_PHASES[keyof typeof SCROLL_PHASES];
 
+export type ScrollCallback = (state: ScrollState) => void;
+
 export interface ScrollStateOptions {
   endDelay?: number;
   passive?: boolean;
   capture?: boolean;
   once?: boolean;
+  onScroll?: ScrollCallback;
 }
 
 export type ElementOrWindow = HTMLElement | Window;
@@ -34,12 +37,15 @@ export interface ScrollState {
   velocity: number;
 }
 
-export interface ScrollToProps {
-  x?: number;
-  y?: number;
+export interface ScrollToOptions {
   smooth?: boolean;
   easing?: EasingType;
   duration?: number;
+}
+
+export interface ScrollToProps extends ScrollToOptions {
+  x?: number;
+  y?: number;
 }
 
 export type ScrollTo = (props: ScrollToProps) => void;

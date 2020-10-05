@@ -19,6 +19,8 @@
     "@jwdinker/scroll-helpers": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",
     "@jwdinker/use-timeout": "1.0.0",
+    "@types/lodash.throttle": "^4.1.6",
+    "lodash.throttle": "^4.1.1",
     "tslib": "^1.10.0"
   }
 }

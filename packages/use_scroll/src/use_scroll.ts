@@ -5,8 +5,9 @@ import useEventListener from '@jwdinker/use-event-listener';
 import { getScrollCoordinates } from '@jwdinker/scroll-helpers';
 import { EASING_TYPES } from '@jwdinker/easing-fns';
 import getDirections from '@jwdinker/get-directions';
+import throttler from 'lodash.throttle';
 
-import { smoothScroll, getVelocity, getDistance } from './helpers';
+import { smoothScroll, getVelocity, getDistance, isSameCoordinates } from './helpers';
 import {
   ScrollStateOptions,
   ScrollElement,
@@ -28,15 +29,21 @@ const INITIAL_STATE: ScrollState = {
 
 function useScroll(
   element: ScrollElement = null,
-  { endDelay = 100, passive = false, capture = false, once = false }: ScrollStateOptions = {}
+  {
+    endDelay = 45,
+    passive = false,
+    capture = false,
+    once = false,
+    onScroll = () => {},
+  }: ScrollStateOptions = {}
 ): ScrollStateReturn {
   const initialSet = useRef(false);
   const event = useRef<Event | null>(null);
-
+  const callback = useRef(onScroll);
   const [scroll, setScroll] = useState<ScrollState>(() => INITIAL_STATE);
 
   const _scroll = useRef(scroll);
-  const previous = useRef<PreviousScrollCoordinates>([0, 0]);
+  const previous = useRef<PreviousScrollCoordinates>([-1, -1]);
   const startTime = useRef(-1);
   _scroll.current = scroll;
 
@@ -47,34 +54,45 @@ function useScroll(
     return element;
   }, [element]);
 
+  useEffect(() => {
+    callback.current = onScroll;
+  }, [onScroll]);
+
   const end = useCallback(() => {
     const _element = getElement();
     if (_element) {
       const { x, y } = getScrollCoordinates(_element);
-      setScroll((previousScroll) => ({
-        ...previousScroll,
-        phase: SCROLL_PHASES.END,
-        x,
-        y,
-        isScrolling: false,
-        direction: [0, 0],
-      }));
+      setScroll((previousScroll) => {
+        const state = {
+          ...previousScroll,
+          phase: SCROLL_PHASES.END,
+          x,
+          y,
+          isScrolling: false,
+        };
+        callback.current(state);
+        return state;
+      });
     }
   }, [getElement]);
 
   const [begin, clear] = useTimeout(end, endDelay);
 
-  const start = useCallback((target: HTMLElement | Window) => {
-    const { x, y } = getScrollCoordinates(target);
-    const xy = [x, y];
+  const start = useCallback((xy: number[]) => {
+    const [x, y] = xy;
+
     startTime.current = Date.now();
-    setScroll({
-      phase: SCROLL_PHASES.START,
-      x,
-      y,
-      isScrolling: true,
-      direction: getDirections(previous.current, xy),
-      velocity: 0,
+    setScroll(() => {
+      const state = {
+        phase: SCROLL_PHASES.START,
+        x,
+        y,
+        isScrolling: true,
+        direction: getDirections(previous.current, xy),
+        velocity: 0,
+      };
+      callback.current(state);
+      return state;
     });
   }, []);
 
@@ -82,16 +100,15 @@ function useScroll(
   // because the async nature of setState will cause the previous and current
   // scroll values to be the same...atleast it does when using hot module
   // replacement.
-  const move = useCallback((target: HTMLElement | Window) => {
-    const { x, y } = getScrollCoordinates(target);
-    const xy = [x, y];
+  const move = useCallback((xy: number[]) => {
+    const [x, y] = xy;
 
     setScroll((previousScroll) => {
       const { velocity: previousVelocity } = previousScroll;
       const time = Date.now();
 
       const velocity = getVelocity(getDistance(xy, previous.current), startTime.current, time);
-      return {
+      const state = {
         ...previousScroll,
         phase: SCROLL_PHASES.MOVE,
         x,
@@ -99,6 +116,8 @@ function useScroll(
         direction: getDirections(previous.current, xy),
         velocity: velocity > previousVelocity ? velocity : previousVelocity,
       };
+      callback.current(state);
+      return state;
     });
   }, []);
 
@@ -129,29 +148,31 @@ function useScroll(
     (_event) => {
       event.current = _event;
       const { currentTarget } = _event;
+      const { x, y } = getScrollCoordinates(currentTarget);
+      const xy = [x, y];
+      const isSame = isSameCoordinates(previous.current, xy);
 
-      if (currentTarget) {
-        _event.preventDefault();
-
+      if (currentTarget && !isSame) {
         const { phase } = _scroll.current;
         clear();
         begin();
         switch (phase) {
           case SCROLL_PHASES.NONE:
           case SCROLL_PHASES.END: {
-            return start(currentTarget);
+            return start(xy);
           }
           default: {
-            return move(currentTarget);
+            return move(xy);
           }
         }
       }
+      return undefined;
     },
     [begin, clear, move, start]
   );
 
   const options = useMemo(() => {
-    return { consolidate: true, passive, capture, once };
+    return { consolidate: false, passive, capture, once };
   }, [capture, once, passive]);
 
   const listener = useEventListener(element, 'scroll', handler, options);
@@ -171,8 +192,8 @@ function useScroll(
       x = 0,
       y = 0,
       smooth = true,
-      easing = EASING_TYPES.EASE_IN_OUT_QUINT,
-      duration = 500,
+      easing = EASING_TYPES.EASE_IN_CUBIC,
+      duration = 350,
     }: ScrollToProps = {}) => {
       const endCoordinates = { x, y };
 
