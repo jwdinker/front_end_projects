@@ -1,5 +1,5 @@
 {
-  "name": "@jwdinker/use-direction",
+  "name": "@jwdinker/use-element-reference-change",
   "version": "1.0.0",
   "private": false,
   "author": "Jack Dinker",
@@ -13,5 +13,7 @@
   "peerDependencies": {
     "react": "^16.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
 }
