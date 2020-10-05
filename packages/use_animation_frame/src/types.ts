@@ -1,11 +1,11 @@
 /**
- * Starts the animation frame loop.  Used in conjunction with toggable.
+ * Starts the animation frame loop.
  */
-type StartFrameLoop = () => void;
+export type StartFrameLoop = () => void;
 
 /**
- * Starts the animation frame loop.  Used in conjunction with toggable.
+ * Starts the animation frame loop.
  */
-type StopFrameLoop = () => void;
+export type StopFrameLoop = () => void;
 
 export type UseAnimationFrameReturn = [StartFrameLoop, StopFrameLoop];

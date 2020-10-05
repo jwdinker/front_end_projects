@@ -1,6 +1,8 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { UseAnimationFrameReturn } from './types';
 
+export * from './types';
+
 /**
  *
  * @param onFrame A callback executed on every animation frame while the loop is executed.
