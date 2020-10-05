@@ -1,6 +1,6 @@
 export type Velocity = [number, number, number];
 
-export type Point = [number, number];
+export type Point = number[];
 
 export interface StartState {
   startTime: number;
