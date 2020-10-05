@@ -1,10 +1,13 @@
 {
   "prettier.ignorePath": ".eslintignore",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.enable": true,
   "eslint.lintTask.options": "--ext .js,.jsx,.ts,.tsx .",
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
     "source.fixAll": true
-  }
+  },
+  "editor.semanticHighlighting.enabled": true
 }
