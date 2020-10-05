@@ -38,8 +38,6 @@ function useAncestorsScrollListener(
         });
       }
 
-      window.addEventListener(SCROLL_EVENT, _handler, options);
-
       document.body.addEventListener(SCROLL_EVENT, _handler, options);
 
       return (): void => {
@@ -49,7 +47,6 @@ function useAncestorsScrollListener(
           });
         }
 
-        window.removeEventListener(SCROLL_EVENT, _handler);
         document.body.removeEventListener(SCROLL_EVENT, _handler);
       };
     }
