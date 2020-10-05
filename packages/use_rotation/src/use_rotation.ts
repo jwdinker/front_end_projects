@@ -1,6 +1,6 @@
 import useEventListener from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import useToggle from '@jwdinker/use-toggle';
 import useRotatable, { Point } from '@jwdinker/use-rotatable';
 import getElementOrReference, { ElementOrReference } from '@jwdinker/get-element-or-reference';
@@ -9,6 +9,7 @@ import makeGetInteractionType, {
   InteractionType,
   InteractionEvent,
 } from '@jwdinker/make-get-interaction-type';
+import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import useOffsets, { Offsets } from '@jwdinker/use-offsets';
 
@@ -26,6 +27,9 @@ function makeCenterPoint(offsets: Offsets): Point {
 
 const { MOUSE, TOUCH, TOUCHES } = INTERACTION_TYPES;
 
+const MOUSE_EVENTS = 'mousedown mouseup mousemove';
+const TOUCH_EVENTS = 'touchstart touchmove touchend touchcancel';
+
 /**
  *
  * @param element The react ref or an HTMLElement used as the rotatable element.
@@ -40,13 +44,13 @@ function useRotation(
 ): UseRotationReturn {
   const { isBrowser } = useSSR();
   const [active, { activate, deactivate }] = useToggle();
-  const options = useMemo(() => ({ initialAngle }), [initialAngle]);
+  const rotationOptions = useMemo(() => ({ initialAngle }), [initialAngle]);
 
   // useOffsets is used to make the center point
   const [offsets] = useOffsets(element);
   const getInteractionType = makeGetInteractionType(mouse, touch);
 
-  const [rotation, set] = useRotatable(options);
+  const [rotation, set] = useRotatable(rotationOptions);
 
   const rotate = useCallback<Rotate>(
     (point, center) => {
@@ -90,8 +94,10 @@ function useRotation(
 
           // active is used to prevent mousemove overriding mouseup
           if (isStart(event.type, !active)) {
-            activate();
-            set.start(point, center);
+            batch(() => {
+              activate();
+              set.start(point, center);
+            });
           }
 
           if (isMove(event.type, active)) {
@@ -100,37 +106,36 @@ function useRotation(
         }
 
         if (isEnd(event.type, active)) {
-          deactivate();
-          set.end();
+          batch(() => {
+            deactivate();
+            set.end();
+          });
         }
       }
     },
     [activate, active, deactivate, element, getCoordinates, getInteractionType, set]
   );
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: isBrowser && mouse ? window : null,
-        type: 'mousedown mouseup mousemove',
-        handler,
-        consolidate: true,
-      }),
-      [handler, isBrowser, mouse]
-    )
-  );
+  const options = useMemo(() => {
+    return { consolidate: true };
+  }, []);
 
-  useEventListener(
-    useMemo(
-      () => ({
-        target: touch > 0 ? element : null,
-        type: 'touchstart touchmove touchend touchcancel',
-        handler,
-        consolidate: true,
-      }),
-      [element, handler, touch]
-    )
-  );
+  const mouseable = useEventListener(isBrowser ? window : null, MOUSE_EVENTS, handler, options);
+  const touchable = useEventListener(element, TOUCH_EVENTS, handler, options);
+
+  useEffect(() => {
+    if (mouse) {
+      mouseable.attach();
+      return mouseable.detach;
+    }
+  }, [mouse, mouseable]);
+
+  useEffect(() => {
+    if (touch > 0) {
+      touchable.attach();
+      return touchable.detach;
+    }
+  }, [touch, touchable]);
 
   const { direction, angle, radians } = rotation;
 
