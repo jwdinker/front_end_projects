@@ -10,22 +10,36 @@ import {
 } from './types';
 
 export { UseCoordinatesState, UseCoordinateHandler } from './types';
+export { default as getDirections } from '@jwdinker/get-directions';
+export { Direction } from '@jwdinker/get-directions';
 
-function useCoordinates(initial: Point = [0, 0]): UseCoordinateReturn {
+const DEFAULT_STATE: UseCoordinatesState = {
+  initial: [0, 0],
+  current: [0, 0],
+  delta: [0, 0],
+  distance: [0, 0],
+  move: [0, 0],
+  direction: [0, 0],
+};
+
+function useCoordinates(initialCoordinates: Point = [0, 0]): UseCoordinateReturn {
   const [coordinates, setCoordinates] = useState<UseCoordinatesState>(() => ({
-    origin: initial,
-    current: initial,
-    distance: initial,
-    move: [0, 0],
-    direction: [0, 0],
+    ...DEFAULT_STATE,
+    initial: initialCoordinates,
+    current: initialCoordinates,
+    distance: initialCoordinates,
   }));
+
+  const reset = useCallback(() => {
+    setCoordinates(DEFAULT_STATE);
+  }, []);
 
   const start = useCallback<UseCoordinateHandler>((x, y) => {
     setCoordinates((state) => {
       const current: Point = [x, y];
       return {
         ...state,
-        origin: current,
+        initial: current,
         current,
         move: [0, 0],
       };
@@ -33,7 +47,7 @@ function useCoordinates(initial: Point = [0, 0]): UseCoordinateReturn {
   }, []);
 
   const move = useCallback<UseCoordinateHandler>((x, y) => {
-    setCoordinates(({ distance, current: previous, origin, ...state }) => {
+    setCoordinates(({ distance, current: previous, initial, ...state }) => {
       const deltaX = previous[0] - x;
       const deltaY = previous[1] - y;
 
@@ -42,9 +56,10 @@ function useCoordinates(initial: Point = [0, 0]): UseCoordinateReturn {
 
       return {
         ...state,
-        origin,
+        initial,
         current,
-        move: [x - origin[0], y - origin[1]],
+        delta: [deltaX, deltaY],
+        move: [x - initial[0], y - initial[1]],
         distance: nextDistance,
         direction: getDirections(previous, current),
       };
@@ -63,8 +78,9 @@ function useCoordinates(initial: Point = [0, 0]): UseCoordinateReturn {
       start,
       move,
       end,
+      reset,
     }),
-    [end, move, start]
+    [end, move, reset, start]
   );
 
   const value = useMemo((): UseCoordinateReturn => {

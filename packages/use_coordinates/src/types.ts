@@ -6,12 +6,17 @@ export interface UseCoordinatesState {
   /**
    * The x,y coordinates at the start phase.
    */
-  origin: Point;
+  initial: Point;
 
   /**
    * The current x,y coordinates of the start and move phase.
    */
   current: Point;
+
+  /**
+   * previous x and y coordinate minutes the current x and y coordinate
+   */
+  delta: Point;
 
   /**
    * The x,y coordinates derived from the total distance traveled since the initial coordinate.  These coordinates
@@ -52,6 +57,7 @@ export interface UseCoordinateHandlers {
   start: UseCoordinateHandler;
   move: UseCoordinateHandler;
   end(): void;
+  reset(): void;
 }
 
 export type UseCoordinateReturn = [UseCoordinatesState, UseCoordinateHandlers];
