@@ -72,7 +72,12 @@ export interface ArrowStyles {
   width: number;
 }
 
-export interface UsePopoverReturnValue {
+export interface PositionUpdateTogglers {
+  watch(): void;
+  unwatch(): void;
+}
+
+export interface PopoverAndArrowStyles {
   popover: PopoverStyles;
   arrow: ArrowStyles;
   padding: {
@@ -81,3 +86,5 @@ export interface UsePopoverReturnValue {
   };
   anchor: AbbreviatedRectangle;
 }
+
+export type UsePopoverReturn = [PopoverAndArrowStyles, PositionUpdateTogglers];
