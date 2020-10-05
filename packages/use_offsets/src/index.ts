@@ -1,9 +1,13 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import * as React from 'react';
 
 import { getOffsets } from './helpers';
 import { UseOffsetsReturn, UseOffsetsElement } from './types';
 
 export { UseOffsetsElement } from './types';
+
+export { Offsets } from './types';
+
+const { useState, useCallback, useEffect } = React;
 
 export const INITIAL_OFFSETS = {
   top: 0,
@@ -42,11 +46,7 @@ function useOffsets(element: UseOffsetsElement): UseOffsetsReturn {
     }
   }, [element, getElement, remeasure]);
 
-  const value = useMemo((): UseOffsetsReturn => {
-    return [offsets, remeasure];
-  }, [offsets, remeasure]);
-
-  return value;
+  return [offsets, remeasure];
 }
 
 export default useOffsets;
