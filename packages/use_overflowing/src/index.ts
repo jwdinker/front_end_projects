@@ -15,7 +15,7 @@ function useOverflowing(
     : boundaries;
   const overflowing = getOverflowingSides(_element as Rectangle, _boundaries as Rectangle);
 
-  const previouslyOverflowing = usePrevious(overflowing, overflowing) as Overflowing;
+  const previouslyOverflowing = usePrevious(overflowing) as Overflowing;
   const keys = SIDES.filter((side) => overflowing[side]);
   const inBounds = keys.length === 0;
 
