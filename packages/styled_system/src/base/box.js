@@ -5,4 +5,8 @@ const Box = styled('div')`
   ${box}
 `;
 
+Box.defaultProps = {
+  position: 'relative',
+};
+
 export default withTheme(Box);

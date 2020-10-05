@@ -7,6 +7,7 @@ const Row = styled('div')`
 
 Row.defaultProps = {
   flex: 1,
+  position: 'relative',
 };
 
 export default withTheme(Row);

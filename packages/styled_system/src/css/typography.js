@@ -1,4 +1,4 @@
-import { typography, system, compose } from 'styled-system';
+import { typography, system, compose, layout, space } from 'styled-system';
 import box from './box';
 import { whiteSpace } from './custom';
 
@@ -9,6 +9,6 @@ const color = system({
   },
 });
 
-const text = compose(box, typography, whiteSpace, color);
+const text = compose(space, layout, typography, whiteSpace, color);
 
 export default text;

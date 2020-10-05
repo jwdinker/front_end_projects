@@ -8,6 +8,7 @@ const Column = styled('div')`
 
 Column.defaultProps = {
   flex: 1,
+  position: 'relative',
 };
 
 export default withTheme(Column);

@@ -12,10 +12,13 @@ const Button = styled('button')`
 
 Button.defaultProps = {
   bg: 'none',
+  p: 0,
+  m: 0,
   display: 'inline-block',
   borderRadius: '0%',
-  borderColor: 'none',
+  borderColor: 'transparent',
   position: 'relative',
+  backgroundColor: 'transparent',
 };
 
 export default withTheme(Button);
