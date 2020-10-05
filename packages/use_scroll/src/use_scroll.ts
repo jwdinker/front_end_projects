@@ -5,7 +5,6 @@ import useEventListener from '@jwdinker/use-event-listener';
 import { getScrollCoordinates } from '@jwdinker/scroll-helpers';
 import { EASING_TYPES } from '@jwdinker/easing-fns';
 import getDirections from '@jwdinker/get-directions';
-import throttler from 'lodash.throttle';
 
 import { smoothScroll, getVelocity, getDistance, isSameCoordinates } from './helpers';
 import {
