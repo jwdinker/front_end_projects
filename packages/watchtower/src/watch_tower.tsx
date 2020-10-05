@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import useScrollSize from '@jwdinker/use-scroll-size';
-import { useSimpleScroll as useScroll } from '@jwdinker/use-scroll';
+import { useScroll } from '@jwdinker/use-scroll';
 import useWindowSize from '@jwdinker/use-window-size';
 import useOffsets from '@jwdinker/use-offsets';
 import useSSR from '@jwdinker/use-ssr';

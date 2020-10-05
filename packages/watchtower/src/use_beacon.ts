@@ -27,8 +27,8 @@ function useBeacon(
   const value = useMemo((): UseBeaconReturn => {
     if (dynamicOffsets) {
       const { height, width } = offsets;
-      const top = offsets.top - scroll.top;
-      const left = offsets.left - scroll.left;
+      const top = offsets.top - scroll.x;
+      const left = offsets.left - scroll.y;
       return [
         {
           element: {

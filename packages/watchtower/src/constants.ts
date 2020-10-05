@@ -14,9 +14,11 @@ export const INITIAL_CONTEXT: WatchTowerContext = [
     container: INITIAL_MEASUREMENTS,
     scroll: {
       isScrolling: false,
-      left: 0,
-      top: 0,
+      x: 0,
+      y: 0,
       direction: [0, 0],
+      phase: 'none',
+      velocity: 0,
     },
   },
   false,
