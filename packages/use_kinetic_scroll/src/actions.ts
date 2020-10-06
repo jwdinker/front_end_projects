@@ -1,16 +1,8 @@
 import getDirections from '@jwdinker/get-directions';
 
-import { InteractionType, INTERACTION_TYPES } from '@jwdinker/make-get-interaction-type';
-import { PHASES, EVENT_TYPES, DEVICE_PIXEL_RATIO, FRAME_RATE } from './constants';
-import {
-  add,
-  subtract,
-  multiply,
-  getVelocity,
-  divide,
-  updateHistory,
-  getPointerVelocity,
-} from './helpers';
+import { INTERACTION_TYPES } from '@jwdinker/make-get-interaction-type';
+import { PHASES, EVENT_TYPES } from './constants';
+import { add, subtract, multiply, getVelocity, updateHistory, getPointerVelocity } from './helpers';
 import {
   KineticScrollAction,
   KineticScrollState,

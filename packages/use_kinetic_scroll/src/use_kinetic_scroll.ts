@@ -3,9 +3,9 @@ import * as React from 'react';
 import useDragListener, { DragCallback, DragEvent } from '@jwdinker/use-drag-listener';
 
 import usePhaseableListener from '@jwdinker/use-phaseable-listener';
-import throttler from 'lodash.throttle';
+
 import useBlockScroll from '@jwdinker/use-block-scroll';
-import { PHASES, DEVICE_PIXEL_RATIO } from './constants';
+import { PHASES } from './constants';
 import {
   KineticScrollProps,
   KineticElement,
@@ -13,15 +13,7 @@ import {
   KineticScrollState,
 } from './types';
 
-import {
-  makeCoordinatesGetter,
-  getDecay,
-  canThrust,
-  getInteractionType,
-  add,
-  divide,
-  subtract,
-} from './helpers';
+import { makeCoordinatesGetter, getDecay, canThrust, getInteractionType } from './helpers';
 
 import {
   reducer,
@@ -91,14 +83,8 @@ function useKineticScroll(
     console.log('FUCK YOU: ', decay[1]);
 
     if (canThrust(decay)) {
-      // const isSameDecay = decay.every(
-      //   (value: number, index: number) => value === previousDecay.current[index]
-      // );
-
-      // if (!isSameDecay) {
-      //   previousDecay.current = decay;
       dispatch(momentumMove(decay));
-      // }
+
       animationFrame.current = window.requestAnimationFrame(progress);
     } else {
       clear();
