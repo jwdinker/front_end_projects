@@ -1,12 +1,15 @@
 import useEventListener from '@jwdinker/use-event-listener';
-import { MapContext } from '../contexts';
 import { useContext, useMemo, useEffect, useRef } from 'react';
+import { MapContext } from '../contexts';
 import { MAP_DISPLAY_EVENT_NAMES } from '../constants';
 
-const eventNames = Object.values(MAP_DISPLAY_EVENT_NAMES).reduce((accumulator, name, index, original) => {
-  if (index === 0) return accumulator + name;
-  return (accumulator += ` ${name}`);
-}, '');
+const eventNames = Object.values(MAP_DISPLAY_EVENT_NAMES).reduce(
+  (accumulator, name, index, original) => {
+    if (index === 0) return accumulator + name;
+    return (accumulator += ` ${name}`);
+  },
+  ''
+);
 
 function useMapListeners({
   onRegionChangeStart = () => {},
@@ -40,17 +43,19 @@ function useMapListeners({
     return null;
   }, [hasMapLoaded, index]);
 
-  const toggle = useEventListener({
-    target: map,
-    type: eventNames,
-    handler: (event) => {
-      const { type } = event;
+  const handler = (event) => {
+    const { type } = event;
 
-      handlers.current.change(event);
-      handlers.current[type](event);
-    },
-    consolidate: true,
-  });
+    handlers.current.change(event);
+    handlers.current[type](event);
+  };
+
+  const toggle = useEventListener(map, eventNames, handler, { consolidate: true });
+
+  useEffect(() => {
+    toggle.attach();
+    return toggle.detach;
+  }, [toggle]);
 
   return toggle;
 }

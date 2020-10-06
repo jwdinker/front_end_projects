@@ -1,10 +1,17 @@
 import { useContext, useRef, useEffect, useMemo } from 'react';
 import { MapContext } from '../contexts';
-import useMapListeners from './use_map_listeners';
 
 function useRegion({ center = [null, null], span = [null, null], animate = false } = {}) {
   const { index, hasMapLoaded } = useContext(MapContext);
-  const { Coordinate, CoordinateSpan, CoordinateRegion, Padding, MapRect, CameraZoomRange } = mapkit;
+  const { mapkit } = window;
+  const {
+    Coordinate,
+    CoordinateSpan,
+    CoordinateRegion,
+    Padding,
+    MapRect,
+    CameraZoomRange,
+  } = mapkit;
 
   const latitude = center[0];
   const longitude = center[1];
@@ -14,7 +21,7 @@ function useRegion({ center = [null, null], span = [null, null], animate = false
 
   const map = useMemo(() => {
     if (hasMapLoaded) {
-      return mapkit.maps[index];
+      return window.mapkit.maps[index];
     }
     return null;
   }, [hasMapLoaded, index]);
@@ -22,7 +29,7 @@ function useRegion({ center = [null, null], span = [null, null], animate = false
   useEffect(() => {
     const hasProps = !!latitude && !!longitude && latitudeDelta && longitudeDelta;
 
-    if (hasMapLoaded && hasProps) {
+    if (hasMapLoaded && hasProps && !!map) {
       const coordinate = new Coordinate(latitude, longitude);
       const _span = new CoordinateSpan(latitudeDelta, longitudeDelta);
       const region = new CoordinateRegion(coordinate, _span);
@@ -41,8 +48,6 @@ function useRegion({ center = [null, null], span = [null, null], animate = false
     longitudeDelta,
     map,
   ]);
-
-  return map ? map.region : null;
 }
 
 export default useRegion;

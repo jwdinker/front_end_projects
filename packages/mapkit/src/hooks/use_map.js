@@ -1,97 +1,110 @@
 import { useContext, useMemo, useRef, useEffect, useCallback } from 'react';
 import { MapContext } from '../contexts';
+import { usePrevious } from '../internal';
 
-function useMap(
-  ref,
-  {
-    colorScheme = 'light',
-    tintColor = 'black',
-    mapType = 'standard',
-    showsCompass = 'adaptive',
-    showsMapTypeControl = false,
-    showsZoomControl = false,
-    showsUserLocationControl = false,
-    showsScale = 'adaptive',
+// {
+//   colorScheme = 'light',
+//   tintColor = 'black',
+//   mapType = 'standard',
+//   showsCompass = 'adaptive',
+//   showsMapTypeControl = false,
+//   showsZoomControl = false,
+//   showsUserLocationControl = false,
+//   showsScale = 'adaptive',
 
-    //Interaction
-    isRotationEnabled = true,
-    isScrollEnabled = true,
-    isZoomEnabled = true,
-  } = {}
-) {
-  const { setIndex, hasMapLoaded } = useContext(MapContext);
-  const { Coordinate, CoordinateSpan, CoordinateRegion, Padding, MapRect, CameraZoomRange } = mapkit;
+//   // Interaction
+//   isRotationEnabled = true,
+//   isScrollEnabled = true,
+//   isZoomEnabled = true,
+// }
+
+const DEFAULT_PROPS = {
+  colorScheme: 'light',
+  tintColor: 'black',
+  mapType: 'standard',
+  showsCompass: 'adaptive',
+  showsMapTypeControl: false,
+  showsZoomControl: false,
+  showsUserLocationControl: false,
+  showsScale: 'adaptive',
+
+  // Interaction
+  isRotationEnabled: true,
+  isScrollEnabled: true,
+  isZoomEnabled: true,
+};
+
+const propKeys = Object.keys(DEFAULT_PROPS);
+
+function useMap(ref, props = DEFAULT_PROPS) {
+  const { setIndex, resetIndex, hasMapLoaded } = useContext(MapContext);
+  const previousProps = usePrevious(props);
 
   const map = useRef();
 
   useEffect(() => {
-    const { Map, maps } = mapkit;
-    if (ref.current) {
-      map.current = new Map(ref.current, {
-        colorScheme,
-        tintColor,
-        mapType,
-        showsCompass,
-        showsMapTypeControl,
-        showsZoomControl,
-        showsUserLocationControl,
-        showsScale,
-        isRotationEnabled,
-        isScrollEnabled,
-        isZoomEnabled,
+    if (!hasMapLoaded) {
+      const { Map, maps } = window.mapkit;
+      if (ref.current) {
+        map.current = new Map(ref.current, props);
+
+        const index = maps.length - 1;
+
+        setIndex(index);
+      }
+    }
+  }, [hasMapLoaded, props, ref, resetIndex, setIndex]);
+
+  useEffect(() => {
+    if (map.current && typeof previousProps !== 'undefined') {
+      propKeys.forEach((key) => {
+        if (previousProps[key] !== props[key]) {
+          map.current[key] = props[key];
+        }
       });
+    }
+  }, [previousProps, props]);
 
-      const index = maps.length - 1;
-
-      setIndex(index);
-
+  useEffect(() => {
+    if (map.current) {
       return () => {
-        setIndex(-1);
+        resetIndex();
         map.current.destroy();
       };
     }
-  }, [
-    colorScheme,
-    isRotationEnabled,
-    isScrollEnabled,
-    isZoomEnabled,
-    mapType,
-    ref,
-    setIndex,
-    showsCompass,
-    showsMapTypeControl,
-    showsScale,
-    showsUserLocationControl,
-    showsZoomControl,
-    tintColor,
-  ]);
+  }, [resetIndex]);
 
-  const showItems = useCallback(
-    (items, { animate = false, padding = null } = {}) => {
-      if (hasMapLoaded) {
-        const _padding = padding ? new Padding(Object.values(padding)) : new Padding(0, 0, 0, 0);
+  // const showItems = useCallback(
+  //   (items, { animate = false, padding = null } = {}) => {
+  //     if (hasMapLoaded) {
+  //       const _padding = padding
+  //         ? new window.mapkit.Padding(Object.values(padding))
+  //         : new window.mapkit.Padding(0, 0, 0, 0);
 
-        if (items) {
-          map.current.showItems(Array.isArray(items) ? items : [items], { animate, padding: _padding });
-        }
-      }
-    },
-    [Padding, hasMapLoaded]
-  );
+  //       if (items) {
+  //         map.current.showItems(Array.isArray(items) ? items : [items], {
+  //           animate,
+  //           padding: _padding,
+  //         });
+  //       }
+  //     }
+  //   },
+  //   [hasMapLoaded]
+  // );
 
-  const getAnnotations = useCallback(() => {
-    if (hasMapLoaded) {
-      return map.current.annotations;
-    }
-  }, [hasMapLoaded]);
+  // const getAnnotations = useCallback(() => {
+  //   if (hasMapLoaded) {
+  //     return map.current.annotations;
+  //   }
+  // }, [hasMapLoaded]);
 
-  const getOverlays = useCallback(() => {
-    if (hasMapLoaded) {
-      return map.current.overlays;
-    }
-  }, [hasMapLoaded]);
+  // const getOverlays = useCallback(() => {
+  //   if (hasMapLoaded) {
+  //     return map.current.overlays;
+  //   }
+  // }, [hasMapLoaded]);
 
-  return { getAnnotations, getOverlays, showItems };
+  // return { getAnnotations, getOverlays, showItems };
 }
 
 export default useMap;

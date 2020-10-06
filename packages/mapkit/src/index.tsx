@@ -8,6 +8,8 @@ export { default as useMapListeners } from './hooks/use_map_listeners';
 export { default as useMapkitListener } from './hooks/use_mapkit_listener';
 export { default as useCamera } from './hooks/use_camera';
 export { default as useRegion } from './hooks/use_region';
+export { default as useGeocoder } from './hooks/use_geocoder';
+
 //      COMPONENTS
 // --------------------------
 

@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import useEventListener from '@jwdinker/use-event-listener';
 
 function useMapkitListener({
@@ -20,18 +20,27 @@ function useMapkitListener({
       'configuration-change': onConfigurationChange,
       error: onError,
     };
-  });
+  }, [
+    onConfigurationChange,
+    onError,
+    onInitialization,
+    onRefresh,
+    onTooManyRequest,
+    onUnauthorized,
+  ]);
 
-  useEventListener({
-    target: mapkit,
-    type: 'configuration-change error',
-    consolidate: true,
-    handler: (event) => {
-      const { type, status } = event;
-      handlers.current[status](event);
-      handlers.current[type](event);
-    },
-  });
+  const handler = (event) => {
+    const { type, status } = event;
+    handlers.current[status](event);
+    handlers.current[type](event);
+  };
+
+  useEventListener(
+    typeof window !== 'undefined' ? window.mapkit : null,
+    'configuration-change error',
+    handler,
+    { consolidate: true }
+  );
 }
 
 export default useMapkitListener;

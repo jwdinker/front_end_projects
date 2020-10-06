@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState, useCallback, Component } from 'react';
-import PropTypes from 'prop-types';
-import useEventListner from '@jwdinker/use-event-listener';
 
 function Mapkit({ handleAuthorization, language, children, isLoaded }) {
   const handler = useRef();
@@ -10,14 +8,17 @@ function Mapkit({ handleAuthorization, language, children, isLoaded }) {
   });
 
   useEffect(() => {
-    mapkit.init({
-      language,
-      authorizationCallback: async (done) => {
-        await handler.current((token) => {
-          done(token);
-        });
-      },
-    });
+    const isWindow = typeof window !== 'undefined';
+    if (isWindow) {
+      window.mapkit.init({
+        language,
+        authorizationCallback: async (done) => {
+          await handler.current((token) => {
+            done(token);
+          });
+        },
+      });
+    }
   }, [language]);
 
   return null;
@@ -25,10 +26,6 @@ function Mapkit({ handleAuthorization, language, children, isLoaded }) {
 
 Mapkit.defaultProps = {
   language: null,
-};
-
-Mapkit.propTypes = {
-  handleAuthorization: PropTypes.func.isRequired,
 };
 
 export default Mapkit;

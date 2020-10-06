@@ -28,5 +28,6 @@
   "dependencies": {
     "@jwdinker/use-event-listener": "^3.0.3",
     "tslib": "^1.10.0"
-  }
+  },
+  "types": "./dist/index.d.ts"
 }
