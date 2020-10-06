@@ -10,13 +10,14 @@ const Contents = () => {
   const ref = useRef();
   const state = useBeacon(ref);
 
-  console.log('STATE: ', state);
+  console.log('STATE: ', JSON.stringify(state, null, 2));
 
   return useMemo(
     () => (
       <Box bg="black" height="3000px" width="3000px">
-        <Centered height="100%" width={1}>
+        <Centered height="100%" width={1} position="relative">
           <Box
+            ref={ref}
             bg="white"
             borderRadius="8px"
             boxShadow="0px 5px 15px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1)"
@@ -25,7 +26,6 @@ const Contents = () => {
             <Centered width={1} height="100%">
               {/* <Text>{`scrollTop:${scroll.top}`}</Text> */}
             </Centered>
-            <Absolute ref={ref} zIndex={-1} bottom={0} left={0} right={0} bg="#7aa9f9" />
           </Box>
         </Centered>
       </Box>
@@ -34,16 +34,18 @@ const Contents = () => {
   );
 };
 
-WatchTower.getInitialProps = async (context) => {
-  return {};
-};
-
 const Page = () => {
   const scroller = useRef();
   return (
-    <Box width={1} height="100vh">
-      <Box height="100%" width="100%" overflow="scroll" ref={scroller} id="scroller">
-        <WatchTower ref={scroller}>
+    <Box width={1}>
+      <Box
+        height="100%"
+        width="100%"
+        maxHeight="100vh"
+        overflow="scroll"
+        ref={scroller}
+        id="scroller">
+        <WatchTower scrollable={scroller}>
           <Contents />
         </WatchTower>
       </Box>

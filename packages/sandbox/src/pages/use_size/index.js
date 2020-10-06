@@ -3,18 +3,23 @@ import React, { useState, useRef } from 'react';
 import { Box, InputGroup, Input, Column, Row, Text } from '@jwdinker/styled-system';
 import useSize from '@jwdinker/use-size';
 import styled, { withTheme } from 'styled-components';
-import { Menu } from '../components';
-import { withCoreProviders } from '../hocs';
+
+import { withCoreProviders } from '../../hocs';
 
 function Layout({ children, ...props }) {
   const [value, setValue] = useState('');
   return 'here i am';
 }
 
-function UseSizeExample() {
+function Index() {
   const element = useRef();
   const size = useSize(element);
-  return <Box ref={element}>hey</Box>;
+  console.log('size: ', size);
+  return (
+    <Box width={1} height="100vh" ref={element}>
+      hey
+    </Box>
+  );
 }
 
-export default withCoreProviders(UseSizeExample);
+export default withCoreProviders(Index);

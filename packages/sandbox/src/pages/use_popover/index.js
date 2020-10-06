@@ -1,178 +1,165 @@
-import React, { useState, useRef, useEffect, useMemo, forwardRef, useLayoutEffect } from 'react';
-import { Box, Row, Text, Centered, Fixed, Absolute, Relative, box } from '@jwdinker/styled-system';
-
-import usePopover, {
-  usePreventOverflow,
-  useFlipable,
-  useHideable,
-  convertTransformToString,
-  DEFAULT_STYLES,
-} from '@jwdinker/use-popover';
-
-import { useSprings, animated, useSpring } from 'react-spring';
-import styled from 'styled-components';
+import React, { forwardRef, useRef, useEffect, useMemo } from 'react';
+import { Box, Triangle, Button, Centered, Text, Flex } from '@jwdinker/styled-system';
+import useToggle from '@jwdinker/use-toggle';
+import useTether from '@jwdinker/use-tether';
+import { useSpring, animated, useSprings } from 'react-spring';
+import usePortal from '@jwdinker/use-portal';
+import usePopover, { useAlignment } from '@jwdinker/use-popover';
+import usePreventOverflow from '@jwdinker/use-prevent-overflow';
+import useWindowSize from '@jwdinker/use-window-size';
+import useScroll from '@jwdinker/use-scroll';
+import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
+import useBoundaries from '@jwdinker/use-boundaries';
+import useFlip from '@jwdinker/use-flip';
 import { withCoreProviders } from '../../hocs';
 
-const AnimatedBox = styled(animated.div)`
-  ${box}
-  position:absolute;
-`;
+const Menu = forwardRef(({ children, container, alignment, align }, anchorRef) => {
+  const elementRef = useRef();
+  const arrowRef = useRef();
 
-const Triangle = styled(animated.div)`
-  z-index: 0;
-  position: absolute;
-  top:0;
-  left:0,
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 20px 40px 20px;
-  border-color: transparent transparent blue transparent;
-`;
+  const [Portal, { open, close, isOpen }] = usePortal();
 
-const SVGTriangle = () => {
-  return (
-    <svg width="40" height="30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M17.66 1.317c1.137-1.756 3.543-1.756 4.68 0l14.513 22.398c1.326 2.045-.03 4.856-2.34 4.856H5.487c-2.312 0-3.667-2.81-2.341-4.856L17.659 1.317z"
-        fill="#000"
-      />
-      <path d="M5 20.855l35 7.716H0l5-7.716z" fill="#000" />
-      <path d="M35 20.855L0 28.57h40l-5-7.716z" fill="#000" />
-    </svg>
-  );
-};
+  const boundaries = useBoundaries(anchorRef);
 
-const MyPopover = forwardRef(({ children }, element) => {
-  const popover = useRef();
-  const triangle = useRef();
-
-  const args = useMemo(() => {
-    return {
-      popover,
-      triangle,
-      element,
-    };
-  }, [element]);
-
-  const props = usePopover(args);
-
-  // useFlipable(props);
-  usePreventOverflow(props, { flipArrow: true });
-  // const { seen } = useHideable(props);
-
-  const [popoverAnimation, setPopoverAnimation] = useSpring((index) => {
-    return { ...DEFAULT_STYLES.POPOVER };
+  const [{ popover, arrow, padding, anchor }, { watch, unwatch }] = usePopover({
+    anchor: anchorRef,
+    popover: elementRef,
+    arrow: arrowRef,
+    alignment,
   });
 
-  const [triangleAnimation, setTriangleAnimation] = useSpring((index) => {
-    return { ...DEFAULT_STYLES.TRIANGLE };
+  const [pox, poy] = usePreventOverflow(popover, boundaries, {
+    padding: padding.popover,
   });
 
-  // useLayoutEffect(() => {
-  //   props.applyStyles(props.styles);
-  // }, [props]);
+  const [aox, aoy] = usePreventOverflow(arrow, boundaries, { padding: padding.arrow });
+
+  const replacement = useFlip(anchor, boundaries, {
+    preference: 'bottom',
+    tethered: [popover, arrow],
+  });
 
   useEffect(() => {
-    const { styles } = props;
+    watch();
+    return unwatch;
+  }, [unwatch, watch]);
 
-    setPopoverAnimation(() => {
-      const { transform, ...restOfStyles } = styles.popover;
+  const [animation, set] = useSprings(
+    2,
+    (index) => {
       return {
-        ...restOfStyles,
-        transform: convertTransformToString(transform),
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        transform: 'translate3d(0px,0px,0px) rotate(0deg)',
+        opacity: 1,
+        zIndex: index === 0 ? 0 : 1,
       };
-    });
+    },
+    []
+  );
 
-    setTriangleAnimation(() => {
-      const { transform, ...restOfStyles } = styles.triangle;
+  useEffect(() => {
+    open();
+  }, [open]);
+
+  useEffect(() => {
+    set((index) => {
+      const offset =
+        index === 0
+          ? {
+              top: poy,
+              left: pox,
+            }
+          : {
+              top: aoy,
+              left: aox,
+            };
       return {
-        ...restOfStyles,
-        transform: convertTransformToString(transform),
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        transform: `translate3d(${offset.left}px,${offset.top}px,0px) rotate(${
+          index === 1 ? arrow.rotate : 0
+        }deg)`,
+        opacity: 1,
+        zIndex: index === 0 ? 0 : 1,
       };
-    });
-  }, [props, setPopoverAnimation, setTriangleAnimation]);
+    }, []);
+  }, [aox, aoy, arrow.left, arrow.rotate, arrow.top, popover.left, popover.top, pox, poy, set]);
 
-  return useMemo(() => {
-    return (
-      <>
-        <Triangle ref={triangle} style={triangleAnimation} />
-        <AnimatedBox
-          style={popoverAnimation}
-          top={0}
-          left={0}
-          ref={popover}
-          bg="white"
-          borderRadius="8px"
-          boxShadow="0px 5px 15px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1)"
-          height="100px"
-          width="100px">
-          <Centered width={1} height="100%">
-            <Text>Popover</Text>
-          </Centered>
-        </AnimatedBox>
-      </>
-    );
-  }, [popoverAnimation, triangleAnimation]);
-});
+  useEffect(() => {
+    align[replacement]();
+  }, [align, replacement]);
 
-const Contents = () => {
-  const element = useRef();
+  const [popoverAnimation, triangleAnimation] = animation;
 
   return useMemo(
     () => (
       <>
-        <Box height="100%" width={1} style={{ WebkitOverflowScrolling: 'touch' }}>
-          <Box bg="white" height="3000px" width="3000px">
-            <Centered height="100%" width={1}>
-              {console.log('RENDERING')}
-              <Box
-                ref={element}
-                bg="blue.5"
-                borderRadius="8px"
-                boxShadow="0px 5px 15px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1)"
-                height="200px"
-                width="200px">
-                <Centered position="relative" width={1} height="100%">
-                  <Absolute
-                    zIndex={1}
-                    height="40px"
-                    width="20px"
-                    right="-20px"
-                    top="50%"
-                    style={{ transform: 'translate3d(0,-50%,0)' }}
-                    border="solid 1px"
-                    borderColor="blue.5"
-                  />
-                  <Absolute
-                    height="440px"
-                    width="440px"
-                    left="-120px"
-                    top="-120px"
-                    border="solid 1px"
-                    borderColor="blue.5"
-                  />
-                  <Absolute
-                    height="100px"
-                    width="100px"
-                    top="-120px"
-                    right="50px"
-                    border="solid 1px"
-                    borderColor="blue.5"
-                  />
-                  <Absolute height="100%" width="50%" left="50%" border="solid 1px" />
-                  <Absolute height="50%" width="100%" top="50%" border="solid 1px" />
-                  <Text>Pilot</Text>
-                </Centered>
-              </Box>
-            </Centered>
-          </Box>
-        </Box>
-        <MyPopover ref={element} />
+        <Portal>
+          <animated.div style={triangleAnimation}>
+            <Box ref={arrowRef} width="30px" maxWidth="30px">
+              <Triangle fill="gray.1" />
+            </Box>
+          </animated.div>
+          <animated.div style={popoverAnimation}>
+            <Box
+              ref={elementRef}
+              borderRadius="4px"
+              m="0px"
+              p={3}
+              height="100px"
+              width="100px"
+              as="ul"
+              bg="gray.1"
+              boxShadow="0px 5px 15px rgba(54, 64, 70, 0.05), 0px 1px 3px rgba(16, 16, 16, 0.1)">
+              {children}
+            </Box>
+          </animated.div>
+        </Portal>
       </>
     ),
-    []
+    [children, popoverAnimation, triangleAnimation]
   );
-};
+});
 
-export default withCoreProviders(Contents);
+function Index() {
+  const anchor = useRef();
+
+  const [alignment, align] = useAlignment();
+  const [active, { activate, deactivate }] = useToggle();
+  return (
+    <>
+      <Box height="100vh" />
+      <Box maxHeight="700px" overflow="scroll" width={1} bg="black">
+        <Centered height="3000px" width={1}>
+          <Button
+            zIndex={999}
+            position="relative"
+            aria-haspopup="true"
+            role="menu"
+            onClick={activate}
+            ref={anchor}>
+            click me
+          </Button>
+        </Centered>
+      </Box>
+      <Box>
+        <Button onClick={align.top}>top</Button>
+        <Button onClick={align.bottom}>bottom</Button>
+        <Button onClick={align.left}>left</Button>
+        <Button onClick={align.right}>right</Button>
+      </Box>
+      <Menu ref={anchor} align={align} alignment={alignment}>
+        <Text style={{ WebkitTransform: 'translateZ(0)' }} fontSize="20px">
+          item 1
+        </Text>
+        <Text>item 2</Text>
+      </Menu>
+      <Box height="100vh" />
+    </>
+  );
+}
+
+export default withCoreProviders(Index);
