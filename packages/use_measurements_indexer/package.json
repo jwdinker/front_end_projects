@@ -1,5 +1,5 @@
 {
-  "name": "@jwdinker/use-interactivity",
+  "name": "@jwdinker/use-measurements-indexer",
   "version": "1.0.0",
   "private": false,
   "author": "Jack Dinker",
@@ -17,7 +17,6 @@
     "react": "^16.8.0"
   },
   "dependencies": {
-    "@jwdinker/use-previous": "1.0.0",
     "tslib": "^1.10.0"
   }
 }
