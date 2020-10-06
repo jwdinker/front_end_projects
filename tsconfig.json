@@ -30,12 +30,24 @@
     "noUnusedParameters": false,
     "forceConsistentCasingInFileNames": true,
 
-    "noEmit": true,
+    "noEmit": false,
     "declaration": true,
     "declarationMap": true,
     "baseUrl": "."
   },
   "include": [],
   "exclude": ["node_modules"],
-  "references": [{ "path": "packages/sandbox" }]
+  "references": [
+    { "path": "packages/sandbox" },
+    { "path": "packages/edu" },
+    { "path": "packages/use_rotatable" },
+    { "path": "packages/use_scalable" },
+    { "path": "utilities/get_element_or_reference" },
+    { "path": "utilities/touch_helpers" },
+    { "path": "utilities/make_get_interaction_type" },
+    { "path": "utilities/get_directions" },
+    { "path": "utilities/angle_helpers" },
+    { "path": "utilities/phase_helpers" },
+    { "path": "utilities/get_distance_from_points" }
+  ]
 }

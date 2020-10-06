@@ -4,3 +4,17 @@ dist
 .DS_Store
 temp*
 .env
+
+packages/use_schedule/
+
+packages/calendar/
+
+packages/edu/
+
+packages/drag_and_drop/
+
+
+
+
+
+packages/use_virtual_scroll/
