@@ -133,6 +133,9 @@
     },
     {
       "path": "../watchtower"
+    },
+    {
+      "path": "../../utilities/visibility_helpers"
     }
   ],
   "exclude": ["node_modules"]
