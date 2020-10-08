@@ -7,7 +7,7 @@ import { withCoreProviders } from '../../hocs';
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function Index() {
-  const time = useClock({ updateBy: 'second' });
+  const time = useClock('second');
 
   const { hour, minutes, seconds, period, dayOfWeek } = time;
 
