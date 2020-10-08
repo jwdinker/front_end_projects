@@ -11,6 +11,7 @@ import useScroll from '@jwdinker/use-scroll';
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useBoundaries from '@jwdinker/use-boundaries';
 import useFlip from '@jwdinker/use-flip';
+import preventOverflow from '@jwdinker/prevent-overflow';
 import { withCoreProviders } from '../../hocs';
 
 const Menu = forwardRef(({ children, container, alignment, align }, anchorRef) => {
@@ -28,11 +29,23 @@ const Menu = forwardRef(({ children, container, alignment, align }, anchorRef) =
     alignment,
   });
 
-  const [pox, poy] = usePreventOverflow(popover, boundaries, {
-    padding: padding.popover,
+  // const [pox, poy] = usePreventOverflow(popover, boundaries, {
+  //   padding: padding.popover,
+  // });
+
+  // const [aox, aoy] = usePreventOverflow(arrow, boundaries, { padding: padding.arrow });
+
+  const [arrowPreventOverflow] = preventOverflow({
+    element: arrow,
+    boundaries,
+    padding: padding.arrow,
   });
 
-  const [aox, aoy] = usePreventOverflow(arrow, boundaries, { padding: padding.arrow });
+  const [popoverOverflowPrevented] = preventOverflow({
+    element: popover,
+    boundaries,
+    padding: padding.popover,
+  });
 
   const replacement = useFlip(anchor, boundaries, {
     preference: 'bottom',
@@ -41,7 +54,9 @@ const Menu = forwardRef(({ children, container, alignment, align }, anchorRef) =
 
   useEffect(() => {
     watch();
-    return unwatch;
+    return () => {
+      unwatch();
+    };
   }, [unwatch, watch]);
 
   const [animation, set] = useSprings(
@@ -65,28 +80,28 @@ const Menu = forwardRef(({ children, container, alignment, align }, anchorRef) =
 
   useEffect(() => {
     set((index) => {
-      const offset =
-        index === 0
-          ? {
-              top: poy,
-              left: pox,
-            }
-          : {
-              top: aoy,
-              left: aox,
-            };
+      const { top, left } = index === 0 ? popoverOverflowPrevented : arrowPreventOverflow;
       return {
         position: 'absolute',
         top: 0,
         left: 0,
-        transform: `translate3d(${offset.left}px,${offset.top}px,0px) rotate(${
+        transform: `translate3d(${left}px,${top}px,0px) rotate(${
           index === 1 ? arrow.rotate : 0
         }deg)`,
         opacity: 1,
         zIndex: index === 0 ? 0 : 1,
       };
     }, []);
-  }, [aox, aoy, arrow.left, arrow.rotate, arrow.top, popover.left, popover.top, pox, poy, set]);
+  }, [
+    arrow.left,
+    arrow.rotate,
+    arrow.top,
+    arrowPreventOverflow,
+    popover.left,
+    popover.top,
+    popoverOverflowPrevented,
+    set,
+  ]);
 
   useEffect(() => {
     align[replacement]();
