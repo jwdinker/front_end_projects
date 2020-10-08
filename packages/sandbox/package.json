@@ -31,6 +31,7 @@
     "@jwdinker/use-prevent-overflow": "1.0.0",
     "@jwdinker/use-previous": "1.0.0",
     "@jwdinker/use-reducer-with-middleware": "1.0.0",
+    "@jwdinker/use-rotatable": "1.0.0",
     "@jwdinker/use-rotation": "1.0.0",
     "@jwdinker/use-scale": "1.0.0",
     "@jwdinker/use-schedule": "1.0.0",

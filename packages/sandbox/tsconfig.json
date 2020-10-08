@@ -24,9 +24,6 @@
       "path": "../use_animation_frame"
     },
     {
-      "path": "../use_element_visibility"
-    },
-    {
       "path": "../use_event_listener"
     },
     {
@@ -133,6 +130,9 @@
     },
     {
       "path": "../watchtower"
+    },
+    {
+      "path": "../use_rotatable"
     },
     {
       "path": "../../utilities/visibility_helpers"

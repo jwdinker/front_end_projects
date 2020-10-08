@@ -1,155 +1,129 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef } from 'react';
 import useClock from '@jwdinker/use-clock';
 import { Box, Centered, Ratio, Absolute, Text } from '@jwdinker/styled-system';
 import upTo from '@jwdinker/up-to';
-import { useSprings, animated } from 'react-spring';
-import usePrevious from '@jwdinker/use-previous';
 
-import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
 
-const SECONDS_HAND_STYLE = {
-  position: 'absolute',
-  top: '10%',
-  left: '50%',
-  height: '40%',
-  width: '1px',
-  background: 'black',
-  transformOrigin: 'bottom',
-  borderRadius: '500px',
+const SecondHand = forwardRef((props, ref) => {
+  return (
+    <Absolute
+      ref={ref}
+      top="10%"
+      left="50%"
+      height="40%"
+      width="1%"
+      background="black"
+      boxShadow="0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+      borderRadius="500px"
+      style={{ transformOrigin: 'bottom' }}
+    />
+  );
+});
+
+const HourHand = forwardRef((props, ref) => {
+  return (
+    <Absolute
+      ref={ref}
+      top="30%"
+      left="50%"
+      height="20%"
+      width="3%"
+      background="black"
+      boxShadow="0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+      borderRadius="500px"
+      style={{ transformOrigin: 'bottom' }}
+    />
+  );
+});
+
+const MinuteHand = forwardRef((props, ref) => {
+  return (
+    <Absolute
+      ref={ref}
+      top="20%"
+      left="50%"
+      height="30%"
+      width="2%"
+      background="black"
+      boxShadow="0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+      borderRadius="500px"
+      style={{ transformOrigin: 'bottom' }}
+    />
+  );
+});
+
+const CenterCircle = () => {
+  return (
+    <Absolute
+      boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+      zIndex={999}
+      top="50%"
+      left="51%"
+      height="5%"
+      bg="red.5"
+      width="5%"
+      borderRadius="50%"
+      style={{ transform: `translate3d(-50%,-50%,0)` }}
+    />
+  );
 };
 
-const HOUR_HAND_STYLE = {
-  position: 'absolute',
-  top: '30%',
-  left: '50%',
-  height: '20%',
-  width: '4px',
-  background: '#ff2701',
-  transformOrigin: 'bottom',
-  borderRadius: '500px',
-};
-
-const MINUTES_HAND_STYLE = {
-  position: 'absolute',
-  top: '20%',
-  left: '50%',
-  height: '30%',
-  width: '4px',
-  background: 'blue',
-  transformOrigin: 'bottom',
-  borderRadius: '500px',
-};
-
-function getStyle(index, time) {
-  switch (index) {
-    case 1: {
-      return {
-        ...HOUR_HAND_STYLE,
-        transform: `rotate(${time.hour}deg)`,
-      };
-    }
-    case 2: {
-      return {
-        ...MINUTES_HAND_STYLE,
-        transform: `rotate(${time.minutes}deg)`,
-      };
-    }
-    default: {
-      return {
-        ...SECONDS_HAND_STYLE,
-        transform: `rotate(${time.seconds}deg)`,
-      };
-    }
-  }
-}
-
-const getValues = (time) => {
-  return {
-    hour: time.hour * 30 + time.minutes / 2,
-    minutes: time.minutes * 6,
-    seconds: time.seconds * 6,
-  };
+const HourLabels = () => {
+  return upTo(0, 11, (key) => {
+    return (
+      <Absolute
+        p="2%"
+        display="flex"
+        style={{ transform: `rotate(${key * 30}deg)`, justifyContent: 'center' }}
+        key={key}
+        height="100%"
+        width="100%">
+        <Text
+          color="gray.8"
+          fontSizeFluid={['8px', '50px']}
+          fontWeight="light"
+          style={{
+            position: 'absolute',
+            transform: `rotate(${360 - key * 30}deg)`,
+          }}>
+          {key === 0 ? 12 : key}
+        </Text>
+      </Absolute>
+    );
+  });
 };
 
 function Index() {
-  const time = useClock({ updateBy: 'second' });
-  const previous = useRef(getValues(time));
-  const total = useRef(getValues(time));
+  const time = useClock('second', 100);
 
-  const [animations, set] = useSprings(3, (index) => {
-    return getStyle(index, total.current);
-  });
+  const minuteHand = useRef();
+  const hourHand = useRef();
+  const secondsHand = useRef();
 
   useEffect(() => {
-    const hourCurrent = time.hour * 30 + time.minutes / 2;
-    const hourDelta = hourCurrent - previous.current.hour;
-
-    const minutesCurrent = time.minutes * 6;
-    const minutesDelta = minutesCurrent - previous.current.minutes;
-
-    const secondsCurrent = time.seconds * 6;
-    const secondsDelta = secondsCurrent - previous.current.seconds;
-
-    const { hour, minutes, seconds } = total.current;
-    total.current = {
-      hour: hour + hourDelta,
-      minutes: minutes + minutesDelta,
-      seconds: seconds + secondsDelta,
-    };
-  }, [previous.hour, previous.minutes, previous.seconds, time.hour, time.minutes, time.seconds]);
-
-  useEffect(() => {
-    set((index) => {
-      return getStyle(index, total.current);
-    }, []);
-  }, [set, time, time.hour, time.minutes, time.seconds]);
-  console.log(
-    'TIME: ',
-    JSON.stringify({ time, totals: total.current, previous: previous.current }, null, 2)
-  );
-
-  useEffect(() => {
-    previous.current = getValues(time);
-  }, [time]);
+    secondsHand.current.style.transform = `rotate(${time.seconds * 6}deg)`;
+    minuteHand.current.style.transform = `rotate(${time.minutes * 6}deg)`;
+    hourHand.current.style.transform = `rotate(${time.hour * 30 + time.minutes / 2}deg)`;
+  }, [time.hour, time.seconds, time.minutes]);
 
   return (
-    <Box height="100vh" width={1} bg="#ebebeb">
+    <Box height="100vh" width={1} bg="#ebebeb" overflow="scroll">
       <Centered height="100%" width={1}>
-        <Box width="50%" maxWidth="50%">
+        <Box width="50%" maxWidth="50%" position="relative">
+          <CenterCircle />
+
           <Ratio
+            position="relative"
             borderRadius="50%"
             width="100%"
             boxShadow="-16px -16px 32px #cacaca, 
             16px 16px 32px #ffffff">
             <Absolute top={0} left={0} height="100%" width={1}>
-              <>
-                {upTo(0, 11, (key) => {
-                  return (
-                    <Absolute
-                      p={3}
-                      display="flex"
-                      style={{ transform: `rotate(${key * 30}deg)`, justifyContent: 'center' }}
-                      key={key}
-                      height="100%"
-                      width="100%">
-                      <Text
-                        color="gray.8"
-                        fontSize="18px"
-                        fontWeight="light"
-                        style={{
-                          position: 'absolute',
-                          transform: `rotate(${360 - key * 30}deg)`,
-                        }}>
-                        {key === 0 ? 12 : key}
-                      </Text>
-                    </Absolute>
-                  );
-                })}
-                <animated.div style={animations[0]} />
-                <animated.div style={animations[1]} />
-                <animated.div style={animations[2]} />
-              </>
+              <HourLabels />
+              <MinuteHand ref={minuteHand} />
+              <HourHand ref={hourHand} />
+              <SecondHand ref={secondsHand} />
             </Absolute>
           </Ratio>
         </Box>
