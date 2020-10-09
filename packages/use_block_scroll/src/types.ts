@@ -3,7 +3,9 @@ import * as React from 'react';
 export type BlockableAxis = 'x' | 'y' | 'xy';
 
 export interface UseBlockScrollOptions {
-  blockable?: BlockableAxis;
+  axis?: BlockableAxis;
+  onBlock?(): void;
+  onUnblock?(): void;
 }
 
 export interface Coordinates {
@@ -11,9 +13,14 @@ export interface Coordinates {
   y: number;
 }
 
-export type BlockScroll = () => void;
-export type RestoreScroll = () => void;
+export interface Dimensions {
+  height: number;
+  width: number;
+}
 
-export type UseBlockScrollReturn = [BlockScroll, RestoreScroll];
+export type EnableBodyScroll = () => void;
+export type DisableBodyScroll = () => void;
+
+export type UseBlockScrollReturn = [EnableBodyScroll, DisableBodyScroll];
 
 export type BlockableElement = React.RefObject<HTMLElement | null | undefined> | null;

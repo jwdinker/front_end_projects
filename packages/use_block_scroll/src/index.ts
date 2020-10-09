@@ -1,7 +1,8 @@
 import * as React from 'react';
 import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
+import useTimeout from '@jwdinker/use-timeout';
 import { UseBlockScrollOptions, UseBlockScrollReturn, BlockableElement } from './types';
-import { makeBlockable } from './helpers';
+import { makeBlockable, getCoordinates } from './helpers';
 
 const { useMemo, useCallback, useRef, useEffect } = React;
 
@@ -28,7 +29,7 @@ function useOverflowPrevention() {
     const canRestore = isHidden;
 
     if (canRestore) {
-      const saved = style.current || 'visible';
+      const saved = style.current;
 
       document.body.style.overflow = saved;
       style.current = '';
@@ -40,36 +41,67 @@ function useOverflowPrevention() {
 
 function useBlockScroll(
   element: BlockableElement,
-  { blockable = 'y' }: UseBlockScrollOptions = {}
+  { axis = 'y', onBlock = () => {}, onUnblock = () => {} }: UseBlockScrollOptions = {}
 ): UseBlockScrollReturn {
   const coordinates = useRef({ x: 0, y: 0 });
+  const isBlocking = useRef(false);
+
+  const [startTimeout, removeTimeout] = useTimeout(() => {
+    if (isBlocking.current) {
+      isBlocking.current = false;
+      onUnblock();
+      overflow.restore();
+    }
+  }, 100);
+
   const listeners = useRef<UseEventListenerReturn[]>([]);
 
-  const isBlockable = useMemo(() => makeBlockable(blockable), [blockable]);
+  const isBlockable = useMemo(() => makeBlockable(axis), [axis]);
 
   const overflow = useOverflowPrevention();
 
   const preventMoveOnBody = (event: any) => {
-    event.preventDefault();
-    return false;
+    if (isBlocking.current) {
+      event.preventDefault();
+      return false;
+    }
   };
 
   const start = (event: any) => {
-    coordinates.current.x = event.targetTouches[0].clientX;
-    coordinates.current.y = event.targetTouches[0].clientY;
+    coordinates.current = getCoordinates(event.targetTouches);
   };
 
   const move = (event: any): boolean => {
     const { currentTarget, targetTouches } = event;
 
     if (currentTarget instanceof HTMLElement) {
-      const canBlock = isBlockable(currentTarget, targetTouches, coordinates.current);
+      const nextCoordinates = getCoordinates(targetTouches);
+      const lastCoordinates = coordinates.current;
+      const canBlock = isBlockable(currentTarget, nextCoordinates, lastCoordinates);
+      coordinates.current = nextCoordinates;
+
+      const hasBlockStarted = canBlock && !isBlocking.current;
+      const hasUnblocked = !canBlock && isBlocking.current;
+
+      if (hasBlockStarted) {
+        overflow.prevent();
+        onBlock();
+      }
+      if (hasUnblocked) {
+        overflow.restore();
+        onUnblock();
+      }
 
       if (canBlock) {
+        removeTimeout();
+        startTimeout();
+        isBlocking.current = true;
         event.preventDefault();
 
         return false;
       }
+
+      isBlocking.current = false;
 
       /*
        * TO DO - gotta recheck on this.
@@ -93,7 +125,7 @@ function useBlockScroll(
   const body = isBrowser ? document : null;
 
   const touchstart = useEventListener(element, TOUCH_START, start);
-  const touchmove = useEventListener(element, TOUCH_MOVE, move, OPTIONS);
+  const touchmove = useEventListener(element, TOUCH_MOVE, move);
 
   // @ts-ignore
   const documentTouchMove = useEventListener(body, TOUCH_MOVE, preventMoveOnBody, OPTIONS);
@@ -108,17 +140,15 @@ function useBlockScroll(
     javascript in their respective order, otherwise stopPropagation won't work
     and you end up blocking all touchmove events.
   */
-  const block = useCallback(() => {
-    overflow.prevent();
+  const enable = useCallback(() => {
     listeners.current.forEach((listener) => listener.attach());
-  }, [overflow]);
+  }, []);
 
-  const unblock = useCallback(() => {
-    overflow.restore();
+  const disable = useCallback(() => {
     listeners.current.forEach((listener) => listener.detach());
-  }, [overflow]);
+  }, []);
 
-  return [block, unblock];
+  return [enable, disable];
 }
 
 export default useBlockScroll;
