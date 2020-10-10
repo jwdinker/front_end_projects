@@ -72,9 +72,6 @@
       "path": "../use_popover"
     },
     {
-      "path": "../use_prevent_overflow"
-    },
-    {
       "path": "../use_boundaries"
     },
     {
@@ -136,6 +133,9 @@
     },
     {
       "path": "../../utilities/visibility_helpers"
+    },
+    {
+      "path": "../../utilities/prevent_overflow"
     }
   ],
   "exclude": ["node_modules"]
