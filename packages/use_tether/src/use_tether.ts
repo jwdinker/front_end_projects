@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useDimensions from '@jwdinker/use-dimensions';
+import getScrollableAncestor from '@jwdinker/get-scrollable-ancestor';
 import { Alignment, UseTetherReturnValue, Anchor, AbbreviatedRectangle } from './types';
 
 import { coordinateFromPosition } from './helpers';
@@ -12,8 +13,10 @@ function useTether(
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
 ): UseTetherReturnValue {
   const anchorReference = anchor && 'current' in anchor ? anchor : null;
+  const canAddPageOffsets = useRef(false);
+
   const [_anchor, watchAnchor, unwatchAnchor] = useBoundingClientRect(anchorReference, {
-    addPageOffsets: true,
+    addPageOffsets: canAddPageOffsets.current,
   });
 
   const [dimensions, watchDimensions, unwatchDimensions] = useDimensions(element);
@@ -24,6 +27,16 @@ function useTether(
 
   const top = coordinateFromPosition[y](coordinates, dimensions);
   const left = coordinateFromPosition[x](coordinates, dimensions);
+
+  useEffect(() => {
+    if (element?.current instanceof HTMLElement) {
+      const elementsScrollableAncestor = getScrollableAncestor(element.current);
+
+      canAddPageOffsets.current = elementsScrollableAncestor !== window;
+
+      console.log('addPageOffsets: ', canAddPageOffsets.current);
+    }
+  }, []);
 
   const watch = useCallback(() => {
     watchAnchor();

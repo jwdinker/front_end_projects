@@ -26,6 +26,7 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {},
   "dependencies": {
+    "@jwdinker/get-scrollable-ancestor": "1.0.0",
     "@jwdinker/use-bounding-client-rect": "1.0.0",
     "@jwdinker/use-dimensions": "1.0.0",
     "tslib": "^1.10.0"

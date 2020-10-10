@@ -11,5 +11,9 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [{ "path": "../use_bounding_client_rect" }, { "path": "../use_dimensions" }]
+  "references": [
+    { "path": "../use_bounding_client_rect" },
+    { "path": "../use_dimensions" },
+    { "path": "../../utilities/get_scrollable_ancestor" }
+  ]
 }
