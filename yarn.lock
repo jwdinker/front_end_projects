@@ -1166,6 +1166,11 @@
   resolved "https://registry.yarnpkg.com/@jwdinker/javascript_helpers/-/javascript_helpers-0.5.0.tgz#0c154ee3ce9b4a36da7d5020a9d5e8dc9529ca50"
   integrity sha512-gpGwxhpKkf8ShSh4/oXV6egucJP/jkapQBN5wl+Rlyww11V89YEyX7/CA1IsMzDuSZ4Yj+t/2lz1fgCVrcCNYw==
 
+"@jwdinker/use-element-visibility@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@jwdinker/use-element-visibility/-/use-element-visibility-1.0.0.tgz#44ba1651cf48483734579df084fc9fb60ee95409"
+  integrity sha512-2PhUUFtq/zJHM7/ZCL7aEbWbE6SEMukoJW/6UDp3Go+6MOrWbg/m3GKcFm0StwM5aonEZ/KFcl+i8swAXFwTTg==
+
 "@jwdinker/use-scroll-block@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@jwdinker/use-scroll-block/-/use-scroll-block-1.3.0.tgz#726df842611126255201afce8c50859d6269e412"
