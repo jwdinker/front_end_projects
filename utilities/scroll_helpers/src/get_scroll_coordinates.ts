@@ -8,7 +8,7 @@ const getScrollCoordinates = (element: ScrollableElement): ScrollCoordinates => 
     return getWindowScrollCoordinates();
   }
 
-  if (element === document.body) {
+  if (element === document) {
     return getDocumentScrollCoordinates();
   }
 

@@ -8,6 +8,6 @@ export interface ScrollDimensions {
   width: number;
 }
 
-export type ScrollableElement = HTMLElement | Window | Document['body'];
+export type ScrollableElement = HTMLElement | Window | Document;
 
 export interface ScrollMeasurements extends ScrollCoordinates, ScrollDimensions {}
