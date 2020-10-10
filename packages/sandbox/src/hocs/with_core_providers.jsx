@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider, createGlobalStyle } from 'styled-components';
 import { NormalizeStyle } from '@jwdinker/styled-system';
-import { CalendarProvider } from '@jwdinker/use-schedule';
+
 import { Mapkit } from '@jwdinker/react-mapkitjs';
 
 // import { NextPage } from 'next';
@@ -18,16 +18,14 @@ function withCoreProviders(Component) {
   return function CoreProviders(props) {
     return (
       <ThemeProvider theme={primary}>
-        <CalendarProvider>
-          {/* <Mapkit
+        {/* <Mapkit
             handleAuthorization={(done) => {
               fetch('https://192.168.1.4:8000/jwt/mapkit')
                 .then((response) => response.json())
                 .then(({ token }) => done(token));
             }}
           /> */}
-          <Component {...props} />
-        </CalendarProvider>
+        <Component {...props} />
 
         <NormalizeStyle />
         <GlobalStyle />
