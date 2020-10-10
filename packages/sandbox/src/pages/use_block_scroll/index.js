@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import useWindowSize from '@jwdinker/use-window-size';
 import { Box, Centered, Column, Text, Row, Absolute } from '@jwdinker/styled-system';
 import useBlockScroll from '@jwdinker/use-block-scroll';
 import upTo from '@jwdinker/up-to';
