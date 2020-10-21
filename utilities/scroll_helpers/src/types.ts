@@ -11,3 +11,5 @@ export interface ScrollDimensions {
 export type ScrollableElement = HTMLElement | Window | Document;
 
 export interface ScrollMeasurements extends ScrollCoordinates, ScrollDimensions {}
+
+export type ScrollAncestors = Array<Element | Window>;

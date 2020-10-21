@@ -1,6 +1,8 @@
 export const OVERFLOW_VALUES = ['overflow-x', 'overflow-y', 'overflow'];
 
-export type ScrollableAncestor = Window | HTMLElement;
+export type ScrollableAncestor = Window | Element;
+
+export type ScrollableAncestors = Array<Window | Element>;
 
 export function hasOverflowableProperty(element: ScrollableAncestor): boolean {
   if (element === window) {
@@ -31,21 +33,23 @@ const getScrollableAncestor = (reference: ScrollableAncestor): ScrollableAncesto
 };
 
 export const getAllScrollableAncestors = (
-  reference: ScrollableAncestor,
-  ancestors: HTMLElement[] = []
-): HTMLElement[] => {
-  if (reference !== window) {
-    const parent = (reference as HTMLElement).parentNode as HTMLElement;
+  element: ScrollableAncestor,
+  ancestors: ScrollableAncestors = []
+): ScrollableAncestors => {
+  if (element !== window) {
+    const parent =
+      'parentNode' in element && element.parentNode instanceof HTMLElement
+        ? element.parentNode
+        : null;
 
-    const isBody = parent === document.body;
-    if (!isBody) {
+    if (parent) {
       if (hasOverflowableProperty(parent)) {
         ancestors.push(parent);
       }
       return getAllScrollableAncestors(parent, ancestors);
     }
   }
-
+  ancestors.push(window);
   return ancestors;
 };
 
