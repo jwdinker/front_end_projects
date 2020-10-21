@@ -1,11 +1,15 @@
 import * as React from 'react';
 
-import { getOffsets } from './helpers';
-import { UseOffsetsReturn, UseOffsetsElement } from './types';
+import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
+import {
+  haveOffsetsChanged,
+  getElementOffsets,
+  OFFSET_TYPES,
+  Offsets,
+  OffsetType,
+} from '@jwdinker/offset-helpers';
 
-export { UseOffsetsElement } from './types';
-
-export { Offsets } from './types';
+export { ElementOrReference } from '@jwdinker/get-element-or-reference';
 
 const { useState, useCallback, useEffect } = React;
 
@@ -18,35 +22,47 @@ export const INITIAL_OFFSETS = {
   width: 0,
 };
 
-function useOffsets(element: UseOffsetsElement): UseOffsetsReturn {
+export interface OffsetHandlers {
+  measure(): void;
+  reset(): void;
+}
+
+export type UseOffsetsReturn = [Offsets, OffsetHandlers];
+export { Offsets, OFFSET_TYPES } from '@jwdinker/offset-helpers';
+
+function useOffsets(
+  element: ElementOrReference,
+  type: OffsetType = OFFSET_TYPES.RELATIVE
+): UseOffsetsReturn {
   const [offsets, setOffsets] = useState(() => {
     return INITIAL_OFFSETS;
   });
 
-  const getElement = useCallback(() => {
-    return element && 'current' in element && element.current instanceof HTMLElement
-      ? element.current
-      : element instanceof HTMLElement
-      ? element
-      : null;
-  }, [element]);
+  const destructuredElement = getElement(element);
 
-  const remeasure = useCallback(() => {
-    const _element = getElement();
-
-    if (_element) {
-      const nextOffsets = getOffsets(_element);
-      setOffsets(nextOffsets);
+  const measure = useCallback(() => {
+    if (destructuredElement) {
+      const nextOffsets = getElementOffsets(destructuredElement, type);
+      setOffsets((previousOffsets) => {
+        return haveOffsetsChanged(previousOffsets, nextOffsets) ? nextOffsets : previousOffsets;
+      });
     }
-  }, [getElement]);
+  }, [destructuredElement, type]);
+
+  const reset = useCallback(() => {
+    setOffsets(INITIAL_OFFSETS);
+  }, []);
 
   useEffect(() => {
-    if (getElement()) {
-      remeasure();
-    }
-  }, [element, getElement, remeasure]);
+    measure();
+  }, [measure]);
 
-  return [offsets, remeasure];
+  const handlers = {
+    measure,
+    reset,
+  };
+
+  return [offsets, handlers];
 }
 
 export default useOffsets;
