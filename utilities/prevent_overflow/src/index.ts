@@ -35,18 +35,15 @@ export type PreventOverflowReturn = [PreventOverflowValues, PreventedSides];
 
 const SIDES = ['top', 'bottom', 'left', 'right'] as const;
 
+export const DEFAULT_PADDING: Padding = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+};
+
 function preventOverflow(props: PreventOverflowProps) {
-  const {
-    element,
-    boundaries,
-    padding = {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    },
-    allow = [],
-  } = props;
+  const { element, boundaries, padding = DEFAULT_PADDING, allow = [] } = props;
 
   const allowed = SIDES.reduce((accumulator, side) => {
     accumulator[side] = allow.indexOf(side) > -1;
