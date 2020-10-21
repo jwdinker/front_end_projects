@@ -1,6 +1,10 @@
 import { RefObject } from 'react';
 
-export type ElementOrReference = RefObject<HTMLElement | undefined | null> | null | HTMLElement;
+export type ElementOrReference =
+  | RefObject<HTMLElement | undefined | null>
+  | null
+  | HTMLElement
+  | undefined;
 
 export type GetElementReturn = HTMLElement | undefined | null;
 
