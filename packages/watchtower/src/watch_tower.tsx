@@ -20,7 +20,6 @@ The roles of WatchTower is to:
          getBoundingClientRect). 
      - scrollable dimensions. 
      - ancestor dimensions. 
-
   Essentially, the WatchTower has a one to many relationship with useOffsets hooks.
 */
 
@@ -42,9 +41,9 @@ function WatchTower({
   const target = useRef<Target>(null);
   useEffect(() => {
     target.current = getTarget();
-  }, [scrollable, isBrowser, getTarget]);
+  }, [getTarget]);
 
-  const [container, remeasure] = useOffsets(target);
+  const [container, { measure }] = useOffsets(target, 'absolute');
 
   /*
   useScrollSize
@@ -84,9 +83,9 @@ function WatchTower({
 
   useEffect(() => {
     if (changed && isBrowser && target.current) {
-      remeasure();
+      measure();
     }
-  }, [changed, isBrowser, remeasure]);
+  }, [changed, isBrowser, measure]);
 
   const value = useMemo((): WatchTowerContext => {
     return [

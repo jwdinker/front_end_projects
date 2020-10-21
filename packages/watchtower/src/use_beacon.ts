@@ -15,20 +15,20 @@ function useBeacon(
   element: ElementOrReference,
   { dynamicOffsets = true }: UseBeaconOptions = {}
 ): UseBeaconReturn {
-  const [offsets, remeasure] = useOffsets(element, true);
+  const [offsets, { measure }] = useOffsets(element, 'absolute');
   const [{ container, scroll }, changed] = useWatchTowerContext();
 
   useEffect(() => {
     if (changed) {
-      remeasure();
+      measure();
     }
-  }, [changed, element, remeasure]);
+  }, [changed, measure]);
 
   const value = useMemo((): UseBeaconReturn => {
     if (dynamicOffsets) {
       const { height, width } = offsets;
-      const top = offsets.top - scroll.x;
-      const left = offsets.left - scroll.y;
+      const top = offsets.top - scroll.y;
+      const left = offsets.left - scroll.x;
       return [
         {
           element: {
