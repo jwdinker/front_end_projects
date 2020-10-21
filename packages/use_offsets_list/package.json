@@ -1,12 +1,12 @@
 {
-  "name": "@jwdinker/use-flip",
+  "name": "@jwdinker/use-offsets-list",
   "version": "1.0.0",
   "main": "./dist/index.js",
-  "description": "A react hook for generating the replacement alignment of a tethered element given boundaries.",
+  "description": "A react hook for recursively calculating an element's offsets relative to the document.",
   "keywords": [
     "react",
-    "flip",
-    "popover",
+    "measurements",
+    "size",
     "hooks"
   ],
   "files": [
@@ -30,7 +30,8 @@
     "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
   },
   "dependencies": {
-    "@jwdinker/use-overflowing": "1.0.0"
-  },
-  "devDependencies": {}
+    "@jwdinker/get-element-or-reference": "1.0.0",
+    "@jwdinker/offset-helpers": "1.0.0",
+    "tslib": "^1.10.0"
+  }
 }
