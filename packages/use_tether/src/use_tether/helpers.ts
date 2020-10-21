@@ -1,4 +1,4 @@
-import { CoordinateFromPosition } from './types';
+import { CoordinateFromPosition } from '../types';
 
 export const coordinateFromPosition: CoordinateFromPosition = {
   top: (coordinates, dimensions) => coordinates.top - dimensions.height,

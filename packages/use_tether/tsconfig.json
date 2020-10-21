@@ -13,7 +13,9 @@
   "include": ["src"],
   "references": [
     { "path": "../use_bounding_client_rect" },
-    { "path": "../use_dimensions" },
-    { "path": "../../utilities/get_scrollable_ancestor" }
+    { "path": "../use_scroll_coordinates" },
+    { "path": "../use_ancestors_scroll_listener" },
+    { "path": "../use_offsets_list" },
+    { "path": "../..//utilities/prevent_overflow" }
   ]
 }
