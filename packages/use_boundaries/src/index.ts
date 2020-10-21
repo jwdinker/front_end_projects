@@ -1,7 +1,7 @@
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useWindowSize from '@jwdinker/use-window-size';
 import { useScroll, getScrollableAncestor } from '@jwdinker/use-scroll';
-import { useMemo, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Boundaries, BoundaryElement } from './types';
 import { mergeViewportScrollWithWindowRect } from './helpers';
 
@@ -15,7 +15,7 @@ import { mergeViewportScrollWithWindowRect } from './helpers';
  * ancestor of the element as a boundary.
  */
 function useBoundaries(element: BoundaryElement = null, useOverflowAncestor = true): Boundaries {
-  const ancestor = useRef<HTMLElement | Window | null>(null);
+  const ancestor = useRef<HTMLElement | Window | null | Document>(null);
   const _element = useRef<HTMLElement | null>(null);
   const _window = useRef<Window | null>(null);
   const [windowRectangle] = useWindowSize();
@@ -42,19 +42,7 @@ function useBoundaries(element: BoundaryElement = null, useOverflowAncestor = tr
 
   const [scroll] = useScroll(_window);
 
-  const [rectangle, watch, unwatch] = useBoundingClientRect(
-    _element,
-    useMemo(() => ({ addPageOffsets: true }), [])
-  );
-
-  useEffect(() => {
-    if (_element.current) {
-      watch();
-      return (): void => {
-        unwatch();
-      };
-    }
-  }, [unwatch, watch]);
+  const [rectangle, handlers] = useBoundingClientRect(_element);
 
   return _element.current ? rectangle : mergeViewportScrollWithWindowRect(windowRectangle, scroll);
 }
