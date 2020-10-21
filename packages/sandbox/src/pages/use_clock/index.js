@@ -94,7 +94,7 @@ const HourLabels = () => {
   });
 };
 
-function Index() {
+function AnalogClock() {
   const time = useClock('second', 100);
 
   const minuteHand = useRef();
@@ -132,4 +132,4 @@ function Index() {
   );
 }
 
-export default withCoreProviders(Index);
+export default withCoreProviders(AnalogClock);

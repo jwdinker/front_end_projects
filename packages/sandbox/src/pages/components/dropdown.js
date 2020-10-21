@@ -86,19 +86,19 @@ function DropDown({ label, children }) {
     };
   });
 
-  const replacementAlignment = useFlip(measurements.anchor, boundaries, {
-    preference: 'bottom',
-    tethered: [measurements.popover, measurements.arrow],
-  });
+  //   const replacementAlignment = useFlip(measurements.anchor, boundaries, {
+  //     preference: 'bottom',
+  //     tethered: [measurements.popover, measurements.arrow],
+  //   });
 
   useEffect(() => {
     watch();
     return unwatch;
   }, [unwatch, watch]);
 
-  useEffect(() => {
-    align[replacementAlignment]();
-  }, [align, replacementAlignment]);
+  //   useEffect(() => {
+  //     align[replacementAlignment]();
+  //   }, [align, replacementAlignment]);
 
   //   const transitions = useTransition(active, null, {
   //     from: {
@@ -157,7 +157,7 @@ function DropDown({ label, children }) {
           <animated.div ref={arrowReference} style={arrow}>
             {children[0]}
           </animated.div>
-          <animated.div ref={popoverReference} style={dropdown}>
+          <animated.div id="FUCK" ref={popoverReference} style={dropdown}>
             {children[1]}
           </animated.div>
         </>
@@ -174,40 +174,41 @@ function DropDown({ label, children }) {
           {label}
         </Button>
 
-        {getChildren()}
+        <animated.div style={dropdown}>
+          <Box ref={popoverReference}>{children}</Box>
+        </animated.div>
       </>
     );
-  }, [getChildren, label, toggle]);
+  }, [arrow, children, dropdown, label, numberOfChildren, toggle]);
 }
 
 function Index() {
   const element = useRef();
 
   return (
-    <Box height="100vh" maxHeight="100%" width={1}>
-      <Box height="100%" width={1} overflow="scroll">
-        <Box height="300%" width={1}>
-          <Centered height="100%" width={1}>
-            <DropDown label="Stuff">
-              <Box width="30px">
-                <Triangle fill="blue.5" />
-              </Box>
-              <Box
-                border="1px solid"
-                bg="white"
-                px={3}
-                py={3}
-                borderRadius="8px"
-                boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)">
-                <Box>option 1</Box>
-                <Box>option 2</Box>
-              </Box>
-            </DropDown>
-          </Centered>
-        </Box>
-      </Box>
+    <Box height="300vh" width={1}>
+      <Centered height="100%" width={1}>
+        <DropDown label="Stuff">
+          <Box width="30px">
+            <Triangle fill="blue.5" />
+          </Box>
+          <Box
+            border="1px solid"
+            bg="white"
+            px={3}
+            py={3}
+            borderRadius="8px"
+            boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)">
+            <Box>option 1</Box>
+            <Box>option 2</Box>
+          </Box>
+        </DropDown>
+      </Centered>
     </Box>
   );
 }
 
-export default withCoreProviders(Index);
+const Page = withCoreProviders(Index);
+
+Page.displayName = 'Dropdown';
+export default Page;

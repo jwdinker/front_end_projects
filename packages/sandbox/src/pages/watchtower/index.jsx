@@ -4,13 +4,13 @@ import { Box, Row, Text, Centered, Fixed, Absolute, Relative } from '@jwdinker/s
 import { WatchTower, useBeacon } from '@jwdinker/watchtower';
 import { withCoreProviders } from '../../hocs';
 
-console.log('watchtower: ', WatchTower, useBeacon);
-
 const Contents = () => {
   const ref = useRef();
   const state = useBeacon(ref);
 
   console.log('STATE: ', JSON.stringify(state, null, 2));
+
+  const [{ scroll }] = state;
 
   return useMemo(
     () => (
@@ -24,13 +24,13 @@ const Contents = () => {
             height="200px"
             width="200px">
             <Centered width={1} height="100%">
-              {/* <Text>{`scrollTop:${scroll.top}`}</Text> */}
+              <Text>{`scrollTop:${scroll.y}`}</Text>
             </Centered>
           </Box>
         </Centered>
       </Box>
     ),
-    []
+    [scroll.y]
   );
 };
 
