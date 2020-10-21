@@ -5,16 +5,20 @@ export function makeBlockable(blockable: BlockableAxis) {
   const isYBlocked = blockable === 'y' || areBothBlocked;
   const isXBlocked = blockable === 'x' || areBothBlocked;
 
-  return (target: HTMLElement, targetTouches: TouchList, coordinates: Coordinates): boolean => {
-    const x = targetTouches[0].clientX - coordinates.x;
-    const y = targetTouches[0].clientY - coordinates.y;
+  return (
+    scroller: HTMLElement,
+    currentCoordinates: Coordinates,
+    lastCoordinates: Coordinates
+  ): boolean => {
+    const directionX = lastCoordinates.x - currentCoordinates.x;
+    const directionY = lastCoordinates.y - currentCoordinates.y;
 
-    const { scrollTop, scrollLeft, scrollHeight, scrollWidth } = target;
+    const { scrollTop, scrollLeft, scrollHeight, scrollWidth } = scroller;
 
-    const atTop = scrollTop === 0 && y > 0;
-    const atLeft = scrollLeft === 0 && x > 0;
-    const atBottom = scrollHeight - scrollTop <= target.clientHeight && y < 0;
-    const atRight = scrollWidth - scrollLeft <= target.clientWidth && x < 0;
+    const atTop = scrollTop <= 0 && directionY <= 0;
+    const atLeft = scrollLeft <= 0 && directionX <= 0;
+    const atBottom = scrollHeight - scrollTop <= scroller.clientHeight && directionY > 0;
+    const atRight = scrollWidth - scrollLeft <= scroller.clientWidth && directionX > 0;
 
     const atHorizontalEdge = isXBlocked && (atLeft || atRight);
     const atVerticalEdge = isYBlocked && (atTop || atBottom);
@@ -23,3 +27,7 @@ export function makeBlockable(blockable: BlockableAxis) {
     return canBlock;
   };
 }
+
+export const getCoordinates = (targetTouches: TouchList): Coordinates => {
+  return { x: targetTouches[0].clientX, y: targetTouches[0].clientY };
+};

@@ -1,4 +1,4 @@
-import { AlignmentTypes, AlignmentOppositeTypes, Alignment } from './types';
+import { Alignment, DefaultFlip } from './types';
 
 export const ALIGNMENTS_KEYS = {
   top: ['centerX', 'top'] as const,
@@ -26,8 +26,27 @@ export const ALIGNMENT_OPPOSITE_TYPES = {
 export const DEFAULT_ANCHOR_MEASUEMENTS = {
   top: 0,
   left: 0,
-  right: 0,
-  bottom: 0,
   height: 0,
   width: 0,
 };
+
+export const DEFAULT_FLIP: DefaultFlip = {
+  top: ['bottom', 'left', 'right'],
+  left: ['right', 'top', 'bottom'],
+  right: ['left', 'top', 'bottom'],
+  bottom: ['top', 'left', 'right'],
+};
+
+export const SIDE_OPPOSITES = {
+  top: 'bottom',
+  left: 'right',
+  bottom: 'top',
+  right: 'left',
+} as const;
+
+export const ARROW_ROTATIONS = {
+  top: 180,
+  left: 90,
+  right: -90,
+  bottom: 0,
+} as const;

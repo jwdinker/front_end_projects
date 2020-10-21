@@ -9,7 +9,7 @@ import { dummyImages } from '../../dummy_data';
 const Contents = () => {
   const container = useRef();
   const [items, setItems] = useState(dummyImages);
-  const [offsets, remeasure] = useOffsets(container);
+  const [offsets, { measure }] = useOffsets(container);
 
   const [dimensions, changed] = useScrollSize(typeof window !== 'undefined' ? window : null);
 
@@ -34,9 +34,9 @@ const Contents = () => {
 
   useEffect(() => {
     if (changed) {
-      remeasure();
+      measure();
     }
-  }, [changed, remeasure]);
+  }, [changed, measure]);
 
   console.log('STATE', JSON.stringify({ ...dimensions, changed }, null, 2));
 

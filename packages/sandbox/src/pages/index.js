@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from '@jwdinker/styled-system';
 
 import { withCoreProviders } from '../hocs';

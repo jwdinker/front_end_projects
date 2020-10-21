@@ -1,56 +1,80 @@
 import { useEffect, useRef } from 'react';
 
 import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
-import { getAllScrollableAncestors } from '@jwdinker/get-scrollable-ancestor';
+import { getAllScrollableAncestors, ScrollableAncestors } from '@jwdinker/get-scrollable-ancestor';
 
 type ScrollHandler = (event: Event) => void;
+
+type AncestorScrollListenerElement = ElementOrReference | ElementOrReference[];
 
 const SCROLL_EVENT = 'scroll';
 
 export { ElementOrReference } from '@jwdinker/get-element-or-reference';
 export { default as getElement } from '@jwdinker/get-element-or-reference';
 
+const getScrollables = (
+  elements: ElementOrReference | ElementOrReference[]
+): ScrollableAncestors => {
+  if (Array.isArray(elements)) {
+    let scrollables: ScrollableAncestors = [];
+    for (let i = 0; i < elements.length; i += 1) {
+      const element = getElement(elements[i]);
+      if (element instanceof HTMLElement) {
+        const ancestors = getAllScrollableAncestors(element);
+        scrollables = scrollables.concat(ancestors);
+      }
+    }
+
+    const set = new Set(scrollables);
+    return [...set];
+  }
+
+  if (elements instanceof HTMLElement) {
+    return getAllScrollableAncestors(elements);
+  }
+  return [];
+};
+
 function useAncestorsScrollListener(
-  element: ElementOrReference,
-  handler: ScrollHandler,
+  element: AncestorScrollListenerElement,
+  callback: ScrollHandler,
   { passive = true, capture = true, once = false }: AddEventListenerOptions = {}
 ): void {
-  const ancestors = useRef<HTMLElement[] | undefined>();
-
-  const saved = useRef<ScrollHandler>(handler);
+  const saved = useRef<ScrollHandler | null>(null);
 
   useEffect(() => {
-    saved.current = handler;
-  }, [handler]);
+    saved.current = callback;
+    return () => {
+      saved.current = null;
+    };
+  }, [callback]);
+
+  const dependencies = Array.isArray(element)
+    ? [...element, capture, once, passive]
+    : [element, capture, once, passive];
 
   useEffect(() => {
-    const _element = getElement(element);
-    if (_element) {
-      ancestors.current = getAllScrollableAncestors(_element);
+    const ancestors = getScrollables(element);
 
-      const options = { passive, capture, once };
+    const options = { passive, capture, once };
 
-      const _handler = (event: Event): void => saved.current(event);
-
-      if (ancestors.current && ancestors.current.length > 0) {
-        ancestors.current.forEach((ancestor) => {
-          ancestor.addEventListener(SCROLL_EVENT, _handler, options);
-        });
+    const _handler = (event: Event): void => {
+      if (saved.current) {
+        saved.current(event);
       }
+    };
 
-      document.body.addEventListener(SCROLL_EVENT, _handler, options);
+    ancestors.forEach((ancestor) => {
+      ancestor.addEventListener(SCROLL_EVENT, _handler, options);
+    });
 
-      return (): void => {
-        if (ancestors.current && ancestors.current.length > 0) {
-          ancestors.current.forEach((ancestor) => {
-            ancestor.addEventListener(SCROLL_EVENT, _handler, options);
-          });
-        }
-
-        document.body.removeEventListener(SCROLL_EVENT, _handler);
-      };
-    }
-  }, [capture, element, handler, once, passive]);
+    return () => {
+      ancestors.forEach((ancestor) => {
+        ancestor.addEventListener(SCROLL_EVENT, _handler, options);
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...dependencies]);
 }
 
 export default useAncestorsScrollListener;

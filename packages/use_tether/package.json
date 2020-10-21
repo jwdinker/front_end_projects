@@ -26,8 +26,11 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {},
   "dependencies": {
+    "@jwdinker/prevent-overflow": "1.0.0",
+    "@jwdinker/use-ancestors-scroll-listener": "1.0.0",
     "@jwdinker/use-bounding-client-rect": "1.0.0",
-    "@jwdinker/use-dimensions": "1.0.0",
+    "@jwdinker/use-offsets-list": "1.0.0",
+    "@jwdinker/use-scroll-coordinates": "1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {}

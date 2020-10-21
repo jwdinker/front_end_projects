@@ -34,7 +34,7 @@ class Document extends NextDocument {
     return (
       <Html>
         <Head>
-          <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js" />
+          {/* <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js" /> */}
           <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>

@@ -11,5 +11,9 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": []
+  "references": [
+    { "path": "../../utilities/get_element_or_reference" },
+    { "path": "../../utilities/make_has_changed" },
+    { "path": "../../utilities/offset_helpers" }
+  ]
 }

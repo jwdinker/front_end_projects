@@ -30,6 +30,9 @@
     "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
   },
   "dependencies": {
+    "@jwdinker/get-element-or-reference": "1.0.0",
+    "@jwdinker/make-has-changed": "1.0.0",
+    "@jwdinker/offset-helpers": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

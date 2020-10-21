@@ -24,9 +24,6 @@
       "path": "../use_animation_frame"
     },
     {
-      "path": "../use_element_visibility"
-    },
-    {
       "path": "../use_event_listener"
     },
     {
@@ -72,16 +69,7 @@
       "path": "../use_dimensions"
     },
     {
-      "path": "../use_popover"
-    },
-    {
-      "path": "../use_prevent_overflow"
-    },
-    {
       "path": "../use_boundaries"
-    },
-    {
-      "path": "../use_flip"
     },
     {
       "path": "../use_overflowing"
@@ -135,7 +123,16 @@
       "path": "../watchtower"
     },
     {
+      "path": "../use_rotatable"
+    },
+    {
       "path": "../../utilities/visibility_helpers"
+    },
+    {
+      "path": "../../utilities/prevent_overflow"
+    },
+    {
+      "path": "../use_scroll_coordinates"
     }
   ],
   "exclude": ["node_modules"]

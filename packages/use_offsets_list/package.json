@@ -1,0 +1,37 @@
+{
+  "name": "@jwdinker/use-offsets-list",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "description": "A react hook for recursively calculating an element's offsets relative to the document.",
+  "keywords": [
+    "react",
+    "measurements",
+    "size",
+    "hooks"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
+    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
+    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
+  },
+  "dependencies": {
+    "@jwdinker/get-element-or-reference": "1.0.0",
+    "@jwdinker/offset-helpers": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}

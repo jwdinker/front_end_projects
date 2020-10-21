@@ -1,23 +1,9 @@
-import { Rectangle } from '@jwdinker/use-bounding-client-rect';
-import { Dimensions } from '@jwdinker/use-dimensions';
-
-export type Alignment = 'top' | 'bottom' | 'left' | 'right';
+import { Padding } from '@jwdinker/prevent-overflow';
+import { ElementOrReference } from '@jwdinker/use-offsets-list';
 
 export type Side = 'top' | 'bottom' | 'left' | 'right';
 
-export interface AlignmentTypes {
-  top: 'top';
-  bottom: 'bottom';
-  left: 'left';
-  right: 'right';
-}
-
-export interface AlignmentOppositeTypes {
-  top: 'bottom';
-  bottom: 'top';
-  left: 'right';
-  right: 'left';
-}
+export type Alignment = Side;
 
 export interface AbbreviatedRectangle {
   top: number;
@@ -26,42 +12,48 @@ export interface AbbreviatedRectangle {
   width: number;
 }
 
-export interface TetherTogglers {
-  watch(): void;
-  unwatch(): void;
+export interface FlippableSides {
+  top?: Side[];
+  left?: Side[];
+  right?: Side[];
+  bottom?: Side[];
 }
 
-type CoordinateFromPositionFn = (
+export interface DefaultFlip {
+  top?: Side[];
+  left?: Side[];
+  right?: Side[];
+  bottom?: Side[];
+}
+
+export interface FlipOptions {
+  flip?: FlippableSides;
+  preference?: Alignment;
+  tethered?: AbbreviatedRectangle[];
+}
+
+export type Anchor = AbbreviatedRectangle | ElementOrReference;
+
+export interface PreventableOverflowOptions {
+  allow?: Side[];
+  padding?: Padding[];
+}
+
+export interface Dimensions {
+  height: number;
+  width: number;
+}
+
+export type CoordinateFromPositionFn = (
   coordinates: AbbreviatedRectangle,
   dimensions: Dimensions
 ) => number;
 
 export interface CoordinateFromPosition {
   top: CoordinateFromPositionFn;
+  centerX: CoordinateFromPositionFn;
+  centerY: CoordinateFromPositionFn;
   bottom: CoordinateFromPositionFn;
   left: CoordinateFromPositionFn;
   right: CoordinateFromPositionFn;
-  centerX: CoordinateFromPositionFn;
-  centerY: CoordinateFromPositionFn;
 }
-
-export type UseTetherReturnValue = [
-  AbbreviatedRectangle | Rectangle,
-  AbbreviatedRectangle | Rectangle,
-  TetherTogglers
-];
-
-export type Anchor =
-  | React.RefObject<HTMLElement | undefined>
-  | Rectangle
-  | AbbreviatedRectangle
-  | null;
-
-export interface Align {
-  top(): void;
-  bottom(): void;
-  left(): void;
-  right(): void;
-}
-
-export type UseAlignmentReturnValue = [Alignment, Align];

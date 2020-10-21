@@ -1,0 +1,17 @@
+{
+  "name": "@jwdinker/offset-helpers",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "peerDependencies": {},
+  "dependencies": {
+    "@jwdinker/make-has-changed": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}

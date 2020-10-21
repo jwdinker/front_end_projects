@@ -11,5 +11,5 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [{ "path": "../use_event_listener" }]
+  "references": [{ "path": "../use_event_listener" }, { "path": "../use_timeout" }]
 }

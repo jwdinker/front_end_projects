@@ -1,10 +1,10 @@
-import { ScrollableElement } from './types';
+import { ScrollableElement, ScrollAncestors } from './types';
 import isOverflowable from './is_overflowable';
 
 function getAllScrollableAncestors(
   element: ScrollableElement,
-  ancestors: HTMLElement[] = []
-): HTMLElement[] {
+  ancestors: ScrollAncestors = []
+): ScrollAncestors {
   if (element !== window) {
     const parent =
       'parentNode' in element && element.parentNode instanceof HTMLElement
@@ -18,7 +18,7 @@ function getAllScrollableAncestors(
       return getAllScrollableAncestors(parent, ancestors);
     }
   }
-
+  ancestors.push(window);
   return ancestors;
 }
 
