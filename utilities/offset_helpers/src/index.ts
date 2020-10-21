@@ -28,16 +28,15 @@ export const getPosition = (node: HTMLElement): { top: number; left: number } =>
   let top = 0;
   let left = 0;
 
-  let element: Element = node;
+  let element: Element | null = node;
   while (element) {
     if (element instanceof HTMLElement) {
       const { offsetTop, offsetLeft, clientLeft, clientTop } = element;
       top += offsetTop + clientTop;
       left += offsetLeft + clientLeft;
-      const parent = element.offsetParent;
-      if (parent) {
-        element = parent;
-      }
+      element = element.offsetParent;
+    } else {
+      element = null;
     }
   }
   return {
