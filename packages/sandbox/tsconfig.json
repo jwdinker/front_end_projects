@@ -69,13 +69,7 @@
       "path": "../use_dimensions"
     },
     {
-      "path": "../use_popover"
-    },
-    {
       "path": "../use_boundaries"
-    },
-    {
-      "path": "../use_flip"
     },
     {
       "path": "../use_overflowing"
@@ -136,6 +130,9 @@
     },
     {
       "path": "../../utilities/prevent_overflow"
+    },
+    {
+      "path": "../use_scroll_coordinates"
     }
   ],
   "exclude": ["node_modules"]
