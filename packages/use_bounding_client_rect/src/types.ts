@@ -13,23 +13,19 @@ export interface Rectangle {
   x?: number;
   y?: number;
 }
-
-export type UseBoundingClientRectReturn = [Rectangle, StartFrameLoop, StopFrameLoop];
-
-export interface UseBoundingClientRectOptions {
-  /**
-   * Boolean for determining whether the window x and y offsets should be
-   * included in the measurements.  Defaults to false
-   */
-  addPageOffsets?: boolean;
+export interface UseBoundingClientRectHandlers {
+  update(): void;
+  watch: StartFrameLoop;
+  unwatch: StopFrameLoop;
 }
+
+export type UseBoundingClientRectReturn = [Rectangle, UseBoundingClientRectHandlers];
 
 export type UseBoundingClientRect = (
   /**
    * An HTML element or React reference containing a HTML Element.
    */
-  element: RectangleElement,
-  options: UseBoundingClientRectOptions
+  element: RectangleElement
 ) => UseBoundingClientRectReturn;
 
 export type HasChanged = (previous: Rectangle, current: Rectangle) => boolean;

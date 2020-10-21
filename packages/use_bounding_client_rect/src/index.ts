@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
-import getElement from '@jwdinker/get-element-or-reference';
-import { HasChanged, UseBoundingClientRect } from './types';
+import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
+import { HasChanged, UseBoundingClientRectReturn } from './types';
 
 export * from './types';
 
@@ -21,7 +21,22 @@ const MEASURABLE_PROPERTIES = ['top', 'left', 'height', 'width'] as const;
 const hasChanged: HasChanged = (previous, current) =>
   MEASURABLE_PROPERTIES.some((property) => previous[property] !== current[property]);
 
-const useBoundingClientRect: UseBoundingClientRect = (element, { addPageOffsets = false } = {}) => {
+const getMeasurements = (element: HTMLElement) => {
+  const { top, bottom, left, right, height, width, x, y } = element.getBoundingClientRect();
+  return {
+    top,
+    bottom,
+    left,
+    right,
+    height,
+    width,
+    x,
+    y,
+  };
+};
+
+function useBoundingClientRect(element: ElementOrReference): UseBoundingClientRectReturn {
+  const hasInitiallyMeasured = useRef(false);
   const [measurements, setMeasurements] = useState(() => INITIAL_STATE);
 
   const handler = (): void => {
@@ -29,7 +44,7 @@ const useBoundingClientRect: UseBoundingClientRect = (element, { addPageOffsets 
 
     if (_element) {
       const { top, bottom, left, right, height, width, x, y } = _element.getBoundingClientRect();
-      const rect = {
+      const nextMeasurements = {
         top,
         bottom,
         left,
@@ -40,24 +55,30 @@ const useBoundingClientRect: UseBoundingClientRect = (element, { addPageOffsets 
         y,
       };
 
-      if (addPageOffsets) {
-        const scrollLeft = window.pageXOffset;
-        const scrollTop = window.pageYOffset;
-        rect.top += scrollTop;
-        rect.bottom += scrollTop;
-        rect.left += scrollLeft;
-        rect.right += scrollLeft;
-      }
-
-      if (hasChanged(measurements, rect)) {
-        setMeasurements(rect);
-      }
+      setMeasurements((previousMeasurements) => {
+        return hasChanged(previousMeasurements, nextMeasurements)
+          ? nextMeasurements
+          : previousMeasurements;
+      });
     }
   };
 
   const [watch, unwatch] = useAnimationFrame(handler);
 
-  return [measurements, watch, unwatch];
-};
+  useEffect(() => {
+    const _element = getElement(element);
+    if (!hasInitiallyMeasured.current && _element) {
+      setMeasurements(getMeasurements(_element));
+    }
+  }, [element]);
+
+  const handlers = {
+    update: handler,
+    watch,
+    unwatch,
+  };
+
+  return [measurements, handlers];
+}
 
 export default useBoundingClientRect;
