@@ -13,7 +13,6 @@
   "include": ["src"],
   "references": [
     { "path": "../use_event_listener" },
-    { "path": "../use_timeout" },
-    { "path": "../../utilities/easing_fns" }
+    {"path": "../use_request_animation_frame_state"}
   ]
 }
