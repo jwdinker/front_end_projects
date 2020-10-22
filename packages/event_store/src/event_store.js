@@ -1,4 +1,4 @@
-import { getSupportedEventOptions } from './helpers';
+import getSupportedEventOptions from '@jwdinker/get-supported-event-options';
 
 class EventStore {
   constructor(target) {

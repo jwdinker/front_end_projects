@@ -11,5 +11,5 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": []
+  "references": [{"path": "../../utilities/get_supported_event_options"}]
 }
