@@ -1,0 +1,22 @@
+{
+  "name": "@jwdinker/use-request-animation-frame-state",
+  "version": "1.0.0",
+  "description": "A react hook for requesting the state be updated before the next animation frame.",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
