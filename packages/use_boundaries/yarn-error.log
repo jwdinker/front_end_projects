@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/jwdinker/.nvm/versions/node/v11.13.0/bin/node /usr/local/Cellar/yarn/1.21.1/libexec/bin/yarn.js add @jwdinker/use-offsets-list@1.0.0
+  /Users/jwdinker/.nvm/versions/node/v11.13.0/bin/node /usr/local/Cellar/yarn/1.21.1/libexec/bin/yarn.js add @jwdinker/use-ancestor-scroll-listener@1.0.0
 
 PATH: 
   /Users/jwdinker/.nvm/versions/node/v11.13.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/jwdinker/google-cloud-sdk/bin:/Users/jwdinker/.nvm/versions/node/v11.13.0/bin:/Users/jwdinker/npm/bin:/Library/PostgreSQL/11/bin:/Users/jwdinker/npm/bin:/Library/PostgreSQL/11/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@jwdinker%2fuse-offsets-list: Not found
+  Error: https://registry.yarnpkg.com/@jwdinker%2fuse-ancestor-scroll-listener: Not found
       at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.21.1/libexec/lib/cli.js:66947:18)
       at Request.self.callback (/usr/local/Cellar/yarn/1.21.1/libexec/lib/cli.js:140665:22)
       at Request.emit (events.js:193:13)
@@ -28,15 +28,14 @@ Trace:
 
 npm manifest: 
   {
-    "name": "@jwdinker/use-tether",
+    "name": "@jwdinker/use-boundaries",
     "version": "1.0.0",
     "main": "./dist/index.js",
-    "description": "A react hook for deriving position of an element based off an anchor element.",
+    "description": "A react hook for generating the overflow boundary values given an HTML Element",
     "keywords": [
       "react",
-      "measurements",
-      "size",
-      "visibility",
+      "boundaries",
+      "overflow",
       "hooks"
     ],
     "files": [
@@ -55,13 +54,13 @@ npm manifest:
     "browserslist": "> 0.25%, not dead",
     "scripts": {},
     "dependencies": {
+      "@jwdinker/get-containing-block": "1.0.0",
       "@jwdinker/get-scrollable-ancestor": "1.0.0",
-      "@jwdinker/use-ancestors-scroll-listener": "1.0.0",
       "@jwdinker/use-bounding-client-rect": "1.0.0",
-      "@jwdinker/use-dimensions": "1.0.0",
-      "@jwdinker/use-offsets": "1.0.5",
-      "@jwdinker/use-scroll-coordinates": "1.0.0",
-      "tslib": "^1.10.0"
+      "@jwdinker/use-element-reference-change": "1.0.0",
+      "@jwdinker/use-event-listener": "^3.0.3",
+      "@jwdinker/use-scroll": "^4.0.1",
+      "@jwdinker/use-window-size": "2.0.1"
     },
     "devDependencies": {}
   }

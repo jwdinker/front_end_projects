@@ -25,9 +25,11 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {},
   "dependencies": {
-    "@jwdinker/use-bounding-client-rect": "1.0.0",
-    "@jwdinker/use-scroll": "^4.0.1",
-    "@jwdinker/use-window-size": "2.0.1"
+    "@jwdinker/get-scrollable-ancestor": "1.0.0",
+    "@jwdinker/get-window-rectangle": "1.0.0",
+    "@jwdinker/make-has-changed": "1.0.0",
+    "@jwdinker/use-element-references-change": "1.0.0",
+    "@jwdinker/use-request-animation-frame-state": "1.0.0"
   },
   "devDependencies": {}
 }
