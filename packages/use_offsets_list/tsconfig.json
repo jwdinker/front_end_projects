@@ -12,7 +12,7 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../../utilities/get_element_or_reference" },
-    { "path": "../../utilities/offset_helpers" }
+    { "path": "../../utilities/offset_helpers" },
+    { "path": "../use_element_references_change" }
   ]
 }
