@@ -6,44 +6,36 @@ import useOffsetsList, { ElementOrReference } from '@jwdinker/use-offsets-list';
 import { Alignment, Anchor, AbbreviatedRectangle } from '../types';
 
 import { coordinateFromPosition } from './helpers';
-import { DEFAULT_ANCHOR_MEASUEMENTS, ALIGNMENTS_TYPES, ALIGNMENTS_KEYS } from '../constants';
+import { ALIGNMENTS_TYPES, ALIGNMENTS_KEYS } from '../constants';
+import useAnchor from '../use_anchor';
 
 function useTether(
-  anchor: Anchor = DEFAULT_ANCHOR_MEASUEMENTS,
+  anchor: ElementOrReference,
   elements: ElementOrReference[],
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
 ) {
-  const anchorReference = anchor && 'current' in anchor ? anchor : null;
-
-  const [anchorPosition, { update: updateAnchor }] = useBoundingClientRect(anchorReference);
+  const anchorMeasurements = useAnchor(anchor, elements);
   const [offsetsOfElements, remeasure] = useOffsetsList(elements);
-
-  const update = () => {
-    updateAnchor();
-  };
-
-  const references = [anchorReference, ...elements];
-  useAncestorScrollListener(references, update);
-
-  const anchorMeasurements = anchorReference ? anchorPosition : (anchor as AbbreviatedRectangle);
 
   const [x, y] = ALIGNMENTS_KEYS[alignment];
 
-  const tetherables: AbbreviatedRectangle[] = [];
+  const tetheredMeasurements: AbbreviatedRectangle[] = [];
   for (let index = 0; index < offsetsOfElements.length; index += 1) {
     const offsets = offsetsOfElements[index];
-    const coordinates = index === 0 ? anchorMeasurements : tetherables[index - 1];
+    const coordinates = index === 0 ? anchorMeasurements : tetheredMeasurements[index - 1];
     const top = coordinateFromPosition[y](coordinates, offsets);
     const left = coordinateFromPosition[x](coordinates, offsets);
 
-    tetherables.push({
-      ...offsets,
+    const { height, width } = offsets;
+    tetheredMeasurements.push({
       top,
       left,
+      height,
+      width,
     });
   }
 
-  return [tetherables, anchorMeasurements];
+  return [tetheredMeasurements, anchorMeasurements, remeasure];
 }
 
 export default useTether;

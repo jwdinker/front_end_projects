@@ -19,6 +19,7 @@ function useRequestAnimationFrameState<S>(
     return () => {
       if (id.current) {
         cancelAnimationFrame(id.current);
+        id.current = null;
       }
     };
   }, []);
