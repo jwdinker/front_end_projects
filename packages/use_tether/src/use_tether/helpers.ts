@@ -1,4 +1,7 @@
-import { CoordinateFromPosition, AbbreviatedRectangle } from '../types';
+import { Dimensions } from '@jwdinker/use-dimensions-list';
+import { AbbreviatedRectangle } from '@jwdinker/prevent-overflow';
+import { Alignment, CoordinateFromPosition } from '../types';
+import { ALIGNMENTS_KEYS } from '../constants';
 
 export const coordinateFromPosition: CoordinateFromPosition = {
   top: (coordinates, dimensions) => coordinates.top - dimensions.height,
@@ -11,45 +14,26 @@ export const coordinateFromPosition: CoordinateFromPosition = {
   right: (coordinates) => coordinates.left + coordinates.width,
 };
 
-interface GetStylesOptions {
-  raw?: boolean;
-  fixed?: boolean;
-}
+export const makeTetheredOffsets = (
+  anchorOffsets: AbbreviatedRectangle,
+  dimensionsOfTethered: Dimensions[],
+  alignment: Alignment
+) => {
+  const tetheredOffsets: AbbreviatedRectangle[] = [];
+  const [xType, yType] = ALIGNMENTS_KEYS[alignment];
 
-interface TetheredStyleProps {
-  top: number;
-  left: number;
-  rotate?: number;
-  height?: number;
-  width?: number;
-}
+  for (let index = 0; index < dimensionsOfTethered.length; index += 1) {
+    const dimensions = dimensionsOfTethered[index];
+    // if there is more than one element reference, the position of previous element is used.
+    const baseCoordinates = index === 0 ? anchorOffsets : tetheredOffsets[index - 1];
+    const top = coordinateFromPosition[yType](baseCoordinates, dimensions);
+    const left = coordinateFromPosition[xType](baseCoordinates, dimensions);
 
-function getTranform(unformattedTransform: TetheredStyleProps) {
-  const { top, left, rotate } = unformattedTransform;
-  let transform = `translate3d(${left}px,${top}px,0px)`;
-  if (typeof rotate !== 'undefined') {
-    transform += ` rotate(${rotate}deg)`;
+    tetheredOffsets.push({
+      top,
+      left,
+      ...dimensions,
+    });
   }
-  return transform;
-}
-
-function makeStyle(measurements: TetheredStyleProps, style: CSSStyleDeclaration) {
-  const transform = getTranform(measurements);
-
-  return {
-    ...style,
-    transform,
-    top: 0,
-    left: 0,
-  };
-}
-
-export function getStyles(
-  measurements: AbbreviatedRectangle | AbbreviatedRectangle[],
-  style: CSSStyleDeclaration
-) {
-  if (Array.isArray(measurements)) {
-    return measurements.map((measurement) => makeStyle(measurement, style));
-  }
-  return makeStyle(measurements, style);
-}
+  return tetheredOffsets;
+};

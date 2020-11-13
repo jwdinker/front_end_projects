@@ -13,8 +13,9 @@
   "include": ["src"],
   "references": [
     { "path": "../use_ancestors_scroll_listener" },
-    { "path": "../use_offsets_list" },
+    { "path": "../use_dimensions_list" },
     { "path": "../use_request_animation_frame_state" },
+    { "path": "../use_debounce_callback" },
     { "path": "../..//utilities/prevent_overflow" },
     { "path": "../..//utilities/get_containing_block" },
     { "path": "../..//utilities/make_has_changed" },

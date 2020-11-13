@@ -8,4 +8,5 @@ export { default as flippable } from './plugins/flippable';
 export { default as arrowable } from './plugins/arrowable';
 export { default as preventableOverflow } from './plugins/preventable_overflow';
 export { default as preventableOverflowWithArrow } from './plugins/preventable_overflow_with_arrow';
-export { getStyles } from './use_tether/helpers';
+export { default as getStyles } from './helpers/get_styles';
+export { ElementOrReference } from '@jwdinker/use-dimensions-list';

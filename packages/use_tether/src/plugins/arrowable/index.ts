@@ -22,14 +22,14 @@ _________^________
 */
 
 function arrowable(
-  rectangles: AbbreviatedRectangle[],
+  offsets: AbbreviatedRectangle[],
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
 ) {
   const isLeft = alignment === 'left';
   const isRight = alignment === 'right';
   const isHorizontallyAligned = isLeft || isRight;
   const key = alignment === 'top' || alignment === 'bottom' ? 'top' : 'left';
-  const arrow = rectangles[0];
+  const arrow = offsets[0];
 
   let rectangleOffset = 0;
   let rotationOffset = 0;
@@ -43,17 +43,17 @@ function arrowable(
     rotationOffset = arrow.height / 2 - arrow.width / 2;
   }
 
-  const updated = rectangles.map((rectangle, index) => {
+  const updated = offsets.map((offset, index) => {
     if (index === 0) {
       return {
-        ...rectangle,
+        ...offset,
         rotate: ARROW_ROTATIONS[alignment],
         [key]: isHorizontallyAligned ? arrow[key] - rotationOffset : arrow[key],
       };
     }
     return {
-      ...rectangle,
-      [key]: isHorizontallyAligned ? rectangle[key] + rectangleOffset : rectangle[key],
+      ...offset,
+      [key]: isHorizontallyAligned ? offset[key] + rectangleOffset : offset[key],
     };
   });
   return updated;

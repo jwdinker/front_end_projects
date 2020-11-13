@@ -1,41 +1,41 @@
-import useScrollCoordinates, { ScrollElement } from '@jwdinker/use-scroll-coordinates';
-import useAncestorScrollListener from '@jwdinker/use-ancestors-scroll-listener';
+import useDimensionsList, { ElementOrReference } from '@jwdinker/use-dimensions-list';
+import * as React from 'react';
+import useDebounceCallback from '@jwdinker/use-debounce-callback';
+import { Alignment, UseTetherReturn } from '../types';
 
-import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
-import useOffsetsList, { ElementOrReference } from '@jwdinker/use-offsets-list';
-import { Alignment, Anchor, AbbreviatedRectangle } from '../types';
-
-import { coordinateFromPosition } from './helpers';
-import { ALIGNMENTS_TYPES, ALIGNMENTS_KEYS } from '../constants';
+import { makeTetheredOffsets } from './helpers';
+import { ALIGNMENTS_TYPES } from '../constants';
 import useAnchor from '../use_anchor';
 
+const { useEffect, useCallback } = React;
+
 function useTether(
-  anchor: ElementOrReference,
-  elements: ElementOrReference[],
+  anchorReference: ElementOrReference,
+  tetheredReferences: ElementOrReference[],
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
-) {
-  const anchorMeasurements = useAnchor(anchor, elements);
-  const [offsetsOfElements, remeasure] = useOffsetsList(elements);
+): UseTetherReturn {
+  const [anchorOffsets, updatePosition] = useAnchor(anchorReference, tetheredReferences);
+  const [dimensions, resizeElements] = useDimensionsList(tetheredReferences);
 
-  const [x, y] = ALIGNMENTS_KEYS[alignment];
+  const updateSizeAndPosition = useCallback(() => {
+    updatePosition();
+    resizeElements();
+  }, [updatePosition, resizeElements]);
 
-  const tetheredMeasurements: AbbreviatedRectangle[] = [];
-  for (let index = 0; index < offsetsOfElements.length; index += 1) {
-    const offsets = offsetsOfElements[index];
-    const coordinates = index === 0 ? anchorMeasurements : tetheredMeasurements[index - 1];
-    const top = coordinateFromPosition[y](coordinates, offsets);
-    const left = coordinateFromPosition[x](coordinates, offsets);
+  const resizer = useDebounceCallback(updateSizeAndPosition, 100);
 
-    const { height, width } = offsets;
-    tetheredMeasurements.push({
-      top,
-      left,
-      height,
-      width,
-    });
-  }
+  useEffect(() => {
+    window.addEventListener('resize', resizer);
+    return () => {
+      window.removeEventListener('resize', resizer);
+    };
+  }, [resizer]);
 
-  return [tetheredMeasurements, anchorMeasurements, remeasure];
+  return [
+    makeTetheredOffsets(anchorOffsets, dimensions, alignment),
+    anchorOffsets,
+    updateSizeAndPosition,
+  ];
 }
 
 export default useTether;

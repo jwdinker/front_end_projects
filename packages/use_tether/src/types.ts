@@ -1,5 +1,5 @@
 import { Padding } from '@jwdinker/prevent-overflow';
-import { ElementOrReference } from '@jwdinker/use-offsets-list';
+import { ElementOrReference } from '@jwdinker/use-dimensions-list';
 
 export type Side = 'top' | 'bottom' | 'left' | 'right';
 
@@ -44,6 +44,10 @@ export interface Dimensions {
   width: number;
 }
 
+export interface TetheredTransform extends AbbreviatedRectangle {
+  rotate?: number | undefined;
+}
+
 export type CoordinateFromPositionFn = (
   coordinates: AbbreviatedRectangle,
   dimensions: Dimensions
@@ -57,3 +61,13 @@ export interface CoordinateFromPosition {
   left: CoordinateFromPositionFn;
   right: CoordinateFromPositionFn;
 }
+
+export type TetheredPosition = 'absolute' | 'fixed';
+
+export type UpdateAnchorPosition = () => void;
+
+export type UseAnchorReturn = [AbbreviatedRectangle, UpdateAnchorPosition];
+
+export type UpdateSizeAndPosition = () => void;
+
+export type UseTetherReturn = [AbbreviatedRectangle[], AbbreviatedRectangle, UpdateSizeAndPosition];
