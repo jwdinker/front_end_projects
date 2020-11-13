@@ -26,6 +26,7 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {},
   "dependencies": {
+    "@jwdinker/get-window-rectangle": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",
     "@jwdinker/use-ssr": "1.0.0",
     "@jwdinker/use-timeout": "1.0.0",

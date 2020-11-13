@@ -2,43 +2,9 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import useEventListener from '@jwdinker/use-event-listener';
 import useTimeout from '@jwdinker/use-timeout';
 import useSSR from '@jwdinker/use-ssr';
+import getWindowRectangle, { WindowRectangle } from '@jwdinker/get-window-rectangle';
 
-/**
- * The normalized measurements of the viewport.
- */
-export interface WindowRectangle {
-  top: number;
-  left: number;
-  right: number;
-  bottom: number;
-  height: number;
-  width: number;
-}
-
-const getWindowMeasurements = (): WindowRectangle => {
-  if (typeof window !== 'undefined') {
-    const width =
-      window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    const height =
-      window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    return {
-      width,
-      height,
-      top: 0,
-      left: 0,
-      right: width,
-      bottom: height,
-    };
-  }
-  return {
-    height: 0,
-    width: 0,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  };
-};
+export { WindowRectangle } from '@jwdinker/get-window-rectangle';
 
 /**
  *
@@ -69,12 +35,12 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
   const handler = useCallback(() => {
     clear();
     start();
-    setSize(getWindowMeasurements());
+    setSize(getWindowRectangle());
   }, [clear, start]);
 
   useEffect(() => {
     if (isBrowser) {
-      setSize(getWindowMeasurements());
+      setSize(getWindowRectangle());
     }
   }, [isBrowser]);
 
