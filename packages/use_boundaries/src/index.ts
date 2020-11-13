@@ -1,12 +1,13 @@
 import * as React from 'react';
 import useElementReferencesChange, {
   ReferenceCallback,
-  ElementReference,
+  ElementOrReference,
 } from '@jwdinker/use-element-references-change';
 import { getAllScrollableAncestors, ScrollableAncestors } from '@jwdinker/get-scrollable-ancestor';
 import getWindowRectangle from '@jwdinker/get-window-rectangle';
 import useRequestAnimationFrameState from '@jwdinker/use-request-animation-frame-state';
 import makeHasChanged from '@jwdinker/make-has-changed';
+import useDebounceCallback from '@jwdinker/use-debounce-callback';
 
 const { useRef, useEffect, useCallback } = React;
 
@@ -33,7 +34,7 @@ const INITIAL_MEASUREMENTS = {
   width: 0,
 };
 
-function useBoundaries(from: ElementReference = null): Boundaries {
+function useBoundaries(from: ElementOrReference = null, resizeDelay = 100): Boundaries {
   const scrollers = useRef<ScrollableAncestors>([]);
   const scrollParentOfReference = useRef<HTMLElement>();
 
@@ -112,23 +113,23 @@ function useBoundaries(from: ElementReference = null): Boundaries {
     order to remove the scroll event listeners (if there are any) to prevent
     state updates on an unmounted component.  
   */
-  useElementReferencesChange(from, { onReference, onUnmount: detach });
+  useElementReferencesChange(from, { onReference, onDereference: detach });
 
   /*
     The update function is run once to set the initial boundaries prior to a
     scroll event.  A resize event listener is also attach to account for changing
     boundaries as a result of window size changes.
   */
+
+  const resize = useDebounceCallback(update, resizeDelay);
+
   useEffect(() => {
     update();
-    const handleUpdate = () => {
-      update();
-    };
-    window.addEventListener('resize', handleUpdate);
+    window.addEventListener('resize', resize);
     return () => {
-      window.removeEventListener('resize', handleUpdate);
+      window.removeEventListener('resize', resize);
     };
-  }, [update]);
+  }, [resize, update]);
 
   return state;
 }

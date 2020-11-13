@@ -13,6 +13,7 @@
   "include": ["src"],
   "references": [
     { "path": "../use_element_references_change" },
+    { "path": "../use_debounce_callback" },
     { "path": "../use_request_animation_frame_state" },
     { "path": "../../utilities/get_scrollable_ancestor" },
     { "path": "../../utilities/get_window_rectangle" },

@@ -28,6 +28,7 @@
     "@jwdinker/get-scrollable-ancestor": "1.0.0",
     "@jwdinker/get-window-rectangle": "1.0.0",
     "@jwdinker/make-has-changed": "1.0.0",
+    "@jwdinker/use-debounce-callback": "1.0.0",
     "@jwdinker/use-element-references-change": "1.0.0",
     "@jwdinker/use-request-animation-frame-state": "1.0.0"
   },
