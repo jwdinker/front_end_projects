@@ -1,0 +1,32 @@
+{
+  "name": "@jwdinker/use-debounce-callback",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "description": "A react hook for creating a function that executes after a delay",
+  "keywords": [
+    "react",
+    "window",
+    "size",
+    "hooks"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Jack Dinker",
+      "email": "jwdinker.accounts@gmail.com"
+    }
+  ],
+  "peerDependencies": {
+    "react": "^16.8.x",
+    "react-dom": "^16.8.x"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "dependencies": {
+    "@jwdinker/use-timeout": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}
