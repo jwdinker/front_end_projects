@@ -14,6 +14,7 @@
   "references": [
     { "path": "../../utilities/get_element_or_reference" },
     { "path": "../../utilities/get_scrollable_ancestor" },
-    { "path": "../use_element_references_change" }
+    { "path": "../use_element_references_change" },
+    { "path": "../../utilities/get_supported_event_options" }
   ]
 }

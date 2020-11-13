@@ -14,8 +14,9 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@jwdinker/get-element-or-reference": "1.0.0",
     "@jwdinker/get-scrollable-ancestor": "1.0.0",
+    "@jwdinker/get-supported-event-options": "1.0.0",
+    "@jwdinker/use-element-references-change": "1.0.0",
     "tslib": "^1.10.0"
   }
 }
