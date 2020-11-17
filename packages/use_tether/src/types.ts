@@ -29,7 +29,6 @@ export interface DefaultFlip {
 export interface FlipOptions {
   flip?: FlippableSides;
   preference?: Alignment;
-  tethered?: AbbreviatedRectangle[];
 }
 
 export type Anchor = AbbreviatedRectangle | ElementOrReference;
