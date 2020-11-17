@@ -42,7 +42,7 @@ export const DEFAULT_PADDING: Padding = {
   bottom: 0,
 };
 
-function preventOverflow(props: PreventOverflowProps) {
+function preventOverflow(props: PreventOverflowProps): PreventOverflowReturn {
   const { element, boundaries, padding = DEFAULT_PADDING, allow = [] } = props;
 
   const allowed = SIDES.reduce((accumulator, side) => {
