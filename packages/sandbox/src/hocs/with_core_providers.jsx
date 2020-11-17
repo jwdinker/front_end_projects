@@ -9,7 +9,7 @@ import { Mapkit } from '@jwdinker/react-mapkitjs';
 import { primary } from '../themes';
 
 const GlobalStyle = createGlobalStyle`
-html,body{
+body {
   font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 `;

@@ -41,12 +41,9 @@ import useTether, {
 
 import useBoundaries from '@jwdinker/use-boundaries';
 import useForceUpdate from '@jwdinker/use-force-update';
-import makeCSSTransformFromObject from '@jwdinker/make-css-transform-from-object';
 import { withCoreProviders } from '../../hocs';
 
 const { log } = console;
-
-const getTransform = makeCSSTransformFromObject(['translate3d', 'rotate', 'scaleY']);
 
 const Popover = ({ anchorReference, children }) => {
   const popoverReference = useRef();
@@ -66,20 +63,14 @@ const Popover = ({ anchorReference, children }) => {
     boundaries,
     alignment
   );
-  const alternateAlignment = flippableWithArrow(anchorMeasurements, withArrowStyles, boundaries);
+  const alternateAlignment = flippableWithArrow(anchorMeasurements, boundaries, {
+    tethered: withArrowStyles,
+    preference: 'bottom',
+  });
 
   const [animations, set] = useSprings(2, (index) => {
-    const { left, top, rotate } = withPreventableOverflow[index];
-    return {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      transform: getTransform({
-        translate3d: `${left}px,${top}px,0`,
-        rotate: `${rotate || 0}deg`,
-        scaleY: '0',
-      }),
-    };
+    const style = getStyles(withPreventableOverflow[index], { position: 'fixed', zIndex: 9999 });
+    return style;
   });
 
   useEffect(() => {
@@ -87,33 +78,11 @@ const Popover = ({ anchorReference, children }) => {
     console.log('%cChanged alignemnt:', 'background:red;', alternateAlignment);
   }, [align, alternateAlignment]);
 
-  // log(
-  //   'Measurments: ',
-  //   JSON.stringify(
-  //     {
-  //       item: measurements[0],
-  //       anchor: anchorMeasurements,
-  //       boundaries,
-  //     },
-  //     null,
-  //     2
-  //   ),
-  //   '\n\n'
-  // );
-
   useLayoutEffect(() => {
     set((index) => {
-      const { left, top, rotate } = withPreventableOverflow[index];
-      return {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        transform: getTransform({
-          translate3d: `${left}px,${top}px,0`,
-          rotate: `${rotate || 0}deg`,
-          scaleY: '1',
-        }),
-      };
+      const style = getStyles(withPreventableOverflow[index], { position: 'fixed', zIndex: 9999 });
+
+      return style;
     });
   }, [set, withPreventableOverflow]);
 
@@ -134,14 +103,16 @@ const Popover = ({ anchorReference, children }) => {
 function Index() {
   const anchorReference = useRef();
 
-  useEffect(() => {
-    window.scrollTo(window.innerWidth / 2, window.innerHeight / 2);
-  }, []);
+  const buttonRef = useRef();
+  const [isOpen, { toggle }] = useToggle(true);
 
   return (
     <>
-      <Box id="container" height="100vh" width={1}>
-        <Box height="300vh" width="100vw" bg="black">
+      <Absolute top={0} left={0} zIndex={9999}>
+        <Button onClick={toggle}>remove popover</Button>
+      </Absolute>
+      <Box id="container" height="80vh" width={1} overflow="scroll" bg="black">
+        <Box height="250vh" width="250vw">
           <Centered height="100%" width={1}>
             <Box borderRadius="8px" ref={anchorReference} bg="#000000" height="50px" width="100px">
               <Centered height="100%" width={1}>
@@ -151,17 +122,30 @@ function Index() {
               </Centered>
             </Box>
           </Centered>
-
-          <Popover anchorReference={anchorReference}>
-            <Box borderRadius="8px" bg="white" px={3} py={3}>
-              This is the Popover
-            </Box>
-            <Box width="50px">
-              <Triangle fill="white" />
-            </Box>
-          </Popover>
         </Box>
       </Box>
+
+      <Box height="600px" width={1} id="spacer" bg="green.1">
+        Spacer
+      </Box>
+
+      <Box id="container" height="80vh" width={1} overflow="scroll" bg="gray.5">
+        <Box height="250vh" width="250vw">
+          <Centered height="100%" width={1}>
+            OTHER BOX
+          </Centered>
+        </Box>
+      </Box>
+      {isOpen ? (
+        <Popover anchorReference={anchorReference}>
+          <Box borderRadius="8px" bg="white" px={3} py={3}>
+            This is the Popover
+          </Box>
+          <Box width="50px">
+            <Triangle fill="white" />
+          </Box>
+        </Popover>
+      ) : null}
     </>
   );
 }

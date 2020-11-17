@@ -3,6 +3,7 @@ import NextDocument, { Html, Head, Main, NextScript, DocumentContext } from 'nex
 import { ServerStyleSheet } from 'styled-components';
 import { reset } from '@jwdinker/drag-and-drop';
 
+/* <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js" /> */
 class Document extends NextDocument {
   static async getInitialProps(ctx) {
     const sheet = new ServerStyleSheet();
@@ -34,7 +35,6 @@ class Document extends NextDocument {
     return (
       <Html>
         <Head>
-          {/* <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js" /> */}
           <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>

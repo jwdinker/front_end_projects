@@ -98,6 +98,8 @@ function Index() {
 
   const totalSize = getTotalSize();
 
+  console.log('get total size: ', totalSize);
+
   const items = useMemo(() => {
     if (!canRender) {
       return [];
@@ -118,9 +120,16 @@ function Index() {
         top="2%"
         boxShadow="0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)">
         <Text>{`indexes: ${startIndex} -> ${endIndex}`}</Text>
-        <Button onClick={scrollTo}>Scroll To: {`${HALFWAY}`}</Button>
+        <Button onClick={scrollTo}>Scroll To: {`${HALFWAY}-${totalSize}`}</Button>
       </Absolute>
-      <Relative ref={container} height="100vh" width={1} maxHeight="100vh" overflow="scroll">
+      <Relative
+        ref={container}
+        style={{ WebkitOverflowScrolling: 'touch' }}
+        height="100vh"
+        width={1}
+        maxHeight="100vh"
+        style={{ willChange: 'transform' }}
+        overflow="scroll">
         <Box position="absolute" left={0} top={0} minHeight={`${totalSize}px`} width={1}>
           {items}
         </Box>

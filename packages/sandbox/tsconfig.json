@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
+    
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
@@ -133,7 +134,35 @@
     },
     {
       "path": "../use_scroll_coordinates"
-    }
+    },
+    {
+      "path": "../../utilities/visibility_helpers"
+    },
+    {
+      "path": "../../utilities/get_containing_block"
+    },
+    {
+      "path": "../../utilities/get_scroll_coordinates"
+    },
+    {
+      "path": "../use_element_references_change"
+    },
+    {
+      "path": "../use_dimensions_list"
+    },
+    {
+      "path": "../../utilities/make_css_transform_from_object"
+    },
+    {
+      "path": "../use_debounce_callback"
+    },
+    {
+      "path": "../../utilities/style_object_to_string"
+    },
+    {
+      "path": "../../utilities/title_case"
+    },
+    
   ],
   "exclude": ["node_modules"]
 }

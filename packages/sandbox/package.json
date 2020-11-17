@@ -9,9 +9,13 @@
     "@jwdinker/calendar": "1.0.0",
     "@jwdinker/drag-and-drop": "1.0.0",
     "@jwdinker/event-store": "1.0.0",
+    "@jwdinker/get-containing-block": "1.0.0",
+    "@jwdinker/make-css-transform-from-object": "1.0.0",
     "@jwdinker/prevent-overflow": "1.0.0",
     "@jwdinker/react-mapkitjs": "2.0.1",
+    "@jwdinker/style-object-to-string": "1.0.0",
     "@jwdinker/styled-system": "2.0.0",
+    "@jwdinker/title-case": "1.0.0",
     "@jwdinker/up-to": "1.0.0",
     "@jwdinker/use-animation-frame": "1.0.3",
     "@jwdinker/use-block-scroll": "1.0.0",
@@ -19,10 +23,13 @@
     "@jwdinker/use-bounding-client-rect": "1.0.0",
     "@jwdinker/use-clock": "1.0.0",
     "@jwdinker/use-coordinates": "1.0.0",
+    "@jwdinker/use-dimensions-list": "1.0.0",
     "@jwdinker/use-drag": "1.0.0",
     "@jwdinker/use-drag-listener": "1.0.0",
+    "@jwdinker/use-element-references-change": "1.0.0",
     "@jwdinker/use-element-visibility": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/use-force-update": "1.0.0",
     "@jwdinker/use-kinetic-scroll": "1.0.0",
     "@jwdinker/use-measurements-indexer": "1.0.0",
     "@jwdinker/use-offsets": "1.0.5",
@@ -70,9 +77,10 @@
     "tslib": "^1.10.0"
   },
   "scripts": {
-    "dev": "rm -rf .next && NODE_OPTIONS='inspect' NODE_ENV='development' node node_modules/.bin/next dev --hostname 192.168.1.4",
+    "dev": "rm -rf .next && NODE_OPTIONS='inspect' NODE_ENV='development' node node_modules/.bin/next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prod_start": "NODE_ENV=production next start"
   },
   "devDependencies": {
     "@types/node": "^13.5.0",
