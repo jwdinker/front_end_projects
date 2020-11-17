@@ -20,6 +20,21 @@ function isRefObject<T = any>(target: unknown): target is React.RefObject<T> {
 }
 
 /**
+ * 
+ * @param target Checks if the target prop is a reference by looking if it contains a
+    'current' key. Otherwise it's assumed that it is window, document, etc. 
+ */
+function getTarget(target: EventTarget) {
+  if (typeof window === 'undefined' || !target) {
+    return null;
+  }
+  if (isRefObject(target)) {
+    return target.current;
+  }
+  return target;
+}
+
+/**
  * Handles the complexity of adding and removing event listeners;
  * also consolidates the event listeners on the target and does
  * the checks for you to see if passive, once and capture are supported
@@ -27,7 +42,6 @@ function isRefObject<T = any>(target: unknown): target is React.RefObject<T> {
  */
 function useEventListener(
   target: EventTarget,
-
   type: string,
   handler: EventHandler,
   options: EventListenerOptions = {}
@@ -41,98 +55,80 @@ function useEventListener(
   } = options;
 
   const listener = useRef<Listener | null>(null);
-  const handle = useRef<EventHandler>(() => {});
-  const saved = useRef<EventHandler>(handler);
+  const savedHandler = useRef<EventHandler>();
+  const caller = useRef<EventHandler>();
 
   /*
     Handlers are saved so useCallback hell can be avoided and listeners are not
     constantly added and removed.
   */
   useEffect(() => {
-    saved.current = handler;
+    caller.current = handler;
+    return () => {
+      caller.current = undefined;
+    };
   }, [handler]);
 
-  /*
-  -------------
-  | getOptions |
-  -------------
-    Checks which addEventListener options are supported by the browser.
-  */
-
-  const _options = useMemo(() => {
-    return getSupportedEventOptions({ capture, passive, once });
-  }, [capture, once, passive]);
-
-  const types = useMemo(() => {
-    return type.split(' ');
-  }, [type]);
-
-  /*
-  -------------
-  | getTarget |
-  -------------
-    Checks if the target prop is a reference by looking if it contains a
-    'current' key. Otherwise it's assumed that it is window, document, etc. 
-  */
-  const getTarget = useCallback(() => {
-    if (typeof window === 'undefined' || !target) {
-      return null;
-    }
-    if (isRefObject(target)) {
-      return target.current;
-    }
-    return target;
-  }, [target]);
-
-  /*
-  ----------
-  | detach |
-  ----------
-    Removes the event listener from the event store.  If there are no handlers
-    remaining on the event, the event key is removed.
-  */
+  /**
+   * Removes the event listener from the event store.  If there are no handlers
+   * remaining on the event, the event key is removed.
+   */
   const detach = useCallback(() => {
     if (listener.current) {
       listener.current.unsubscribe();
       listener.current = null;
     } else {
-      const _target = getTarget();
-      if (_target) {
-        types.forEach((name) => {
-          _target.removeEventListener(name, handle.current);
+      const element = getTarget(target);
+      if (element) {
+        type.split(' ').forEach((name) => {
+          if (savedHandler.current) {
+            element.removeEventListener(name, savedHandler.current);
+          }
         });
       }
     }
-  }, [getTarget, types]);
+  }, [target, type]);
 
-  /*
-  ----------
-  | attach |
-  ----------
-    Adds the listener to the target if it exists.
-  */
+  /**
+   * Adds the listener to the target if it exists
+   */
   const attach = useCallback(() => {
-    const _target = getTarget();
+    const element = getTarget(target);
 
-    if (_target) {
-      handle.current = (payload: Event): void => {
-        saved.current(payload);
-      };
-
-      const _handler = (payload: Event): void => {
-        saved.current(payload);
+    if (element) {
+      savedHandler.current = (payload: Event): void => {
+        if (caller.current) {
+          caller.current(payload);
+        }
       };
 
       if (consolidate) {
-        const store = createConsolidatedEventStore(_target, storeName);
-        listener.current = store.subscribe(type, _handler, _options);
+        const store = createConsolidatedEventStore(element, storeName);
+
+        listener.current = store.subscribe(type, savedHandler.current, { passive, capture, once });
       } else {
-        types.forEach((name) => {
-          _target.addEventListener(name, handle.current, _options);
+        savedHandler.current = (payload: Event) => {
+          if (caller.current) {
+            caller.current(payload);
+          }
+        };
+
+        const eventOptions = getSupportedEventOptions({ capture, passive, once });
+
+        type.split(' ').forEach((name) => {
+          if (savedHandler.current) {
+            element.addEventListener(name, savedHandler.current, eventOptions);
+          }
         });
       }
     }
-  }, [_options, consolidate, getTarget, storeName, type, types]);
+  }, [capture, consolidate, once, passive, storeName, target, type]);
+
+  useEffect(() => {
+    return () => {
+      savedHandler.current = undefined;
+    };
+  }, []);
 
   const value = useMemo((): UseEventListenerReturn => {
     return {

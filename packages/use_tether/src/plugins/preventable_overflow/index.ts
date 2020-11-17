@@ -5,7 +5,7 @@ function preventableOverflow(
   offsets: AbbreviatedRectangle[],
   boundaries: AbbreviatedRectangle,
   options: PreventableOverflowOptions = {}
-) {
+): AbbreviatedRectangle[] {
   const { allow = [], padding = [] } = options;
 
   return offsets.map((offset, index) => {
@@ -14,7 +14,7 @@ function preventableOverflow(
       boundaries,
       allow,
       padding: padding[index] || undefined,
-    });
+    })[0];
     return value;
   });
 }

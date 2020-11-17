@@ -1,5 +1,5 @@
 import { Padding } from '@jwdinker/prevent-overflow';
-import { ElementOrReference } from '@jwdinker/use-offsets-list';
+import { ElementOrReference } from '@jwdinker/use-dimensions-list';
 
 export type Side = 'top' | 'bottom' | 'left' | 'right';
 
@@ -29,7 +29,6 @@ export interface DefaultFlip {
 export interface FlipOptions {
   flip?: FlippableSides;
   preference?: Alignment;
-  tethered?: AbbreviatedRectangle[];
 }
 
 export type Anchor = AbbreviatedRectangle | ElementOrReference;
@@ -42,6 +41,10 @@ export interface PreventableOverflowOptions {
 export interface Dimensions {
   height: number;
   width: number;
+}
+
+export interface TetheredTransform extends AbbreviatedRectangle {
+  rotate?: number | undefined;
 }
 
 export type CoordinateFromPositionFn = (
@@ -57,3 +60,13 @@ export interface CoordinateFromPosition {
   left: CoordinateFromPositionFn;
   right: CoordinateFromPositionFn;
 }
+
+export type TetheredPosition = 'absolute' | 'fixed';
+
+export type UpdateAnchorPosition = () => void;
+
+export type UseAnchorReturn = [AbbreviatedRectangle, UpdateAnchorPosition];
+
+export type UpdateSizeAndPosition = () => void;
+
+export type UseTetherReturn = [AbbreviatedRectangle[], AbbreviatedRectangle, UpdateSizeAndPosition];

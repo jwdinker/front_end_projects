@@ -11,7 +11,7 @@ export type GetElementReturn = HTMLElement | undefined | null;
 const getElementFromReference = (element: ElementOrReference): GetElementReturn => {
   if (typeof window !== 'undefined') {
     if (element) {
-      if ('current' in element && element.current instanceof HTMLElement) {
+      if ('current' in element) {
         return element.current;
       }
       if (element instanceof HTMLElement) {

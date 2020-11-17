@@ -7,6 +7,7 @@ import React, {
   useMemo,
   Children,
   useCallback,
+  forwardRef,
 } from 'react';
 import useWindowSize from '@jwdinker/use-window-size';
 import {
@@ -25,184 +26,123 @@ import upTo from '@jwdinker/up-to';
 import useToggle from '@jwdinker/use-toggle';
 import useSize from '@jwdinker/use-size';
 import useDrag from '@jwdinker/use-drag';
-import { useTransition, animated, useSpring } from 'react-spring';
+import { useTransition, animated, useSprings, useSpring, useChain, useTrail } from 'react-spring';
 import useSSR from '@jwdinker/use-ssr';
+import usePrevious from '@jwdinker/use-previous';
 
-import usePopover, { useAlignment } from '@jwdinker/use-popover';
-import useFlip from '@jwdinker/use-flip';
+import useTether, { useAlignment, flippable, getStyles } from '@jwdinker/use-tether';
 import useBoundaries from '@jwdinker/use-boundaries';
+
 import { withCoreProviders } from '../../hocs';
 
-const getTransform = ({ top, left, rotate }) => {
-  let transform = `translate3d(${left}px,${top}px,0px)`;
-  if (typeof rotate !== 'undefined') {
-    transform += ` rotate(${rotate}deg)`;
-  }
-
-  return transform;
-};
-
-const getStyle = (isOpen, measurements) => {
-  return {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    transform: getTransform(measurements),
-  };
-};
-
-function DropDown({ label, children }) {
-  const anchorReference = useRef();
-  const popoverReference = useRef();
-  const arrowReference = useRef();
-  const [isOpen, { toggle }] = useToggle();
+function Dropdown({ anchor, isOpen, children, onClickOutside }) {
+  const dropdownRef = useRef();
+  const [alignment, align] = useAlignment('bottom');
 
   const boundaries = useBoundaries();
 
-  const [alignment, align] = useAlignment();
+  const references = [dropdownRef];
 
-  const [measurements, { watch, unwatch }] = usePopover({
-    anchor: anchorReference,
-    popover: popoverReference,
-    arrow: arrowReference,
-    alignment,
+  const [measurements, anchorMeasurements] = useTether(anchor, references, alignment);
+
+  const alternativeAlignment = flippable(anchorMeasurements, boundaries, {
+    tethered: measurements,
+    preference: 'bottom',
   });
 
-  const [dropdown, setDropdown] = useSpring(() => {
+  const [animation, set] = useSpring(() => {
     return {
       position: 'fixed',
       top: 0,
       left: 0,
-      transform: `translate3d(0px,0px,0px)`,
+      opacity: 0,
+      zIndex: 1,
+      transformOrigin: 'top center',
+      transform: `translate3d(0px,0px,0) scale(0)`,
     };
   });
 
-  const [arrow, setArrow] = useSpring(() => {
-    return {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      transform: `translate3d(0px,0px,0px) rotate(0deg)`,
-    };
-  });
-
-  //   const replacementAlignment = useFlip(measurements.anchor, boundaries, {
-  //     preference: 'bottom',
-  //     tethered: [measurements.popover, measurements.arrow],
-  //   });
+  const { left, top } = measurements[0];
 
   useEffect(() => {
-    watch();
-    return unwatch;
-  }, [unwatch, watch]);
-
-  //   useEffect(() => {
-  //     align[replacementAlignment]();
-  //   }, [align, replacementAlignment]);
-
-  //   const transitions = useTransition(active, null, {
-  //     from: {
-  //       ...measurements.popover,
-  //       position: 'fixed',
-  //       opacity: 0,
-  //       transform: 'scaleY(0)',
-  //       transformOrigin: 'top center',
-  //     },
-  //     enter: {
-  //       ...measurements.popover,
-  //       position: 'fixed',
-  //       opacity: 1,
-  //       transform: 'scaleY(1)',
-  //       transformOrigin: 'top center',
-  //     },
-  //     leave: {
-  //       ...measurements.popover,
-  //       position: 'fixed',
-  //       opacity: 0,
-  //       transform: 'scaleY(0)',
-  //       transformOrigin: 'top center',
-  //     },
-  //   });
+    align(alternativeAlignment);
+  }, [alternativeAlignment, align]);
 
   useEffect(() => {
-    if (isOpen) {
-      setDropdown(() => getStyle(isOpen, measurements.popover));
-      setArrow(() => getStyle(isOpen, measurements.arrow));
-    }
-  }, [
-    isOpen,
-    measurements.anchor.top,
-    measurements.arrow,
-    measurements.popover,
-    setArrow,
-    setDropdown,
-  ]);
+    const [opacity, scale] = isOpen ? [1, 1] : [0, 0];
 
-  const numberOfChildren = Children.count(children);
-  const isDropDownOnly = numberOfChildren === 1;
-  const hasArrow = numberOfChildren === 2;
-  const hasTooManyChildren = numberOfChildren > 2;
+    set(() => {
+      return {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 1,
+        opacity,
+        transformOrigin: 'top center',
+        transform: `translate3d(${left}px,${top}px,0) scale(${scale})`,
+      };
+    });
+  }, [isOpen, left, set, top]);
 
-  const getChildren = useCallback(() => {
-    if (numberOfChildren === 1) {
-      return (
-        <animated.div ref={popoverReference} style={dropdown}>
-          {children}
-        </animated.div>
-      );
-    }
-    if (numberOfChildren === 2) {
-      return (
-        <>
-          <animated.div ref={arrowReference} style={arrow}>
-            {children[0]}
-          </animated.div>
-          <animated.div id="FUCK" ref={popoverReference} style={dropdown}>
-            {children[1]}
-          </animated.div>
-        </>
-      );
-    }
-
-    throw new Error('DropDown component cannot have more than 2 children.');
-  }, [arrow, children, dropdown, numberOfChildren]);
-
-  return useMemo(() => {
-    return (
-      <>
-        <Button ref={anchorReference} onClick={toggle}>
-          {label}
-        </Button>
-
-        <animated.div style={dropdown}>
-          <Box ref={popoverReference}>{children}</Box>
-        </animated.div>
-      </>
-    );
-  }, [arrow, children, dropdown, label, numberOfChildren, toggle]);
+  return (
+    <>
+      <animated.div ref={dropdownRef} style={animation}>
+        {children}
+      </animated.div>
+      {isOpen ? (
+        <div
+          aria-modal="true"
+          tabIndex={-1}
+          role="dialog"
+          onClick={onClickOutside}
+          style={{ position: 'fixed', height: '100vh', width: '100vw', top: 0, left: 0 }}
+        />
+      ) : null}
+    </>
+  );
 }
 
 function Index() {
   const element = useRef();
+  const buttonRef = useRef();
+  const [isOpen, { toggle, deactivate }] = useToggle(false);
+
+  console.log('jackDinker'.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase());
+
+  useEffect(() => {
+    console.log('IS TRUE: ', document.body instanceof HTMLBodyElement);
+  }, []);
 
   return (
-    <Box height="300vh" width={1}>
+    <Box position="static" height="300vh" width="300vw">
+      <Box height="100vh" width={1}>
+        <Centered width={1} height="100%">
+          <Button ref={buttonRef} onClick={toggle}>
+            click me
+          </Button>
+        </Centered>
+      </Box>
       <Centered height="100%" width={1}>
-        <DropDown label="Stuff">
-          <Box width="30px">
-            <Triangle fill="blue.5" />
+        <Dropdown label="Stuff" anchor={buttonRef} isOpen={isOpen} onClickOutside={deactivate}>
+          {/* <Centered width={1}>
+            <Box width="30px" key={0}>
+              <Triangle fill="blue.5" />
+            </Box>
+          </Centered> */}
+          <Box mx={1} my={1}>
+            <Box
+              key={1}
+              border="1px solid"
+              bg="white"
+              px={3}
+              py={3}
+              borderRadius="8px"
+              boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)">
+              <Box>option 1</Box>
+              <Box>option 2</Box>
+            </Box>
           </Box>
-          <Box
-            border="1px solid"
-            bg="white"
-            px={3}
-            py={3}
-            borderRadius="8px"
-            boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)">
-            <Box>option 1</Box>
-            <Box>option 2</Box>
-          </Box>
-        </DropDown>
+        </Dropdown>
       </Centered>
     </Box>
   );

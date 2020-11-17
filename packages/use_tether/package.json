@@ -26,11 +26,14 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {},
   "dependencies": {
+    "@jwdinker/get-containing-block": "1.0.0",
+    "@jwdinker/get-document-scroll-coordinates": "1.0.0",
+    "@jwdinker/make-has-changed": "1.0.0",
     "@jwdinker/prevent-overflow": "1.0.0",
     "@jwdinker/use-ancestors-scroll-listener": "1.0.0",
-    "@jwdinker/use-bounding-client-rect": "1.0.0",
-    "@jwdinker/use-offsets-list": "1.0.0",
-    "@jwdinker/use-scroll-coordinates": "1.0.0",
+    "@jwdinker/use-debounce-callback": "1.0.0",
+    "@jwdinker/use-dimensions-list": "1.0.0",
+    "@jwdinker/use-request-animation-frame-state": "1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {}

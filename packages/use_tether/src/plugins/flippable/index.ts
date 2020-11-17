@@ -4,9 +4,10 @@ import { DEFAULT_FLIP, SIDE_OPPOSITES } from '../../constants';
 import { FlipOptions, AbbreviatedRectangle } from '../../types';
 
 function flippable(
-  anchor: AbbreviatedRectangle,
+  anchorOffsets: AbbreviatedRectangle,
+  tetheredOffsets: AbbreviatedRectangle[],
   boundaries: AbbreviatedRectangle,
-  { flip = DEFAULT_FLIP, preference = 'bottom', tethered = [] }: FlipOptions = {}
+  { flip = DEFAULT_FLIP, preference = 'bottom' }: FlipOptions = {}
 ) {
   let alignment = preference;
 
@@ -17,7 +18,9 @@ function flippable(
     will show where the popover will and will not fit.
   */
   const perimeter =
-    tethered.length > 0 ? getPerimeterOfElements(anchor, tethered, preference) : anchor;
+    tetheredOffsets.length > 0
+      ? getPerimeterOfElements(anchorOffsets, tetheredOffsets, preference)
+      : anchorOffsets;
 
   const overflowing = getOverflowingSides(perimeter, boundaries);
 

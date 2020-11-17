@@ -1,49 +1,41 @@
-import useScrollCoordinates, { ScrollElement } from '@jwdinker/use-scroll-coordinates';
-import useAncestorScrollListener from '@jwdinker/use-ancestors-scroll-listener';
+import useDimensionsList, { ElementOrReference } from '@jwdinker/use-dimensions-list';
+import * as React from 'react';
+import useDebounceCallback from '@jwdinker/use-debounce-callback';
+import { Alignment, UseTetherReturn } from '../types';
 
-import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
-import useOffsetsList, { ElementOrReference } from '@jwdinker/use-offsets-list';
-import { Alignment, Anchor, AbbreviatedRectangle } from '../types';
+import { makeTetheredOffsets } from './helpers';
+import { ALIGNMENTS_TYPES } from '../constants';
+import useAnchor from '../use_anchor';
 
-import { coordinateFromPosition } from './helpers';
-import { DEFAULT_ANCHOR_MEASUEMENTS, ALIGNMENTS_TYPES, ALIGNMENTS_KEYS } from '../constants';
+const { useEffect, useCallback } = React;
 
 function useTether(
-  anchor: Anchor = DEFAULT_ANCHOR_MEASUEMENTS,
-  elements: ElementOrReference[],
+  anchorReference: ElementOrReference,
+  tetheredReferences: ElementOrReference[],
   alignment: Alignment = ALIGNMENTS_TYPES.bottom
-) {
-  const anchorReference = anchor && 'current' in anchor ? anchor : null;
+): UseTetherReturn {
+  const [anchorOffsets, updatePosition] = useAnchor(anchorReference, tetheredReferences);
+  const [dimensions, resizeElements] = useDimensionsList(tetheredReferences);
 
-  const [anchorPosition, { update: updateAnchor }] = useBoundingClientRect(anchorReference);
-  const [offsetsOfElements, remeasure] = useOffsetsList(elements);
+  const updateSizeAndPosition = useCallback(() => {
+    updatePosition();
+    resizeElements();
+  }, [updatePosition, resizeElements]);
 
-  const update = () => {
-    updateAnchor();
-  };
+  const resizer = useDebounceCallback(updateSizeAndPosition, 100);
 
-  const references = [anchorReference, ...elements];
-  useAncestorScrollListener(references, update);
+  useEffect(() => {
+    window.addEventListener('resize', resizer);
+    return () => {
+      window.removeEventListener('resize', resizer);
+    };
+  }, [resizer]);
 
-  const anchorMeasurements = anchorReference ? anchorPosition : (anchor as AbbreviatedRectangle);
-
-  const [x, y] = ALIGNMENTS_KEYS[alignment];
-
-  const tetherables: AbbreviatedRectangle[] = [];
-  for (let index = 0; index < offsetsOfElements.length; index += 1) {
-    const offsets = offsetsOfElements[index];
-    const coordinates = index === 0 ? anchorMeasurements : tetherables[index - 1];
-    const top = coordinateFromPosition[y](coordinates, offsets);
-    const left = coordinateFromPosition[x](coordinates, offsets);
-
-    tetherables.push({
-      ...offsets,
-      top,
-      left,
-    });
-  }
-
-  return [tetherables, anchorMeasurements];
+  return [
+    makeTetheredOffsets(anchorOffsets, dimensions, alignment),
+    anchorOffsets,
+    updateSizeAndPosition,
+  ];
 }
 
 export default useTether;

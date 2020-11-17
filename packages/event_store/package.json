@@ -17,6 +17,7 @@
   },
   "devDependencies": {},
   "dependencies": {
+    "@jwdinker/get-supported-event-options": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

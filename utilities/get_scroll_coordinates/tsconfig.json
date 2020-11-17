@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "declarationDir": "dist",
+    "lib": ["es2018", "esnext.asynciterable","dom"],
+    "target": "es2018",
+    "module": "commonjs"
+  },
+  "include": ["src"],
+  "references": [
+    {"path": "../get_window_scroll_coordinates"},
+    {"path": "../get_element_scroll_coordinates"},
+    {"path": "../get_document_scroll_coordinates"}]
+}

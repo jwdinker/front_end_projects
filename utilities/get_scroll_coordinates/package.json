@@ -1,0 +1,19 @@
+{
+  "name": "@jwdinker/get-scroll-coordinates",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "peerDependencies": {},
+  "dependencies": {
+    "@jwdinker/get-document-scroll-coordinates": "1.0.0",
+    "@jwdinker/get-element-scroll-coordinates": "1.0.0",
+    "@jwdinker/get-window-scroll-coordinates": "1.0.0",
+    "tslib": "^1.10.0"
+  }
+}
