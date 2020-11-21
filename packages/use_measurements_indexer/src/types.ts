@@ -5,10 +5,12 @@ export interface Measurements {
 
 export type SetItemSize = (index: number, previousItemOffset: number) => number;
 
+export type OnMeasure = (index: number, measurements: Measurements) => void;
+
 export interface UseMeasurementsIndexerProps {
   itemSize?: number | SetItemSize;
   estimatedItemSize?: number;
-  onMeasure?: (index: number, measurements: Measurements) => void;
+  onMeasure?: OnMeasure;
   numberOfItems?: number;
   log?: boolean;
 }

@@ -3,14 +3,16 @@ import * as React from 'react';
 
 import { IndexRange, Measurements, UseMeasurementsIndexerProps } from './types';
 
-const { useRef, useCallback } = React;
+export { UseMeasurementsIndexerProps, Measurements, IndexRange, OnMeasure } from './types';
+
+const { useRef } = React;
 
 function useMeasurementsIndexer({
   itemSize = 100,
   estimatedItemSize = 100,
-  onMeasure = () => {},
   numberOfItems = -1,
   log = false,
+  onMeasure = () => {},
 }: UseMeasurementsIndexerProps = {}) {
   const cache = useRef({});
   const indexed = useRef([0, 0]);
@@ -26,22 +28,19 @@ function useMeasurementsIndexer({
    * @param offset The offset of the item.
    * @param size The size of the item.
    */
-  const setMeasurements = useCallback(
-    (index: number, offset: number, size: number) => {
-      const item = { offset, size };
-      cache.current[index] = item;
-      onMeasure(index, item);
-    },
-    [onMeasure]
-  );
+  function setMeasurements(index: number, offset: number, size: number) {
+    const item = { offset, size };
+    cache.current[index] = item;
+    onMeasure(index, item);
+  }
 
-  const setMinIndexed = useCallback((index: number): void => {
+  function setMinIndexed(index: number): void {
     indexed.current[0] = index;
-  }, []);
+  }
 
-  const setMaxIndexed = (index: number): void => {
+  function setMaxIndexed(index: number): void {
     indexed.current[1] = index;
-  };
+  }
 
   /**
    * getOffsetAtIndex
@@ -49,13 +48,13 @@ function useMeasurementsIndexer({
    * @param index The index from which the offset is returned.  If the offset
    * has not been measured yet, zero is returned.  This is an internal helper.
    */
-  const getOffsetAtIndex = (index: number): number => {
+  function getOffsetAtIndex(index: number): number {
     const item = cache.current[index];
     if (item) {
       return item.offset;
     }
     return 0;
-  };
+  }
 
   /**
    * getSizeAtIndex
@@ -63,13 +62,13 @@ function useMeasurementsIndexer({
    * @param index The index from which the size is returned.  If the size
    * has not been measured yet, zero is returned.  This is an internal helper.
    */
-  const getSizeAtIndex = (index: number): number => {
+  function getSizeAtIndex(index: number): number {
     const item = cache.current[index];
     if (item) {
       return item.size;
     }
     return 0;
-  };
+  }
 
   /**
    * getItemSize
@@ -80,9 +79,25 @@ function useMeasurementsIndexer({
    * A conditional helper function for determining whether to retreive the size
    * of the item at index from a callback or just return a numbered parameter.
    */
-  const getItemSize = (index: number, offset: number): number => {
+  function getItemSize(index: number, offset: number): number {
     return typeof itemSize === 'function' ? itemSize(index, offset) : itemSize;
-  };
+  }
+
+  /**
+   * resetFromIndex
+   * --------------
+   * @param resetIndex - the starting index from which measurements are retaken
+   * via the itemSize prop and finishes at the highest measured index.
+   */
+  function resetFromIndex(resetIndex: number): void {
+    const highestMeasuredIndex = indexed.current[1];
+    let offset = getOffsetAtIndex(resetIndex);
+    for (let index = resetIndex; index <= highestMeasuredIndex; index += 1) {
+      const sizeAtIndex = getItemSize(index, offset);
+      offset += sizeAtIndex;
+      setMeasurements(index, offset, sizeAtIndex);
+    }
+  }
 
   /**
    * measureDownToMinIndex
@@ -98,7 +113,7 @@ function useMeasurementsIndexer({
    * - Once, the index is greater than or equal to the stopIndex the loop
    *   ceases and the stopIndex becomes the new lowest measured index.
    */
-  const measureDownToMinIndex = (stopIndex: number): void => {
+  function measureDownToMinIndex(stopIndex: number): void {
     // console.log('%c↓ measuring', 'background:red;color:white;');
     const lowestMeasuredIndex = indexed.current[0];
     let offset = getOffsetAtIndex(lowestMeasuredIndex);
@@ -118,7 +133,7 @@ function useMeasurementsIndexer({
       setMeasurements(index, offset, sizeAtIndex);
     }
     setMinIndexed(stopIndex);
-  };
+  }
 
   /**
    * measureUptoMaxIndex
@@ -134,7 +149,7 @@ function useMeasurementsIndexer({
    * - Once, the index is greater than or equal to the stopIndex the loop ceases
    *   and the stopIndex becomes the new highest measured index.
    */
-  const measureUpToMaxIndex = (stopIndex: number): void => {
+  function measureUpToMaxIndex(stopIndex: number): void {
     const highestMeasuredIndex = indexed.current[1];
     let offset = getOffsetAtIndex(highestMeasuredIndex);
     const isInitial = stopIndex === 0 && highestMeasuredIndex === 0;
@@ -159,7 +174,7 @@ function useMeasurementsIndexer({
     }
 
     setMaxIndexed(stopIndex);
-  };
+  }
 
   /**
    * measure
@@ -173,14 +188,14 @@ function useMeasurementsIndexer({
    *- if the index is greater than the highest measured index, the offset is
    *  moving forward and no measurements exist within that range yet.
    */
-  const measure = (index: number): void => {
+  function measure(index: number): void {
     if (index < indexed.current[0]) {
       measureDownToMinIndex(index);
       return;
     }
 
     measureUpToMaxIndex(index);
-  };
+  }
 
   /**
    * getMeasurements
@@ -194,7 +209,7 @@ function useMeasurementsIndexer({
    * - if the measurements already existed or the measurements were just taken,
    *   they are returned.
    */
-  const getMeasurements = (index: number): Measurements => {
+  function getMeasurements(index: number): Measurements {
     let measurements = cache.current[index];
 
     if (!measurements) {
@@ -203,9 +218,9 @@ function useMeasurementsIndexer({
     }
 
     return measurements;
-  };
+  }
 
-  const binarySearch = (offset: number): number => {
+  function binarySearch(offset: number): number {
     let [low, high] = indexed.current;
 
     while (low <= high) {
@@ -226,9 +241,9 @@ function useMeasurementsIndexer({
       return low - 1;
     }
     return low;
-  };
+  }
 
-  const exponentialSearch = (offset: number): number => {
+  function exponentialSearch(offset: number): number {
     const [min, max] = indexed.current;
     const isBackwards = offset < 0;
     const isForwards = offset >= 0;
@@ -250,7 +265,7 @@ function useMeasurementsIndexer({
     }
 
     return binarySearch(offset);
-  };
+  }
 
   /**
    * findClosestIndexToOffset
@@ -263,7 +278,7 @@ function useMeasurementsIndexer({
    *   one exception this will run in an unmeasured range is when the first
    *   measurement is taken as there is no measurement cached
    */
-  const findClosestIndexToOffset = (offset: number): number => {
+  function findClosestIndexToOffset(offset: number): number {
     const [min, max] = indexed.current;
 
     const highestOffset = getOffsetAtIndex(max);
@@ -274,7 +289,7 @@ function useMeasurementsIndexer({
       return binarySearch(offset);
     }
     return exponentialSearch(offset);
-  };
+  }
 
   /**
    * getEndIndex
@@ -291,7 +306,7 @@ function useMeasurementsIndexer({
    * - The loop can run indefinitely for use cases like infinite scrolling
    *   unless a number of items is supplied.
    */
-  const getEndIndex = (startIndex: number, threshold: number): number => {
+  function getEndIndex(startIndex: number, threshold: number): number {
     let accumlatingSize = getMeasurements(startIndex).offset;
     let endIndex = startIndex;
     const hasStopPoint = numberOfItems > -1;
@@ -312,7 +327,7 @@ function useMeasurementsIndexer({
       accumlatingSize += currentSize;
     }
     return endIndex;
-  };
+  }
 
   /**
    * getIndexRangeFromOffsets
@@ -320,16 +335,20 @@ function useMeasurementsIndexer({
    * @param startOffset The offset used to find the start of the index segment.
    * @param endOffset The offset used to find the end of the index segment.
    */
-  const getIndexRangeFromOffsets = (startOffset: number, endOffset: number): IndexRange => {
+  function getIndexRangeFromOffsets(startOffset: number, endOffset: number): IndexRange {
     if (endOffset < startOffset) {
       throw new Error(
         `getIndexRangeFromOffsets requires the endOffset be greater than the startOffset`
       );
     }
-    const startIndex = findClosestIndexToOffset(startOffset);
+    /*
+     zero must be offered up as an alternative when rubberband scrolling returns
+     a negative value and the index doesn't exist. 
+    */
+    const startIndex = findClosestIndexToOffset(startOffset) || 0;
     const endIndex = getEndIndex(startIndex, endOffset);
     return [startIndex, endIndex];
-  };
+  }
 
   /**
    * clearMeasurements
@@ -339,10 +358,10 @@ function useMeasurementsIndexer({
    *   indexes back to 0.
    * - Primary use case is if the measurements change, the cache needs to be cleared.
    */
-  const clearMeasurements = (): void => {
+  function clearMeasurements(): void {
     cache.current = {};
     indexed.current = [0, 0];
-  };
+  }
 
   /**
    * getTotalSize
@@ -358,7 +377,7 @@ function useMeasurementsIndexer({
    * - Otherwise, only the measured size is calculated.  The use case for this
    *   is hacks with a transform where the total size won't matter.
    */
-  const getTotalSize = (): number => {
+  function getTotalSize(): number {
     const [min, max] = indexed.current;
     const totalMeasuredSize = Math.abs(getMeasurements(min).offset) + getMeasurements(max).offset;
 
@@ -366,7 +385,7 @@ function useMeasurementsIndexer({
 
     if (hasItemLimit) {
       if (isFixedItemSize) {
-        return (itemSize as number) * (numberOfItems - 1);
+        return (itemSize as number) * numberOfItems;
       }
 
       if (isVariableItemSize && hasEstimatedItemSize) {
@@ -378,12 +397,13 @@ function useMeasurementsIndexer({
     }
 
     return totalMeasuredSize;
-  };
+  }
 
   return {
     getMeasurements,
     getIndexByOffset: findClosestIndexToOffset,
     getIndexRangeFromOffsets,
+    resetFromIndex,
     clearMeasurements,
     getTotalSize,
   };
