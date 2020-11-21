@@ -85,7 +85,7 @@ function Index() {
   const canRender = _window.height !== 0;
 
   const indexes = canRender
-    ? getIndexRangeFromOffsets(scroll.y, scroll.y + _window.height)
+    ? getIndexRangeFromOffsets(Math.max(0, scroll.y), scroll.y + _window.height)
     : [0, 0];
 
   const startIndex = Math.max(indexes[0], 0);
@@ -97,8 +97,6 @@ function Index() {
   }, [getMeasurements]);
 
   const totalSize = getTotalSize();
-
-  console.log('get total size: ', totalSize);
 
   const items = useMemo(() => {
     if (!canRender) {

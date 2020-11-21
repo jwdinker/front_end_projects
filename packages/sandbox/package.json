@@ -49,6 +49,7 @@
     "@jwdinker/use-tether": "1.0.0",
     "@jwdinker/use-timeout": "1.0.0",
     "@jwdinker/use-toggle": "1.0.0",
+    "@jwdinker/use-virtual-list": "1.0.0",
     "@jwdinker/use-virtual-scroll": "1.0.0",
     "@jwdinker/use-window-size": "2.0.1",
     "@jwdinker/visibility-helpers": "1.0.0",

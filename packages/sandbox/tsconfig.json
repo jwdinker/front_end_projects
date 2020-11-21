@@ -162,6 +162,9 @@
     {
       "path": "../../utilities/title_case"
     },
+    {
+      "path": "../use_virtual_list"
+    },
     
   ],
   "exclude": ["node_modules"]
