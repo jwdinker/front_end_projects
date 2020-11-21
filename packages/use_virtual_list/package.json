@@ -1,0 +1,22 @@
+{
+  "name": "@jwdinker/use-virtual-list",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Jack Dinker",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {},
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "dependencies": {
+    "@jwdinker/up-to": "1.0.0",
+    "@jwdinker/use-measurements-indexer": "1.0.0",
+    "@jwdinker/use-scroll-coordinates": "1.0.0",
+    "@jwdinker/use-size": "3.0.0"
+  }
+}
