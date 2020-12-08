@@ -17,6 +17,8 @@
     "react": "^16.8.0"
   },
   "dependencies": {
+    "@jwdinker/use-instance": "1.0.0",
+    "auto-bind": "^4.0.0",
     "tslib": "^1.10.0"
   }
 }
