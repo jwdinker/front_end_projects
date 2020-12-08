@@ -11,5 +11,5 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [{"path": "../use_measurements_indexer" },{"path": "../use_scroll_coordinates" }, {"path": "../../utilities/up_to"}]
+  "references": [{"path": "../use_measurements_indexer" },{"path": "../use_scroll_coordinates" }, {"path": "../../utilities/up_to"}, {"path": "../use_scroll"}]
 }

@@ -16,7 +16,7 @@
   "dependencies": {
     "@jwdinker/up-to": "1.0.0",
     "@jwdinker/use-measurements-indexer": "1.0.0",
-    "@jwdinker/use-scroll-coordinates": "1.0.0",
-    "@jwdinker/use-size": "3.0.0"
+    "@jwdinker/use-previous": "1.0.0",
+    "@jwdinker/use-scroll": "4.0.1"
   }
 }

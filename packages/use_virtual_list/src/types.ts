@@ -1,26 +1,32 @@
-import { UseMeasurementsIndexerProps } from '@jwdinker/use-measurements-indexer';
-import { ScrollElement } from '@jwdinker/use-scroll-coordinates';
-import {
-  CSSProperties,
-  StatelessComponent,
-  ComponentClass,
-  MutableRefObject,
-  RefObject,
-} from 'react';
+import { IndexRange, UseMeasurementsIndexerProps } from '@jwdinker/use-measurements-indexer';
+import { CSSProperties, ComponentClass } from 'react';
+import { ScrollToAnimationProps } from '@jwdinker/use-scroll';
+import { SCROLL_TO_ALIGNMENTS } from './constants';
 
 export type LayoutType = 'vertical' | 'horizontal';
 
+export type Axis = 'x' | 'y';
+
 export interface VirtualListProps extends UseMeasurementsIndexerProps {
   component: ComponentClass;
-  layout?: LayoutType;
   numberOfItems: number;
-  runway?: number;
+  containerSize: number;
   responsive?: boolean;
+  buffer?: number;
+  axis?: Axis;
 }
 
 export interface ContainerAndContentStyles {
   container: CSSProperties;
   contents: CSSProperties;
+}
+
+export type ScrollToAlignment = typeof SCROLL_TO_ALIGNMENTS[keyof typeof SCROLL_TO_ALIGNMENTS];
+
+export type ScrollToBehvaior = 'smooth' | 'auto';
+
+export interface ScrollToIndexOptions extends ScrollToAnimationProps {
+  alignment?: ScrollToAlignment;
 }
 
 export interface VirtualScrollerProps {
@@ -29,26 +35,24 @@ export interface VirtualScrollerProps {
   items: React.Component[];
 }
 
-// export interface VirtualScrollerProps {
-//   references: {
-//     container: React.MutableRefObject<HTMLElement | undefined>;
-//     scroller: React.MutableRefObject<HTMLElement | undefined>;
-//   };
-//   styles: {
-//     spacer: CSSProperties;
-//     scroller: CSSProperties;
-//   };
-//   items: React.Component[];
-// }
+export interface ScrollItemProps {
+  index: number;
+  key: number;
+  style: CSSProperties;
+  isScrolling: boolean;
+  isVisible: boolean;
+  data?: object;
+}
 
-// export interface VirtualScrollerProps {
-//   references: {
-//     container(instance: HTMLElement | null): void;
-//     scroller(instance: HTMLElement | null): void;
-//   };
-//   styles: {
-//     spacer: CSSProperties;
-//     scroller: CSSProperties;
-//   };
-//   items: React.Component[];
-// }
+export interface Indexes {
+  rendered: IndexRange;
+  visible: IndexRange;
+}
+
+export interface ScrollOffsetForAlignmentProps {
+  alignment: ScrollToAlignment;
+  containerSize: number;
+  totalSizeOfItems: number;
+  offsetOfItem: number;
+  sizeOfItem: number;
+}
