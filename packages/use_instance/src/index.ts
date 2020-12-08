@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 type InstanceFn<T> = () => T;
 export type Instance<T> = InstanceFn<T> | T;
@@ -12,6 +12,12 @@ function useInstance<T>(instance: Instance<T>): T {
     }
     return ref.current;
   };
+
+  useEffect(() => {
+    // clean up effect for fast refresh
+    // @ts-ignore
+    ref.current = null;
+  }, []);
 
   return get();
 }
