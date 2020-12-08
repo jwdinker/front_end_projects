@@ -21,17 +21,24 @@ export interface ScrollCoordinates {
   x: number;
   y: number;
 }
+
 const { useEffect } = React;
+
+const INITIAL_STATE = {
+  x: 0,
+  y: 0,
+};
 
 function useScrollCoordinates(
   element: ScrollElement = null,
   { passive = true, capture = false, once = false, consolidate = true } = {}
 ): ScrollCoordinates {
-  const [scroll, setScroll] = useRequestAnimationFrameState({ x: 0, y: 0 });
+  const [scroll, setScroll] = useRequestAnimationFrameState(INITIAL_STATE);
 
   const handler = (event: any) => {
     setScroll((previousCoordinates) => {
       const coordinates = getScrollCoordinates(event.target || event.currentTarget);
+
       return hasChanged(previousCoordinates, coordinates) ? coordinates : previousCoordinates;
     });
   };
