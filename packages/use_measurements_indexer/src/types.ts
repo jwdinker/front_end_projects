@@ -3,9 +3,11 @@ export interface Measurements {
   offset: number;
 }
 
-export type SetItemSize = (index: number, previousItemOffset: number) => number;
+export type SetItemSize = (index: number) => number;
 
 export type OnMeasure = (index: number, measurements: Measurements) => void;
+
+export type OnReset = (range: IndexRange) => void;
 
 interface CachedMeasurement {
   [key: number]: {
@@ -14,29 +16,29 @@ interface CachedMeasurement {
   };
 }
 
+export interface MeasurementIndexerState {
+  indexed: Indexed;
+  cache: CachedMeasurement;
+}
+
+export type OffsetGetter = (index: number) => number;
+
 export type IndexRange = [number, number];
 
-export interface UseMeasurementsIndexerProps {
-  itemSize: number | SetItemSize;
-  estimatedItemSize?: number;
-  numberOfItems?: number;
-  log?: boolean;
-  onMeasure?: OnMeasure;
-  onReset?: (range: IndexRange) => void;
-  onClear?: () => void;
-}
+export type Boundaries = [number, number];
+
+export type Indexed = number[];
+
+export type ItemSize = number | SetItemSize;
+
+export type GetMeasurements = (index: number) => Measurements;
 
 export interface MeasurementsIndexerProps {
-  itemSize: number | SetItemSize;
+  itemSize: ItemSize;
   estimatedItemSize?: number;
+  boundaries?: Boundaries;
+  infinite?: boolean;
   onMeasure?: OnMeasure;
   onReset?: (range: IndexRange) => void;
   onClear?: () => void;
-  numberOfItems: number;
-  log: boolean;
-}
-
-export interface MeasurementIndexerState {
-  indexed: IndexRange;
-  cache: CachedMeasurement;
 }
