@@ -3,6 +3,14 @@ export interface Measurements {
   offset: number;
 }
 
+export type IndexRange = [number, number];
+
+export type Boundaries = [number, number];
+
+export type ItemSize = number | SetItemSize;
+
+export type GetMeasurements = (index: number) => Measurements;
+
 export type SetItemSize = (index: number) => number;
 
 export type OnMeasure = (index: number, measurements: Measurements) => void;
@@ -17,21 +25,9 @@ interface CachedMeasurement {
 }
 
 export interface MeasurementIndexerState {
-  indexed: Indexed;
+  indexed: IndexRange;
   cache: CachedMeasurement;
 }
-
-export type OffsetGetter = (index: number) => number;
-
-export type IndexRange = [number, number];
-
-export type Boundaries = [number, number];
-
-export type Indexed = number[];
-
-export type ItemSize = number | SetItemSize;
-
-export type GetMeasurements = (index: number) => Measurements;
 
 export interface MeasurementsIndexerProps {
   itemSize: ItemSize;

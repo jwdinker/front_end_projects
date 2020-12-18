@@ -1,6 +1,7 @@
 /* eslint-disable react/static-property-placement */
 
 import * as React from 'react';
+import useForceUpdate from '@jwdinker/use-force-update';
 import { IndexRange, Measurements, MeasurementsIndexerProps } from './types';
 import {
   validateOffsetRange,
@@ -9,6 +10,7 @@ import {
   binarySearch,
   isForwards,
   isBackwards,
+  hasMeasuredIndex,
 } from './helpers';
 
 const { useRef, useEffect } = React;
@@ -27,6 +29,8 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   } = props;
 
   const state = useRef(getInitialState());
+
+  const [force] = useForceUpdate();
 
   const fixedItemSize = typeof itemSize === 'number' ? itemSize : 0;
   const numberOfItems = getNumberOfItems(boundaries);
@@ -56,13 +60,13 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   }
 
   /**
-   * inRange
+   * inBounds
    * -------------------------------------------------------------------------
    * @param index - the index that will checked whether it's in bounds are not.
    * If the infinite setting is enabled, the index is assumed to be in range.
    * -------------------------------------------------------------------------
    */
-  function inRange(index: number) {
+  function inBounds(index: number) {
     if (infinite) {
       return infinite;
     }
@@ -133,7 +137,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
     // - moving backwards: previous item's top/left offset minus current item size.
     let offset = key === 1 ? item.offset + item.size : item.offset;
 
-    if (inRange(index)) {
+    if (inBounds(index)) {
       if (isForwards(threshold)) {
         while (offset <= threshold) {
           index += 1;
@@ -261,7 +265,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
     let endIndex = startIndex;
 
     // only the threshold will be used if infinite is enabled.
-    while (totalSize < threshold && inRange(endIndex)) {
+    while (totalSize < threshold && inBounds(endIndex)) {
       endIndex += 1;
       const currentSize = getMeasurements(endIndex).size;
       totalSize += currentSize;
@@ -331,20 +335,30 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
    * -------------------------------------------------------------------------
    * @param resetIndex - the starting index from which measurements are retaken
    * via the itemSize prop and finishes at the highest measured index.
-   *
+   * @param canForceUpdate - boolean for triggering a forced update, triggering
+   * a re-render.
    * -------------------------------------------------------------------------
    */
-  function resetFromIndex(resetIndex: number): void {
-    const safeIndex = getSafeIndex(resetIndex);
-    const highestMeasuredIndex = state.current.indexed[1];
-    let { offset } = getMeasurements(resetIndex);
-    for (let index = safeIndex; index <= highestMeasuredIndex; index += 1) {
-      const sizeAtIndex = getItemSize(index);
-      setMeasurements(index, { offset, size: sizeAtIndex });
-      offset += sizeAtIndex;
-    }
+  function resetFromIndex(resetIndex: number, canForceUpdate = true): void {
+    const { cache, indexed } = state.current;
+    const max = indexed[1];
+    const index = getSafeIndex(resetIndex);
 
-    onReset([safeIndex, highestMeasuredIndex]);
+    if (hasMeasuredIndex(index, indexed)) {
+      for (let i = index; i <= max; i += 1) {
+        delete cache[i];
+      }
+
+      onReset([index, max]);
+
+      indexed[1] = index - 1;
+
+      // make sure this runs after onReset callback just in case someone is
+      // using another cache full of styles.
+      if (canForceUpdate) {
+        force();
+      }
+    }
   }
 
   /*

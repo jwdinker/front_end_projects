@@ -18,6 +18,11 @@ export function getNumberOfItems(boundaries: Boundaries): number {
   return Math.abs(Math.abs(higherNum) - Math.abs(lowerNum));
 }
 
+export function hasMeasuredIndex(index: number, indexed: number[]) {
+  const [min, max] = indexed;
+  return index >= min && index <= max;
+}
+
 export function getInitialState(): MeasurementIndexerState {
   return {
     indexed: [0, -1],
