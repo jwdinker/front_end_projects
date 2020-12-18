@@ -36,20 +36,20 @@ const Page = () => {
   const containerRef = useRef();
   const elementRef = useRef();
 
-  const [container, watchContainer, unwatchContainer] = useBoundingClientRect(containerRef);
-  const [element, watchElement, unwatchElement] = useBoundingClientRect(elementRef);
+  const [container, containerHandlers] = useBoundingClientRect(containerRef);
+  const [element, elementHandlers] = useBoundingClientRect(elementRef);
 
   const visiblePercentage = getVisiblePercentage(element, container);
   const visiblePixels = getVisiblePixels(element, container);
 
   useEffect(() => {
-    watchContainer();
-    watchElement();
+    containerHandlers.watch();
+    elementHandlers.watch();
     return () => {
-      unwatchContainer();
-      unwatchElement();
+      containerHandlers.unwatch();
+      elementHandlers.unwatch();
     };
-  }, [unwatchContainer, unwatchElement, watchContainer, watchElement]);
+  }, [containerHandlers, elementHandlers]);
 
   console.log(
     'Element Status:\n',

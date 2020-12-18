@@ -17,6 +17,7 @@
     "react": "^16.8.0"
   },
   "dependencies": {
+    "@jwdinker/use-force-update": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

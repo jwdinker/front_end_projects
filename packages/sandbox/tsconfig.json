@@ -93,9 +93,9 @@
     {
       "path": "../use_block_scroll"
     },
-    {
-      "path": "../use_virtual_scroll"
-    },
+    // {
+    //   "path": "../use_virtual_scroll"
+    // },
     {
       "path": "../use_clock"
     },
@@ -161,6 +161,15 @@
     },
     {
       "path": "../../utilities/title_case"
+    },
+    {
+      "path": "../../utilities/get_random_color"
+    },
+    {
+      "path": "../../utilities/get_random_number_in_range"
+    },
+    {
+      "path": "../use_virtual_list"
     },
     
   ],

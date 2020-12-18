@@ -12,20 +12,39 @@ import {
 import useWindowSize from '@jwdinker/use-window-size';
 import { withCoreProviders } from '../../hocs';
 
-const Contents = () => {
-  const [size, isResizing] = useWindowSize();
+const getColor = (value) => {
+  if (typeof value === 'boolean') {
+    return value ? '#79ff64' : '#ff6f83';
+  }
+  if (typeof value === 'string') {
+    return '#ffe43a';
+  }
 
-  console.log('SIZE: ', size, 'isResizing:', isResizing);
+  return '#00a1ff';
+};
+
+const KeyValue = ({ name, value }) => {
+  const color = getColor(value);
+  return (
+    <Row>
+      <Text fontSize="30px" fontWeight="bold" color="white">{`${name}:`}</Text>
+      <Text style={{ color }} fontSize="30px" fontWeight="bold">{`${value}`}</Text>
+    </Row>
+  );
+};
+
+const Contents = () => {
+  const [size, isResizing] = useWindowSize(0);
 
   return useMemo(
     () => (
-      <Box height="100%" width="100%">
+      <Box bg="black" height="100vh" width="100%">
         <Centered height="100%" width={1}>
           <Box>
-            <Box>{`isResizing:${isResizing}`}</Box>
+            <KeyValue key={isResizing} name="isResizing" value={isResizing} />
             {Object.keys(size).map((property) => {
               const value = size[property];
-              return <Box key={property}>{`${property}:${value}`}</Box>;
+              return <KeyValue key={property} name={property} value={value} />;
             })}
           </Box>
         </Centered>

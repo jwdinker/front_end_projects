@@ -1,6 +1,6 @@
 import useEventListener from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
-import { useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import useToggle from '@jwdinker/use-toggle';
 import useScalable, { DEFAULTS, Point } from '@jwdinker/use-scalable';
 import getElementOrReference, { ElementOrReference } from '@jwdinker/get-element-or-reference';
@@ -15,7 +15,7 @@ import { getMouseCoordinates } from '@jwdinker/mouse-helpers';
 import { isStart, isMove, isEnd } from '@jwdinker/phase-helpers';
 
 import { unstable_batchedUpdates as batch } from 'react-dom';
-import { UseScaleOptions, UseScaleReturn, Scale } from './types';
+import { UseScaleOptions, UseScaleReturn } from './types';
 
 const TOUCH_EVENTS = 'touchstart touchmove touchend touchcancel';
 const MOUSE_DOWN = 'mousedown';
@@ -45,21 +45,27 @@ function useScale(
   const [isScaling, { activate, deactivate }] = useToggle();
   const [offsets] = useOffsets(element);
   const getInteractionType = useMemo(() => makeGetInteractionType(mouse, touch), [mouse, touch]);
-  const scaleOptions = useMemo(() => {
-    const { height, width, top, left } = offsets;
-    return { initialScale, max, min, height, width, top, left };
-  }, [initialScale, max, min, offsets]);
 
-  const [_scale, set] = useScalable(scaleOptions);
+  const { height, width, top, left } = offsets;
 
-  const scale = useCallback<Scale>(
-    (point, center) => {
-      set.move(point, center);
-    },
-    [set]
-  );
+  const options = {
+    height,
+    width,
+    top,
+    left,
+    initialScale,
+    max,
+    min,
+  };
 
-  const getCoordinates = useCallback((type: InteractionType, event: InteractionEvent): Point[] => {
+  const [_scale, set] = useScalable(options);
+  const _set = useRef(set);
+
+  const scale = (point: Point, center: Point) => {
+    _set.current.move(point, center);
+  };
+
+  const getCoordinates = (type: InteractionType, event: InteractionEvent): Point[] => {
     switch (type) {
       case MOUSE: {
         return [getMouseCoordinates(event as MouseEvent)];
@@ -77,54 +83,42 @@ function useScale(
         ];
       }
     }
-  }, []);
+  };
 
-  const handler = useCallback(
-    (event) => {
-      const _element = getElementOrReference(element);
-      if (_element) {
-        const interactionType = getInteractionType(event);
-        const isInteracting = interactionType !== INTERACTION_TYPES.NONE;
+  const handler = (event: any) => {
+    const _element = getElementOrReference(element);
+    if (_element) {
+      const interactionType = getInteractionType(event);
+      const isInteracting = interactionType !== INTERACTION_TYPES.NONE;
 
-        if (isInteracting) {
-          const [point, center] = getCoordinates(interactionType, event);
+      if (isInteracting) {
+        const [point, center] = getCoordinates(interactionType, event);
 
-          if (isStart(event.type, !isScaling)) {
-            batch(() => {
-              activate();
-              set.start(point, center);
-            });
-          }
-
-          if (isMove(event.type, isScaling)) {
-            set.move(point, center);
-          }
-        }
-
-        if (isEnd(event.type, isScaling)) {
+        if (isStart(event.type, !isScaling)) {
           batch(() => {
-            deactivate();
-            set.end();
+            activate();
+            set.start(point, center);
           });
         }
+
+        if (isMove(event.type, isScaling)) {
+          set.move(point, center);
+        }
       }
-    },
-    [activate, deactivate, element, getCoordinates, getInteractionType, isScaling, set]
-  );
 
-  const options = useMemo(() => {
-    return { consolidate: true };
-  }, []);
+      if (isEnd(event.type, isScaling)) {
+        batch(() => {
+          deactivate();
+          set.end();
+        });
+      }
+    }
+  };
 
-  const downable = useEventListener(element, MOUSE_DOWN, handler, options);
+  const downable = useEventListener(element, MOUSE_DOWN, handler);
 
-  const moveable = useEventListener(
-    isBrowser ? window : null,
-    WINDOW_MOUSE_EVENTS,
-    handler,
-    options
-  );
-  const touchable = useEventListener(element, TOUCH_EVENTS, handler, options);
+  const moveable = useEventListener(isBrowser ? window : null, WINDOW_MOUSE_EVENTS, handler);
+  const touchable = useEventListener(element, TOUCH_EVENTS, handler);
 
   useEffect(() => {
     if (mouse) {

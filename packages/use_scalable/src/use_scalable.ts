@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 
 import getDistanceFromPoints from '@jwdinker/get-distance-from-points';
 import {
@@ -6,7 +6,6 @@ import {
   UseScalableHandler,
   UseScalableReturn,
   UseScalableOptions,
-  Point,
   Dimensions,
 } from './types';
 import { getScale, constrain, makeCenterPoint } from './helpers';
@@ -36,70 +35,47 @@ function useScalable({
     vector: initialScale,
   }));
 
-  const dimensions = useMemo((): Dimensions => {
-    return [width, height];
-  }, [height, width]);
+  const dimensions: Dimensions = [width, height];
 
-  const coordinates = useMemo((): Point => {
-    return [top, left];
-  }, [left, top]);
+  const coordinates = [top, left];
 
-  const start = useCallback<UseScalableHandler>(
-    (point, center) => {
-      const _center = center || makeCenterPoint(dimensions, coordinates);
-      setScale((previous) => {
-        const distance = getDistanceFromPoints(point, _center);
+  const start: UseScalableHandler = (point, center) => {
+    const _center = center || makeCenterPoint(dimensions, coordinates);
+    setScale((previous) => {
+      const distance = getDistanceFromPoints(point, _center);
 
-        return {
-          ...previous,
-          distance,
-        };
+      return {
+        ...previous,
+        distance,
+      };
+    });
+  };
+
+  const move: UseScalableHandler = (point, center) => {
+    const _center = center || makeCenterPoint(dimensions, coordinates);
+    setScale((state) => {
+      const { distance: lastDistance, vector } = state;
+
+      const distance = getDistanceFromPoints(point, _center);
+
+      const _vector = vector.map((value, index) => {
+        return constrain(
+          min[index],
+          max[index],
+          getScale(value, distance[index], lastDistance[index])
+        );
       });
-    },
-    [coordinates, dimensions]
-  );
 
-  const move = useCallback<UseScalableHandler>(
-    (point, center) => {
-      const _center = center || makeCenterPoint(dimensions, coordinates);
-      setScale((state) => {
-        const { distance: lastDistance, vector } = state;
+      return {
+        distance: distance.map((d, i) => (d <= 0 ? lastDistance[i] : d)),
+        vector: _vector,
+      };
+    });
+  };
 
-        const distance = getDistanceFromPoints(point, _center);
+  const end = (): void => {};
 
-        const _vector = vector.map((value, index) => {
-          return constrain(
-            min[index],
-            max[index],
-            getScale(value, distance[index], lastDistance[index])
-          );
-        });
-
-        return {
-          distance: distance.map((d, i) => (d <= 0 ? lastDistance[i] : d)),
-          vector: _vector,
-        };
-      });
-    },
-    [coordinates, dimensions, max, min]
-  );
-
-  const end = useCallback((): void => {}, []);
-
-  const handlers = useMemo(
-    () => ({
-      start,
-      move,
-      end,
-    }),
-    [end, move, start]
-  );
-
-  const value = useMemo((): UseScalableReturn => {
-    return [scale, handlers];
-  }, [handlers, scale]);
-
-  return value;
+  return [scale, { start, move, end }];
 }
 
 export default useScalable;

@@ -1,10 +1,11 @@
-import React, { useRef, useMemo, createElement, useEffect } from 'react';
-import { Box, Centered, Text, Absolute, Relative } from '@jwdinker/styled-system';
+import React, { useRef, useMemo, createElement, useEffect, useCallback, memo } from 'react';
+import { Box, Centered, Text, Absolute, Relative, Button } from '@jwdinker/styled-system';
 import useMeasurementsIndexer from '@jwdinker/use-measurements-indexer';
 import upTo from '@jwdinker/up-to';
 import { useSpring, animated } from 'react-spring';
 import useWindowSize from '@jwdinker/use-window-size';
 import { useKineticScroll } from '@jwdinker/use-kinetic-scroll';
+
 import { withCoreProviders } from '../../hocs';
 
 function randomIntFromInterval(min, max) {
@@ -24,11 +25,13 @@ const MyComponent = ({ style, index }) => {
   return (
     <Box style={style}>
       <Centered width={1} height="100%">
-        <Text fontSizeFluid={['25px', '75px']}>{index + 1}</Text>
+        <Text fontSizeFluid={['25px', '75px']}>{index}</Text>
       </Centered>
     </Box>
   );
 };
+
+const MemoizedComponent = memo(MyComponent, () => true);
 
 function Index() {
   const container = useRef();
@@ -36,13 +39,13 @@ function Index() {
 
   const [_window, hasSizeChanged] = useWindowSize();
 
-  const [scroll] = useKineticScroll(container, { wheel: true });
+  const [scroll, { scrollTo }] = useKineticScroll(container, { wheel: true });
 
   const getSize = (index) => {
     return randomIntFromInterval(100, 800);
   };
 
-  const saveProps = (index, { size, offset }) => {
+  const saveProps = useCallback((index, { size, offset }) => {
     cachedProps.current[index] = {
       key: index,
       index,
@@ -54,34 +57,25 @@ function Index() {
         background: getRandomColor(),
       },
     };
-  };
+  }, []);
 
-  const {
-    getMeasurements,
-    getIndexByOffset,
-    getIndexRangeFromOffsets,
-    clearMeasurements,
-    getTotalSize,
-  } = useMeasurementsIndexer({
-    itemSize: getSize,
+  const { clear, getIndexRangeFromOffsets, getMeasurements } = useMeasurementsIndexer({
+    itemSize: 100,
     onMeasure: saveProps,
     log: true,
+    infinite: true,
   });
-
-  useEffect(() => {
-    if (hasSizeChanged) {
-      cachedProps.current = {};
-      clearMeasurements();
-    }
-  }, [clearMeasurements, hasSizeChanged]);
 
   const canRender = _window.height !== 0;
 
   const [x, y] = scroll.xy;
+
+  const scrollOffset = Math.max(0, y);
   const indexes = canRender
-    ? getIndexRangeFromOffsets(y - _window.height, y + _window.height * 2)
+    ? getIndexRangeFromOffsets(scrollOffset, scrollOffset + _window.height)
     : [0, 0];
 
+  console.log('INDEXES: ', indexes);
   const [startIndex, endIndex] = indexes;
 
   const items = useMemo(() => {
@@ -89,7 +83,7 @@ function Index() {
       return [];
     }
     return upTo(startIndex, endIndex, (index) => {
-      return createElement(MyComponent, cachedProps.current[index]);
+      return createElement(MemoizedComponent, cachedProps.current[index]);
     });
   }, [canRender, endIndex, startIndex]);
 
@@ -107,6 +101,13 @@ function Index() {
 
   return (
     <>
+      <Button
+        onClick={() => {
+          const { offset } = getMeasurements(-300);
+          scrollTo(0, offset);
+        }}>
+        click me
+      </Button>
       <Absolute
         p="2%"
         zIndex={1}

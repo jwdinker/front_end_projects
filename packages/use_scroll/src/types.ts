@@ -1,62 +1,48 @@
 import { EasingType } from '@jwdinker/easing-fns';
-import { ScrollCoordinates } from '@jwdinker/scroll-helpers';
-import { Direction } from '@jwdinker/get-directions';
 import { SCROLL_PHASES } from './constants';
 
-export type Element = React.RefObject<HTMLElement | undefined> | Window;
+export interface ScrollCoordinates {
+  x: number;
+  y: number;
+}
 
 export type ScrollPhase = typeof SCROLL_PHASES[keyof typeof SCROLL_PHASES];
 
-export type ScrollCallback = (state: ScrollState) => void;
-
-export interface ScrollStateOptions {
-  endDelay?: number;
-  passive?: boolean;
-  capture?: boolean;
-  once?: boolean;
-  onScroll?: ScrollCallback;
+export interface ScrollState extends ScrollCoordinates {
+  isScrolling: boolean;
+  direction: number;
+  phase: ScrollPhase;
 }
-
-export type ElementOrWindow = HTMLElement | Window;
 
 export type ScrollElement =
-  | React.RefObject<HTMLElement | Window | undefined | null>
+  | React.RefObject<HTMLElement | Window | null | undefined>
+  | HTMLElement
   | Window
-  | null;
+  | null
+  | undefined;
 
-export type PreviousScrollCoordinates = number[];
+export type ScrollTarget = HTMLElement | globalThis.Window;
 
-export type ScrollDistance = [number, number];
-
-export interface ScrollState {
-  phase: ScrollPhase;
-  isScrolling: boolean;
-  x: number;
-  y: number;
-  direction: Direction[];
-  velocity: number;
-}
-
-export interface ScrollToOptions {
-  smooth?: boolean;
+export interface ScrollToAnimationProps {
   easing?: EasingType;
   duration?: number;
 }
 
-export interface ScrollToProps extends ScrollToOptions {
+export interface ScrollToOptions extends ScrollToAnimationProps {
   x?: number;
   y?: number;
 }
 
-export type ScrollTo = (props: ScrollToProps) => void;
+export type ScrollToCoord = [number, number];
 
-export type ScrollStateReturn = [ScrollState, ScrollTo, Event | null];
-
-export interface SmoothScrollProps {
-  start: ScrollCoordinates;
-  end: ScrollCoordinates;
+export interface AnimateScrollProps {
+  startCoord: ScrollCoordinates;
+  endCoord: ScrollCoordinates;
   duration: number;
   easing: EasingType;
+  callback: (xy: ScrollToCoord) => void;
 }
 
-export type SmoothScrollCallback = (x: number, y: number) => void;
+export type ScrollTo = (options: ScrollToOptions) => void;
+
+export type UseScrollReturn = [ScrollState, ScrollTo];

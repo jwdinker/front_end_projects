@@ -9,47 +9,62 @@ import { dragStart, dragMove, dragEnd, INITIAL_STATE, reducer } from './actions'
 import { UseDragProps, DragState } from './types';
 import { getCoordinates } from './helpers';
 
-const { useMemo, useReducer, useRef } = React;
+const { useMemo, useRef, useState } = React;
 
 function useDrag(
   element: DragElement,
   {
     mouse = true,
     touch = 1,
-    initialCoordinates = [0, 0],
     canDrag = () => true,
     passive = true,
     capture = false,
   }: UseDragProps = {}
 ): DragState {
   const startTime = useRef(0);
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, setState] = useState(INITIAL_STATE);
 
   const getInteractionType = useMemo(() => makeGetInteractionType(mouse, touch), [mouse, touch]);
 
   const start: DragCallback = (event, listeners) => {
-    if (canDrag(event)) {
-      listeners.listen();
+    setState((previousState) => {
       const interactionType = getInteractionType(event);
       const coordinates = getCoordinates(event, interactionType);
       const timestamp = Date.now();
       startTime.current = timestamp;
-      dispatch(dragStart(coordinates, timestamp));
-    }
+
+      const startState = reducer(previousState, dragStart(coordinates, timestamp));
+      if (canDrag(startState, event)) {
+        listeners.listen();
+        startTime.current = timestamp;
+        return startState;
+      }
+      return previousState;
+    });
   };
 
   const move: DragCallback = (event) => {
-    const interactionType = getInteractionType(event);
-    const coordinates = getCoordinates(event, interactionType);
-    const timestamp = Date.now();
-    const duration = timestamp - startTime.current;
-    dispatch(dragMove(coordinates, getTouchForceAtIndex(event), duration, timestamp));
+    setState((previousState) => {
+      const interactionType = getInteractionType(event);
+      const coordinates = getCoordinates(event, interactionType);
+      const timestamp = Date.now();
+      const duration = timestamp - startTime.current;
+      const moveState = reducer(
+        previousState,
+        dragMove(coordinates, getTouchForceAtIndex(event), duration, timestamp)
+      );
+      if (canDrag(moveState, event)) {
+        return moveState;
+      }
+
+      return previousState;
+    });
   };
 
   const end: DragCallback = (event, listeners) => {
     listeners.unlisten();
     const duration = Date.now() - startTime.current;
-    dispatch(dragEnd(duration));
+    setState((previousState) => reducer(previousState, dragEnd(duration)));
   };
 
   useDragListener(element, {

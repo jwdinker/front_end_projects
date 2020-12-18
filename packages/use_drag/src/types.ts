@@ -8,15 +8,6 @@ export type Direction = 1 | 0 | -1;
 export type Directions = [Direction, Direction];
 export type Velocity = [number, number];
 
-export interface UseDragProps {
-  touch?: 0 | 1 | 2;
-  mouse?: boolean;
-  canDrag?: (event: DragEvent) => boolean;
-  initialCoordinates?: Coordinates;
-  passive?: boolean;
-  capture?: boolean;
-}
-
 export interface DragState {
   active: boolean;
   phase: DragPhase;
@@ -34,6 +25,17 @@ export interface DragState {
   velocity: Velocity;
   duration: number;
   timestamp: number;
+}
+
+export type CanDrag = (dragState: DragState, event: DragEvent) => boolean;
+
+export interface UseDragProps {
+  touch?: 0 | 1 | 2;
+  mouse?: boolean;
+  canDrag?: CanDrag;
+  initialCoordinates?: Coordinates;
+  passive?: boolean;
+  capture?: boolean;
 }
 
 export interface DragStart {
