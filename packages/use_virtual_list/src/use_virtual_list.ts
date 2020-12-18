@@ -10,6 +10,7 @@ import {
   SPACER_BASE_STYLE,
   CONFIGURATIONS,
   SCROLL_TO_ALIGNMENTS,
+  DEFAULT_INDEXES,
 } from './constants';
 import { getScrollOffsetForAlignment, convertPctToPx } from './helpers';
 
@@ -59,6 +60,7 @@ function useVirtualList(props: VirtualListProps) {
 
   const saveProps: OnMeasure = (index, itemMeasurements) => {
     const { size, offset } = itemMeasurements;
+
     onMeasure(index, itemMeasurements);
 
     cache.current[index] = {
@@ -83,26 +85,30 @@ function useVirtualList(props: VirtualListProps) {
   */
   const onReset = (resetRange: IndexRange) => {
     const [startIndex, endIndex] = resetRange;
+
     for (let index = startIndex; index <= endIndex; index += 1) {
       delete cache.current[index];
     }
+    // !hacky way to get item's useMemo to run again since _cache is dependency.
+    cache.current = { ...cache.current };
   };
 
+  const lastIndex = numberOfItems - 1;
+
   const measurementsIndexer = useMeasurementsIndexer({
-    numberOfItems,
+    boundaries: [0, lastIndex],
     itemSize,
     onMeasure: saveProps,
     estimatedItemSize,
-    log: false,
     onClear,
     onReset,
   });
 
   const {
     getMeasurements,
-    getEndIndex,
-    getOffsetAtIndex,
-    getTotalSize,
+
+    getIndexRangeFromOffsets,
+    getTotalSizeOfItems,
     resetFromIndex,
     clear,
   } = measurementsIndexer;
@@ -111,30 +117,45 @@ function useVirtualList(props: VirtualListProps) {
     Since the container is only measured after it is rendered, the container
     size would default to zero on the first render.  
   */
-  const canRender = containerSize > 0;
+  const canRender = containerSize > 0 && numberOfItems > 0;
 
   const hasContainerSizeChanged = lastContainerSize !== containerSize;
 
-  const bufferOffset = responsive ? 100 : containerSize;
+  const leadingOffset = responsive ? 100 : containerSize;
 
-  // buffer size is applied to the direction of the scroll
-  const [startBuffer, endBuffer] = scrollDirection === -1 ? [-buffer, 0] : [0, buffer];
+  /* 
+    Buffer size is applied to the direction of the scroll. Because there could
+    be a number of items that has a total size smaller than the containerSize, the
+    backwards buffer is only applied backwards when the scrollOffset is less
+    than the container, otherwise the buffer size would make items disappear. 
+  */
+  const [startBuffer, endBuffer] =
+    scrollDirection === -1 && scrollOffset > leadingOffset ? [-buffer, 0] : [0, buffer];
 
-  const visibleStartIndex = canRender ? getOffsetAtIndex(scrollOffset) : 0;
-  const visibleEndIndex = canRender
-    ? getEndIndex(visibleStartIndex, scrollOffset + bufferOffset)
-    : 0;
+  const visibleIndexes = canRender
+    ? getIndexRangeFromOffsets(scrollOffset, scrollOffset + leadingOffset)
+    : DEFAULT_INDEXES;
 
-  const renderStart = Math.max(0, visibleStartIndex + startBuffer);
-  const renderEnd = visibleEndIndex + endBuffer;
+  const renderedIndexes = canRender
+    ? [
+        Math.max(0, visibleIndexes[0] + startBuffer),
+        Math.min(visibleIndexes[1] + endBuffer, numberOfItems - 1),
+      ]
+    : DEFAULT_INDEXES;
 
+  const [renderStart, renderEnd] = renderedIndexes;
   /*
     The items are memoized to prevent unnecessary recreation of the elements.
+    The cache ref is assigned to  a local variable so that when the component
+    remounts the memo function knows to rerun.
   */
+  const _cache = cache.current;
+
   const items = useMemo((): React.Component[] => {
     if (!canRender) {
       return [];
     }
+
     return upTo<React.Component>(renderStart, renderEnd, (index: number) => {
       let elementProps = cache.current[index];
 
@@ -143,16 +164,21 @@ function useVirtualList(props: VirtualListProps) {
           when the render buffer is greater than 0, the extra rendered items may
           not have been measured yet so they need to be accounted for.
         */
-
         getMeasurements(index);
-        elementProps = cache.current[index];
+        elementProps = _cache[index];
       }
 
-      return createElement(component, cache.current[index]);
+      return createElement(component, _cache[index]);
     });
-  }, [canRender, component, getMeasurements, renderEnd, renderStart]);
+    /* 
+      ! since I only need the render indexes to trigger the useMemo hook,
+      ! getMeasurements can be omitted.  Sometimes i hate the dependency array.
+    */
 
-  const totalSize = canRender ? getTotalSize() : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canRender, component, renderEnd, renderStart, _cache]);
+
+  const totalSize = canRender ? getTotalSizeOfItems() : 0;
 
   /**
    * scrollToIndex
@@ -171,7 +197,7 @@ function useVirtualList(props: VirtualListProps) {
     if (scroller.current) {
       const item = getMeasurements(index);
 
-      const nextTotalSize = getTotalSize();
+      const nextTotalSize = getTotalSizeOfItems();
 
       const values = [nextTotalSize, item.offset, item.size];
 
@@ -239,9 +265,15 @@ function useVirtualList(props: VirtualListProps) {
   }, [canClearCache, clear]);
 
   const indexes = {
-    visible: [visibleStartIndex, visibleEndIndex],
-    rendered: [renderStart, renderEnd],
+    visible: visibleIndexes,
+    rendered: renderedIndexes,
   };
+
+  useEffect(() => {
+    return () => {
+      cache.current = {};
+    };
+  }, []);
 
   return [
     items,

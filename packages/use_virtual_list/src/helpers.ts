@@ -7,8 +7,9 @@ export function areEqual(previous: any, current: any) {
 
 export function getScrollOffsetForAlignment(props: ScrollOffsetForAlignmentProps): number {
   const { alignment, containerSize, totalSizeOfItems, offsetOfItem, sizeOfItem } = props;
-  const minimum = Math.max(0, Math.min(totalSizeOfItems - containerSize, offsetOfItem));
-  const maximum = Math.max(0, offsetOfItem - containerSize + sizeOfItem);
+
+  const minimum = Math.max(0, offsetOfItem - containerSize + sizeOfItem);
+  const maximum = Math.max(0, Math.min(totalSizeOfItems - containerSize, offsetOfItem));
 
   switch (alignment) {
     case SCROLL_TO_ALIGNMENTS.END: {

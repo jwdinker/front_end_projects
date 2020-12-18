@@ -40,3 +40,5 @@ export const SCROLL_TO_ALIGNMENTS = {
   CENTER: 'center',
   END: 'end',
 } as const;
+
+export const DEFAULT_INDEXES = [0, 0];

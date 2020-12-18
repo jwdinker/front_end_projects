@@ -1,19 +1,20 @@
-import { IndexRange, UseMeasurementsIndexerProps } from '@jwdinker/use-measurements-indexer';
+import { IndexRange, ItemSize, OnMeasure } from '@jwdinker/use-measurements-indexer';
 import { CSSProperties, ComponentClass } from 'react';
 import { ScrollToAnimationProps } from '@jwdinker/use-scroll';
 import { SCROLL_TO_ALIGNMENTS } from './constants';
 
-export type LayoutType = 'vertical' | 'horizontal';
-
 export type Axis = 'x' | 'y';
 
-export interface VirtualListProps extends UseMeasurementsIndexerProps {
+export interface VirtualListProps {
   component: ComponentClass;
   numberOfItems: number;
   containerSize: number;
   responsive?: boolean;
   buffer?: number;
   axis?: Axis;
+  itemSize: ItemSize;
+  estimatedItemSize?: number;
+  onMeasure?: OnMeasure;
 }
 
 export interface ContainerAndContentStyles {
@@ -23,16 +24,8 @@ export interface ContainerAndContentStyles {
 
 export type ScrollToAlignment = typeof SCROLL_TO_ALIGNMENTS[keyof typeof SCROLL_TO_ALIGNMENTS];
 
-export type ScrollToBehvaior = 'smooth' | 'auto';
-
 export interface ScrollToIndexOptions extends ScrollToAnimationProps {
   alignment?: ScrollToAlignment;
-}
-
-export interface VirtualScrollerProps {
-  spacerStyle: CSSProperties;
-  scrollerStyle: CSSProperties;
-  items: React.Component[];
 }
 
 export interface ScrollItemProps {
