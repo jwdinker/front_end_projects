@@ -38,7 +38,6 @@ function useKineticScroll(
   {
     canScroll = () => true,
     axis = 'y',
-    bounded = true,
     damping = 0.6,
     mouse = false,
     touch = true,
@@ -47,7 +46,6 @@ function useKineticScroll(
 ): KineticScrollReturn {
   const animationFrame = useRef(0);
   const isDecelerating = useRef(false);
-  const previousDecay = useRef([0, 0]);
 
   const _damping = 1 - damping;
   const touchDamping = Math.max(_damping, 0.4);
@@ -79,8 +77,6 @@ function useKineticScroll(
     const duration = now - timestamp;
 
     const decay = getDecay(amplitude, duration);
-
-    console.log('FUCK YOU: ', decay[1]);
 
     if (canThrust(decay)) {
       dispatch(momentumMove(decay));
@@ -117,14 +113,11 @@ function useKineticScroll(
     dispatch(pointerEnd(touchDamping));
   };
 
-  const onWheelStart = useCallback(
-    (event: WheelEvent) => {
-      clear();
-      dispatch(wheelStart(event));
-      return preventDefault(event);
-    },
-    [clear]
-  );
+  const onWheelStart = (event: WheelEvent) => {
+    clear();
+    dispatch(wheelStart(event));
+    return preventDefault(event);
+  };
 
   const onWheelMove = (event: WheelEvent) => {
     dispatch(wheelMove([event.deltaX, event.deltaY]));
