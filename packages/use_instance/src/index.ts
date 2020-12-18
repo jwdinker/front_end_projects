@@ -4,7 +4,7 @@ type InstanceFn<T> = () => T;
 export type Instance<T> = InstanceFn<T> | T;
 
 function useInstance<T>(instance: Instance<T>): T {
-  const ref = useRef<T>();
+  const ref = useRef<T | null>(null);
 
   const get = (): T => {
     if (!ref.current) {
@@ -14,9 +14,10 @@ function useInstance<T>(instance: Instance<T>): T {
   };
 
   useEffect(() => {
-    // clean up effect for fast refresh
-    // @ts-ignore
-    ref.current = null;
+    return () => {
+      // clean up effect for fast refresh
+      ref.current = null;
+    };
   }, []);
 
   return get();
