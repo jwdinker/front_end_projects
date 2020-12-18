@@ -42,7 +42,7 @@ const Contents = () => {
 
   return (
     <Box height="100%" maxWidth="50%">
-      <Absolute>
+      <Absolute zIndex={1}>
         <Button onClick={remove}>Remove First Image</Button>
         <Button onClick={reset}>Reset Images</Button>
       </Absolute>

@@ -1,22 +1,28 @@
 import React from 'react';
-import { Box, Button, Centered, Text } from '@jwdinker/styled-system';
+import { Button, Centered, Text, Absolute } from '@jwdinker/styled-system';
 import useToggle from '@jwdinker/use-toggle';
 import { withCoreProviders } from '../../hocs';
 
-function UseToggleExample() {
-  const [active, helpers] = useToggle();
+function Index() {
+  const [active, { activate, deactivate, toggle }] = useToggle(false);
 
-  const { toggle } = helpers;
+  const color = active ? '#79ff64' : '#ff6f83';
 
   return (
-    <Box height="100vh" width="100%">
-      <Centered width={1} height="100%">
-        <Button bg={active ? 'green.4' : 'red.4'} width="80%" height="60%" onClick={toggle}>
-          <Text fontSize="64px">{active ? 'deactivate' : 'activate'}</Text>
+    <Absolute bg="black" zIndex={-1} height="100%" width="100%">
+      <Centered height="100%" width={1}>
+        <Button height="100%" width="100%" onClick={toggle}>
+          <Text fontSize="30px" fontWeight="bold" color="white">
+            Is active?
+          </Text>
+          <Text style={{ color }} fontSize="30px" fontWeight="bold" color="white">
+            {` ${active}`}
+          </Text>
         </Button>
       </Centered>
-    </Box>
+    </Absolute>
   );
 }
 
-export default withCoreProviders(UseToggleExample);
+const Page = withCoreProviders(Index);
+export default Page;

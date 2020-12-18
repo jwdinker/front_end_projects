@@ -1,13 +1,17 @@
-import React, { useRef, useEffect, useMemo } from 'react';
-import { Centered, Flex, Box, Row, Text, Absolute } from '@jwdinker/styled-system';
+import React, { useRef, useEffect } from 'react';
+import { Centered, Flex, Row, Absolute, Text, Box } from '@jwdinker/styled-system';
 
 import { useSpring, animated } from 'react-spring';
-import useScale from '@jwdinker/use-scale';
-import useSize from '@jwdinker/use-size';
+import useRotation from '@jwdinker/use-rotation';
 import { withCoreProviders } from '../../hocs';
 
-const HEIGHT = 200;
-const WIDTH = 200;
+const BASE_STYLE = {
+  height: '200px',
+  width: `200px`,
+  borderRadius: '8px',
+  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05)',
+  background: 'white',
+};
 
 const getColor = (value) => {
   if (typeof value === 'boolean') {
@@ -30,14 +34,14 @@ const KeyValue = ({ name, value }) => {
   );
 };
 
-function Details({ size, isResizing }) {
+function Details({ rotate, children, ...rotation }) {
   return (
     <Absolute zIndex={1} top={0} left={0} width={1 / 3}>
       <Centered p={3}>
         <Box>
-          <KeyValue key={isResizing} name="isResizing" value={isResizing} />
-          {Object.keys(size).map((property) => {
-            const value = size[property];
+          {Object.keys(rotation).map((property) => {
+            const value = rotation[property];
+
             return (
               <KeyValue
                 key={property}
@@ -55,38 +59,32 @@ function Details({ size, isResizing }) {
 const Contents = () => {
   const element = useRef();
 
-  const scale = useScale(element, { mouse: true, initialScale: [1, 1, 1] });
-  const [size, isResizing] = useSize(element);
+  const rotation = useRotation(element, { mouse: true, touch: 2 });
 
-  const [x, y, z] = scale.vector;
-
-  //! useSpring has fast refresh bug. styles are lost after refresh if using height or width
   const [style, set] = useSpring(() => {
-    return { background: 'white', height: `${HEIGHT * y}px`, width: `${WIDTH * x}px` };
+    return { transform: `rotate(0deg) `, ...BASE_STYLE };
   });
 
   useEffect(() => {
-    if (scale.isScaling) {
+    if (rotation.active) {
       set(() => {
-        return { background: 'white', height: `${HEIGHT * y}px`, width: `${WIDTH * x}px` };
+        return {
+          ...BASE_STYLE,
+          transform: `rotate(${rotation.angle}deg)`,
+        };
       });
     }
-  }, [scale.isScaling, set, x, y]);
+  }, [rotation, rotation.total, set]);
 
   useEffect(() => {
-    const handler = (e) => {
+    document.addEventListener('gesturestart', (e) => {
       e.preventDefault();
-    };
-    document.addEventListener('gesturestart', handler);
-    return () => {
-      document.removeEventListener('gesturestart', handler);
-    };
+    });
   }, []);
 
   return (
     <>
-      <Details isResizing={isResizing} size={size} />
-
+      <Details {...rotation} />
       <Flex bg="black" height="100vh" width="100%">
         <Centered height="100%" width="100%">
           <animated.div ref={element} style={style} />
@@ -96,5 +94,4 @@ const Contents = () => {
   );
 };
 
-const Page = withCoreProviders(Contents);
-export default Page;
+export default withCoreProviders(Contents);

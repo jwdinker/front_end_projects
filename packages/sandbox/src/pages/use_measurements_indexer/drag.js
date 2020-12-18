@@ -4,7 +4,7 @@ import useMeasurementsIndexer from '@jwdinker/use-measurements-indexer';
 import upTo from '@jwdinker/up-to';
 import { useSpring, animated } from 'react-spring';
 import useWindowSize from '@jwdinker/use-window-size';
-import { useKineticScroll } from '@jwdinker/use-kinetic-scroll';
+import useDrag from '@jwdinker/use-drag';
 
 import { withCoreProviders } from '../../hocs';
 
@@ -33,13 +33,14 @@ const MyComponent = ({ style, index }) => {
 
 const MemoizedComponent = memo(MyComponent, () => true);
 
+const axis = 0;
+
 function Index() {
   const container = useRef();
+  const dragger = useRef();
   const cachedProps = useRef({});
 
   const [_window, hasSizeChanged] = useWindowSize();
-
-  const [scroll, { scrollTo }] = useKineticScroll(container, { wheel: true });
 
   const getSize = (index) => {
     return randomIntFromInterval(100, 800);
@@ -51,31 +52,52 @@ function Index() {
       index,
       style: {
         position: 'absolute',
-        height: `${size}px`,
-        width: '100%',
-        top: `${offset}px`,
+        width: `${size}px`,
+        height: '100%',
+        left: `${offset}px`,
         background: getRandomColor(),
       },
     };
   }, []);
 
-  const { clear, getIndexRangeFromOffsets, getMeasurements } = useMeasurementsIndexer({
-    itemSize: 100,
-    onMeasure: saveProps,
-    log: true,
-    infinite: true,
+  const drag = useDrag(container, {
+    mouse: true,
+    canDrag: (state) => {
+      const { xy } = state;
+      const coordinate = xy[axis];
+      return coordinate <= 0;
+    },
   });
 
-  const canRender = _window.height !== 0;
+  console.log('DRAG: ', JSON.stringify(drag, null, 2));
 
-  const [x, y] = scroll.xy;
+  const {
+    phase,
+    xy,
+    direction,
+    move,
+    coordinates: { origin, initial },
+  } = drag;
 
-  const scrollOffset = Math.max(0, y);
-  const indexes = canRender
-    ? getIndexRangeFromOffsets(scrollOffset, scrollOffset + _window.height)
-    : [0, 0];
+  const {
+    clear,
+    getIndexRangeFromOffsets,
+    getMeasurements,
+    getTotalSizeOfItems,
+    findIndexAtOffset,
+  } = useMeasurementsIndexer({
+    itemSize: 400,
+    onMeasure: saveProps,
+    log: true,
+    boundaries: [0, 100],
+  });
 
-  console.log('INDEXES: ', indexes);
+  const coordinate = xy[axis];
+  const canRender = _window.width !== 0;
+
+  const offset = Math.max(0, coordinate * -1);
+  const indexes = canRender ? getIndexRangeFromOffsets(offset, offset + _window.height) : [0, 0];
+
   const [startIndex, endIndex] = indexes;
 
   const items = useMemo(() => {
@@ -90,24 +112,41 @@ function Index() {
   const [animation, set] = useSpring(() => ({
     height: '100%',
     width: '100%',
-    transform: 'translate3d(0,0px,0)',
+    transform: 'translate3d(0px,0px,0)',
   }));
+
+  const totalSize = getTotalSizeOfItems();
+  console.log('totalSize: ', totalSize);
+
+  let translate = 0;
+  const movingPoint = move[axis];
+  const snapPoint = getMeasurements(startIndex).offset;
+  const point = snapPoint + movingPoint;
+
+  if (phase === 'end') {
+    translate = Math.min(-snapPoint, 0);
+  } else {
+    translate = Math.min(0, Math.min(point, totalSize));
+  }
 
   useEffect(() => {
     set(() => {
-      return { height: '100%', width: '100%', transform: `translate3d(0,${-y}px,0)` };
+      return {
+        height: '100%',
+        width: '100%',
+        transform: `translate3d(${translate}px,${0}px,0)`,
+      };
     });
-  }, [set, y]);
+  }, [set, translate]);
+
+  useEffect(() => {
+    return () => {
+      cachedProps.current = {};
+    };
+  }, []);
 
   return (
     <>
-      <Button
-        onClick={() => {
-          const { offset } = getMeasurements(-300);
-          scrollTo(0, offset);
-        }}>
-        click me
-      </Button>
       <Absolute
         p="2%"
         zIndex={1}
@@ -118,8 +157,10 @@ function Index() {
         boxShadow="0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)">
         <Text>{`indexes: ${startIndex} -> ${endIndex}`}</Text>
       </Absolute>
-      <Relative ref={container} height="100vh" width={1} maxHeight="100vh" overflow="scroll">
-        <animated.div style={animation}>{items}</animated.div>
+      <Relative ref={container} height="80vh" width={1} maxHeight="80vh" overflow="hidden">
+        <animated.div ref={dragger} style={animation}>
+          {items}
+        </animated.div>
       </Relative>
     </>
   );

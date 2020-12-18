@@ -47,7 +47,8 @@ function Index() {
     return sizes[index];
   };
 
-  const saveProps = (index, { size, offset }) => {
+  const saveProps = useCallback((index, { size, offset }) => {
+    console.log('INDEX: ', index, offset);
     cachedProps.current[index] = {
       key: index,
       index,
@@ -59,44 +60,41 @@ function Index() {
         background: getRandomColor(),
       },
     };
-  };
+  }, []);
 
-  const {
-    getMeasurements,
-    getIndexByOffset,
-    getIndexRangeFromOffsets,
-    clearMeasurements,
-    getTotalSize,
-  } = useMeasurementsIndexer({
+  const measurementsIndexer = useMeasurementsIndexer({
     itemSize: getSize,
     numberOfItems: NUMBER_OF_ITEMS,
     estimatedItemSize: 600,
     onMeasure: saveProps,
     log: true,
+    upperBound: -1,
   });
 
   useEffect(() => {
     if (hasSizeChanged) {
       cachedProps.current = {};
-      clearMeasurements();
+      measurementsIndexer.clearMeasurements();
     }
-  }, [clearMeasurements, hasSizeChanged]);
+  }, [hasSizeChanged, measurementsIndexer]);
 
   const canRender = _window.height !== 0;
 
   const indexes = canRender
-    ? getIndexRangeFromOffsets(Math.max(0, scroll.y), scroll.y + _window.height)
+    ? measurementsIndexer.getIndexRangeFromOffsets(Math.max(0, scroll.y), scroll.y + _window.height)
     : [0, 0];
 
   const startIndex = Math.max(indexes[0], 0);
   const endIndex = Math.min(indexes[1], NUMBER_OF_ITEMS);
 
   const scrollTo = useCallback(() => {
-    const { offset } = getMeasurements(HALFWAY - 1);
+    const { offset } = measurementsIndexer.getMeasurements(HALFWAY - 1);
     container.current.scrollTo(0, offset);
-  }, [getMeasurements]);
+  }, []);
 
-  const totalSize = getTotalSize();
+  console.log('INDEXES: ', indexes);
+
+  const totalSize = measurementsIndexer.getTotalSize();
 
   const items = useMemo(() => {
     if (!canRender) {

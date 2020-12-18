@@ -76,42 +76,7 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-const logger2 = ({ getState, dispatch }) => (next) => (action) => {
-  console.log(
-    '\n1.\nSTATE',
-    JSON.stringify(getState(), null, 2),
-    '\nREDUCER:',
-    reducer,
-    '\nDISPATCH:',
-    next,
-    '\nACTION:',
-    action
-  );
-  console.info(getState);
-  const result = next(action);
-  console.log('AFTER: ', JSON.stringify(getState(), null, 2));
-  return result;
-};
-
-const comeOn = () => {
-  return (dispatch, getState) => {
-    if (getState().count === 0) {
-      dispatch(setPhase('derp'));
-    }
-  };
-};
-
-export const fucker = (store) => (dispatch) => (action) => {
-  const state = store.getState();
-
-  if (state.count === 0) {
-    dispatch(setPhase('move'));
-    return dispatch(action);
-  }
-  return dispatch(action);
-};
-
-const middleware = [interjector, fucker, logger];
+const middleware = [interjector, logger];
 
 function Index() {
   const [state, dispatch, subscribe] = useReducerWithMiddleware(reducer, initialState, middleware);
