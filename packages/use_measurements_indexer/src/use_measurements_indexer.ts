@@ -214,12 +214,13 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
    * -------------------------------------------------------------------------
    */
   function getMeasurements(index: number): Measurements {
+    const safeIndex = getSafeIndex(index);
     const { cache } = state.current;
-    const item = cache[index];
+    const item = cache[safeIndex];
     if (item) {
       return item;
     }
-    return measureToIndex(index);
+    return measureToIndex(safeIndex);
   }
 
   /**
@@ -373,6 +374,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   }, []);
 
   return {
+    getSafeIndex,
     getMeasurements,
     getTotalSizeOfItems,
     getIndexRangeFromOffsets,
