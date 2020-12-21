@@ -12,6 +12,7 @@ export interface ScrollState extends ScrollCoordinates {
   isScrolling: boolean;
   direction: number;
   phase: ScrollPhase;
+  isAnimating: boolean;
 }
 
 export type ScrollElement =
@@ -36,6 +37,7 @@ export interface ScrollToOptions extends ScrollToAnimationProps {
 export type ScrollToCoord = [number, number];
 
 export interface AnimateScrollProps {
+  rafIdRef: React.MutableRefObject<number>;
   startCoord: ScrollCoordinates;
   endCoord: ScrollCoordinates;
   duration: number;
