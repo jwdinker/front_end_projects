@@ -19,8 +19,8 @@ const { useRef, useEffect, useMemo, createElement } = React;
 function useVirtualList(props: VirtualListProps) {
   const {
     component,
-    responsive = false,
     axis = 'y',
+    responsive = true,
     containerSize = 0,
     itemSize,
     numberOfItems,
@@ -53,7 +53,7 @@ function useVirtualList(props: VirtualListProps) {
     offset of the items.
   */
   const scrollOffset = responsive
-    ? (scroll[typeOf.scroll] / containerSize) * 100
+    ? Math.round((scroll[typeOf.scroll] / containerSize) * 100)
     : scroll[typeOf.scroll];
 
   const cache = useRef({});
@@ -73,10 +73,6 @@ function useVirtualList(props: VirtualListProps) {
         [typeOf.offset]: `${offset}${unit}`,
       },
     };
-  };
-
-  const onClear = () => {
-    cache.current = {};
   };
 
   /*
@@ -100,17 +96,15 @@ function useVirtualList(props: VirtualListProps) {
     itemSize,
     onMeasure: saveProps,
     estimatedItemSize,
-    onClear,
     onReset,
   });
 
   const {
     getMeasurements,
-
+    findIndexAtOffset,
     getIndexRangeFromOffsets,
     getTotalSizeOfItems,
     resetFromIndex,
-    clear,
   } = measurementsIndexer;
 
   /*
@@ -260,9 +254,9 @@ function useVirtualList(props: VirtualListProps) {
 
   useEffect(() => {
     if (canClearCache) {
-      clear();
+      cache.current = {};
     }
-  }, [canClearCache, clear]);
+  }, [canClearCache]);
 
   const indexes = {
     visible: visibleIndexes,
@@ -281,9 +275,16 @@ function useVirtualList(props: VirtualListProps) {
       indexes,
       scroller: scrollerProps,
       spacer: spacerProps,
-      scroll,
+      scroll: {
+        isScrolling: scroll.isScrolling,
+        phase: scroll.phase,
+        direction: scrollDirection,
+        offset: scrollOffset,
+      },
       scrollToIndex,
       resetFromIndex,
+      getMeasurements,
+      findIndexAtOffset,
     },
   ];
 }
