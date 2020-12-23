@@ -5,17 +5,28 @@ import useRequestAnimationFrameState from '@jwdinker/use-request-animation-frame
 import { getScrollCoordinates } from '@jwdinker/scroll-helpers';
 import useTimeout from '@jwdinker/use-timeout';
 import easingFns, { EASING_TYPES } from '@jwdinker/easing-fns';
-import { ScrollElement, ScrollToCoord, ScrollToOptions, UseScrollReturn } from './types';
+import {
+  ScrollElement,
+  ScrollToCoord,
+  ScrollToOptions,
+  UseScrollReturn,
+  ScrollOptions,
+} from './types';
 import { INITIAL_STATE, handleStartOrMove, end } from './state';
 import { getElement } from './helpers';
 import { SCROLL_PROP_KEYS } from './constants';
 
 const { useEffect, useCallback, useRef } = React;
 
-function useScroll(
-  element: ScrollElement = null,
-  { passive = true, capture = false, once = false, consolidate = true } = {}
-): UseScrollReturn {
+function useScroll(element: ScrollElement = null, options: ScrollOptions = {}): UseScrollReturn {
+  const {
+    passive = true,
+    capture = false,
+    once = false,
+    consolidate = false,
+    endDelay = 45,
+  } = options;
+
   const rafId = useRef(0);
   const [scroll, setScroll] = useRequestAnimationFrameState(INITIAL_STATE);
 
@@ -32,7 +43,7 @@ function useScroll(
       const coordinates = getScrollCoordinates(_element);
       setScroll((previousState) => end(previousState, coordinates));
     }
-  }, 45);
+  }, endDelay);
 
   const handler = (event: any) => {
     const isAnimating = !!rafId.current;

@@ -1,6 +1,5 @@
 import makeHasChanged from '@jwdinker/make-has-changed';
-import easingFns from '@jwdinker/easing-fns';
-import { AnimateScrollProps, ScrollCoordinates, ScrollElement, ScrollToCoord } from './types';
+import { ScrollCoordinates, ScrollElement } from './types';
 import { DIRECTION_TYPES, SCROLL_PROP_KEYS } from './constants';
 
 export function getElement(element: ScrollElement) {
