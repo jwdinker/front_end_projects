@@ -307,6 +307,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   function clear(): void {
     state.current = getInitialState();
     onClear();
+    force();
   }
 
   /**
