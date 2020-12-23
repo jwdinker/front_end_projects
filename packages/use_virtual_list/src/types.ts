@@ -9,17 +9,14 @@ export interface VirtualListProps {
   component: React.ElementType;
   numberOfItems: number;
   containerSize: number;
+  direction: number;
+  offset: number;
   responsive?: boolean;
-  buffer?: number;
+  bufferSize?: number;
   axis?: Axis;
   itemSize: ItemSize;
   estimatedItemSize?: number;
   onMeasure?: OnMeasure;
-}
-
-export interface ContainerAndContentStyles {
-  container: React.CSSProperties;
-  contents: React.CSSProperties;
 }
 
 export type ScrollToAlignment = typeof SCROLL_TO_ALIGNMENTS[keyof typeof SCROLL_TO_ALIGNMENTS];

@@ -3,6 +3,7 @@ import * as React from 'react';
 export const CONFIGURATIONS = {
   y: {
     scroll: 'y',
+    oppositeAxis: 'x',
     dimension: 'height',
     oppositeDimension: 'width',
     offset: 'top',
@@ -11,6 +12,7 @@ export const CONFIGURATIONS = {
   },
   x: {
     scroll: 'x',
+    oppositeAxis: 'y',
     dimension: 'width',
     oppositeDimension: 'height',
     offset: 'left',
@@ -19,7 +21,7 @@ export const CONFIGURATIONS = {
   },
 } as const;
 
-export const SCROLLER_BASE_STYLE: React.CSSProperties = {
+export const CONTAINER_BASE_STYLE: React.CSSProperties = {
   position: 'relative',
   overflow: 'scroll',
   willChange: 'transform',
