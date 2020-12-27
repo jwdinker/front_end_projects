@@ -25,3 +25,27 @@ export function getRadians(point1: Point, point2: Point): number {
 export function getAngleFromPoints(point1: Point, point2: Point): number {
   return radiansToDegrees(getRadians(point1, point2));
 }
+
+export function angleToDirections(point1: Point, point2: Point): number[] {
+  const angle = getAngleFromPoints(point1, point2);
+  let x = 0;
+  let y = 0;
+
+  if (angle <= 359 && angle >= 181) {
+    x = -1;
+  }
+
+  if (angle <= 179 && angle >= 1) {
+    x = 1;
+  }
+
+  if (angle >= 91 && angle <= 269) {
+    y = 1;
+  }
+
+  if ((angle >= 271 && angle <= 369) || (angle >= 0 && angle <= 89)) {
+    y = -1;
+  }
+
+  return [x, y];
+}
