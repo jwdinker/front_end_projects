@@ -2,7 +2,6 @@ import * as React from 'react';
 
 export const CONFIGURATIONS = {
   y: {
-    scroll: 'y',
     oppositeAxis: 'x',
     dimension: 'height',
     oppositeDimension: 'width',
@@ -11,7 +10,6 @@ export const CONFIGURATIONS = {
     min: 'minHeight',
   },
   x: {
-    scroll: 'x',
     oppositeAxis: 'y',
     dimension: 'width',
     oppositeDimension: 'height',

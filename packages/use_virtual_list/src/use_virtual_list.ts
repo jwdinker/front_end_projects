@@ -3,7 +3,7 @@ import useMeasurementsIndexer, { IndexRange, OnMeasure } from '@jwdinker/use-mea
 
 import upTo from '@jwdinker/up-to';
 import usePrevious from '@jwdinker/use-previous';
-import { VirtualListProps } from './types';
+import { UnitType, VirtualListProps } from './types';
 
 import {
   CONTAINER_BASE_STYLE,
@@ -12,7 +12,7 @@ import {
   SCROLL_TO_ALIGNMENTS,
   DEFAULT_INDEXES,
 } from './constants';
-import { getScrollOffsetForAlignment, convertPctToPx } from './helpers';
+import { getScrollOffsetForAlignment, pctToPx, pxToPct } from './helpers';
 
 const { useRef, useEffect, useMemo, createElement } = React;
 
@@ -29,6 +29,7 @@ function useVirtualList(props: VirtualListProps) {
     onMeasure = () => {},
     estimatedItemSize,
     bufferSize = 3,
+    bufferByDirection = true,
   } = props;
 
   const typeOf = CONFIGURATIONS[axis];
@@ -38,11 +39,13 @@ function useVirtualList(props: VirtualListProps) {
   const lastContainerSize = usePrevious(containerSize);
   const previousAxis = usePrevious(axis);
 
+  const isInfinite = numberOfItems === -1;
+
   /*
-    When the scroll ends, the direction is set to zero so the previous direction
-    of the scroll must be used.  The direction of the buffered elements has to
-    match the direction of the scroll.  The prevents added repaints from adding
-    and removing elements on every scroll end.
+    When a scroll or swipe ends, the direction maybe set to zero so the previous
+    direction must be used.  The direction of the buffered elements has to match
+    the direction of the scroll.  The prevents added repaints from adding and
+    removing elements on every scroll end.
   */
   const staticDirection = direction === 0 ? direction : previousDirection;
 
@@ -51,7 +54,8 @@ function useVirtualList(props: VirtualListProps) {
     of the container in order to match with the percentage of the size and
     offset of the items.
   */
-  const keystoneOffset = responsive ? Math.round((offset / containerSize) * 100) : offset;
+  const formattedOffset = responsive ? pxToPct(offset, containerSize) : offset;
+  const keystoneOffset = isInfinite ? formattedOffset : Math.max(0, formattedOffset);
 
   const cache = useRef({});
 
@@ -84,7 +88,7 @@ function useVirtualList(props: VirtualListProps) {
     cache.current = { ...cache.current };
   };
 
-  const lastIndex = numberOfItems - 1;
+  const lastIndex = isInfinite ? 0 : numberOfItems - 1;
 
   const onClear = () => {
     cache.current = {};
@@ -97,12 +101,13 @@ function useVirtualList(props: VirtualListProps) {
     estimatedItemSize,
     onReset,
     onClear,
+    infinite: isInfinite,
   });
 
   const {
     clear,
+    getIndexByOffset,
     getMeasurements,
-    findIndexAtOffset,
     getIndexRangeFromOffsets,
     getTotalSizeOfItems,
     resetFromIndex,
@@ -112,7 +117,7 @@ function useVirtualList(props: VirtualListProps) {
     Since the container is only measured after it is rendered, the container
     size would default to zero on the first render.  
   */
-  const canRender = containerSize > 0 && numberOfItems > 0;
+  const canRender = containerSize > 0;
 
   const hasContainerSizeChanged = lastContainerSize !== containerSize;
   const hasAxisChanged = previousAxis !== axis;
@@ -120,26 +125,47 @@ function useVirtualList(props: VirtualListProps) {
   const leadingOffset = responsive ? 100 : containerSize;
 
   /* 
-    Buffer size is applied to the direction of the movement. Because there could
-    be a number of items that has a total size smaller than the containerSize, the
-    backwards buffer is only applied backwards when the keystoneOffset is less
-    than the container, otherwise the buffer size would make items disappear. 
+    If bufferByDirection is enabled, buffer size is applied to the direction of
+    the movement. Because there could be a number of items that has a total size
+    smaller than the containerSize, the backwards buffer is only applied
+    backwards when the keystoneOffset is less than the container, otherwise the
+    buffer size would make items disappear. 
   */
-  const [startBuffer, endBuffer] =
-    staticDirection === -1 && keystoneOffset > leadingOffset ? [-bufferSize, 0] : [0, bufferSize];
+  let startBuffer = -bufferSize;
+  let endBuffer = bufferSize;
+
+  const isOffsetBiggerThanView = keystoneOffset > leadingOffset;
+  const isBackwards = staticDirection === -1;
+  const isForwards = staticDirection === 1;
+
+  if (bufferByDirection) {
+    if (isOffsetBiggerThanView) {
+      if (isForwards) {
+        startBuffer = 0;
+      }
+      if (isBackwards) {
+        endBuffer = 0;
+      }
+    }
+  }
 
   const visibleIndexes = canRender
     ? getIndexRangeFromOffsets(keystoneOffset, keystoneOffset + leadingOffset)
     : DEFAULT_INDEXES;
 
-  const renderedIndexes = canRender
-    ? [
-        Math.max(0, visibleIndexes[0] + startBuffer),
-        Math.min(visibleIndexes[1] + endBuffer, numberOfItems - 1),
-      ]
-    : DEFAULT_INDEXES;
+  let renderStart = 0;
+  let renderEnd = 0;
 
-  const [renderStart, renderEnd] = renderedIndexes;
+  if (canRender) {
+    if (isInfinite) {
+      renderStart = visibleIndexes[0] + startBuffer;
+      renderEnd = visibleIndexes[1] + endBuffer;
+    } else {
+      renderStart = Math.max(0, visibleIndexes[0] + startBuffer);
+      renderEnd = Math.min(visibleIndexes[1] + endBuffer, numberOfItems - 1);
+    }
+  }
+
   /*
     The items are memoized to prevent unnecessary recreation of the elements.
     The cache ref is assigned to  a local variable so that when the component
@@ -184,12 +210,12 @@ function useVirtualList(props: VirtualListProps) {
     const values = [nextTotalSize, item.offset, item.size];
 
     /*
-        If the virtual list is using a reponsive percentage, the total size of
+        If the virtual list is using a responsive percentage, the total size of
         the items,item offset, and item size must be converted to a percentage
         since scrollTo values only work with pixels.   
       */
     const convertedValues = responsive
-      ? values.map((value) => convertPctToPx(value, containerSize))
+      ? values.map((value) => pctToPx(value, containerSize))
       : values;
 
     const [totalSizeConverted, offsetConverted, sizeConverted] = convertedValues;
@@ -234,6 +260,23 @@ function useVirtualList(props: VirtualListProps) {
   */
   const canClearCache = hasAxisChanged || (!responsive && canRender && hasContainerSizeChanged);
 
+  const getMeasurementsAtIndex = (index: number, unitType: UnitType = unit) => {
+    const item = getMeasurements(index);
+    if (unitType === 'px' && unit === '%') {
+      return {
+        offset: pctToPx(item.offset, containerSize),
+        size: pctToPx(item.size, containerSize),
+      };
+    }
+    if (unitType === '%' && unit === 'px') {
+      return {
+        offset: pxToPct(item.offset, containerSize),
+        size: pxToPct(item.size, containerSize),
+      };
+    }
+    return item;
+  };
+
   useEffect(() => {
     if (canClearCache) {
       clear();
@@ -242,7 +285,7 @@ function useVirtualList(props: VirtualListProps) {
 
   const indexes = {
     visible: visibleIndexes,
-    rendered: renderedIndexes,
+    rendered: [renderStart, renderEnd],
   };
 
   useEffect(() => {
@@ -262,8 +305,8 @@ function useVirtualList(props: VirtualListProps) {
     indexes,
     convertedOffset: keystoneOffset,
     resetFromIndex,
-    getMeasurementsAtIndex: getMeasurements,
-    findIndexAtOffset,
+    getMeasurementsAtIndex,
+    getIndexByOffset,
     getAlignedOffsetForIndex,
   };
 }

@@ -25,6 +25,11 @@ export function getScrollOffsetForAlignment(props: ScrollOffsetForAlignmentProps
   }
 }
 
-export function convertPctToPx(value: number, containerSize: number): number {
-  return (value / 100) * containerSize;
+export function pctToPx(value: number, containerSize: number): number {
+  // protect against NAN
+  return value !== 0 ? (value / 100) * containerSize : 0;
+}
+
+export function pxToPct(value: number, containerSize: number): number {
+  return value !== 0 ? Math.round((value / containerSize) * 100) : 0;
 }

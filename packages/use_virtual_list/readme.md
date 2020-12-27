@@ -52,6 +52,7 @@ function VirtualList() {
     estimatedItemSize: 20,
     containerSize: 500,
     bufferSize: 3,
+    bufferByDirection: true,
   };
 
   const { items, styles } = useVirtualList(options);
@@ -78,23 +79,24 @@ function VirtualList() {
 
 ---
 
-- [component]()
-- [numberOfItems]()
-- [itemSize]()
-- [estimatedItemSize]()
-- [offset]()
-- [direction]()
-- [axis]()
-- [containerSize]()
-- [responsive]()
-- [bufferSize]()
-- [onMeasure]()
+- [`component`](#component)
+- [`numberOfItems`](#numberOfItems)
+- [`itemSize`](#itemSize)
+- [`estimatedItemSize`](#estimatedItemSize)
+- [`offset`](#offset)
+- [`direction`](#direction)
+- [`axis`](#axis)
+- [`containerSize`](#containerSize)
+- [`responsive`](#responsive)
+- [`bufferSize`](#bufferSize)
+- [`bufferByDirection`](#bufferByDirection)
+- [`onMeasure`](#onMeasure)
 
 <br>
 <br>
 <br>
 
-### component
+### `component`
 
 **required**
 
@@ -124,7 +126,7 @@ function VirtualList() {
 <br>
 <br>
 
-### numberOfItems
+### `numberOfItems`
 
 **required**
 
@@ -138,11 +140,11 @@ The number of items that will be in the list.
 <br>
 <br>
 
-### itemSize
+### `itemSize`
 
 **required**
 
-```tsx
+```ts
 itemSize:number | (index:number) => number
 ```
 
@@ -155,9 +157,9 @@ Used to set the size of each item in the list.
 <br>
 <br>
 
-### estimatedItemSize
+### `estimatedItemSize`
 
-```tsx
+```ts
 estimatedItemSize: number = 0;
 ```
 
@@ -167,9 +169,13 @@ An estimated size of each item. While not required, the number is used to comput
 <br>
 <br>
 
-### offset
+### `offset`
 
 **required**
+
+```ts
+offset: number;
+```
 
 The number used to determine which items will be rendered. For most use cases this will be a scroll offset, however, it is possible to use it with touch swiping.
 
@@ -177,15 +183,13 @@ The number used to determine which items will be rendered. For most use cases th
 <br>
 <br>
 
-### direction
+### `direction`
 
-**required**
-
-```tsx
+```ts
 direction: -1 | 0 | 1;
 ```
 
-The number used to determine the direction the buffered items are rendered.
+The number used to determine the direction the buffered items are rendered if bufferByDirection is `true`.
 
 - `-1` buffers items backwards.
 - `1`, buffers items forwards.
@@ -194,9 +198,9 @@ The number used to determine the direction the buffered items are rendered.
 <br>
 <br>
 
-### axis
+### `axis`
 
-```tsx
+```ts
 axis:"y" | "x" = "y"
 ```
 
@@ -209,11 +213,11 @@ Determines the layout of the list and used to calculate the resulting styles of 
 <br>
 <br>
 
-### containerSize
+### `containerSize`
 
 **required**
 
-```tsx
+```ts
 containerSize: number;
 ```
 
@@ -226,39 +230,51 @@ The number used to set the size of the container in _pixels_.
 <br>
 <br>
 
-### responsive
+### `responsive`
 
-```tsx
+```ts
 responsive: boolean = true;
 ```
 
-A boolean that determines whether computed values will be based on "%" or "px". If true, the following will return percentages:
+A boolean that determines whether computed values will be based on `%` or `px`. If `true`, the following will return percentages:
 
 - the item offset and size.
 - the spacer height and width
 - the offset provided in options.
 
-This also effects how the itemSize is used. For example, if the containerSize was a 1000px, an itemSize of 100 equal 1000px. This prevents expensive recomputes of all the items if the containerSize were to change. If false, pixel units are used.
+This also effects how the itemSize is used. For example, if the containerSize was a 1000px, an itemSize of 100 equal 1000px. This prevents expensive recomputes of all the items if the containerSize were to change. If `false`, pixel units are used.
 
 <br>
 <br>
 <br>
 
-### bufferSize
+### `bufferSize`
 
-```tsx
+```ts
 bufferSize: number = 3;
 ```
 
-The number of extra items rendered before or after the visible items. The buffered elements are rendered based on the current direction of movement. A direction of `-1` buffers item backwards. A direction of `1`, buffers items forwards.
+The number of extra items rendered before or after the visible items.
 
 <br>
 <br>
 <br>
 
-### onMeasure
+### `bufferByDirection`
 
-```tsx
+```ts
+bufferByDirection: boolean = true;
+```
+
+A boolean enables directional buffering of elements. If `true`, The buffered elements are rendered based on the current direction of movement. A direction of `-1` buffers item backwards. A direction of `1`, buffers items forwards.
+
+<br>
+<br>
+<br>
+
+### `onMeasure`
+
+```ts
 onMeasure(index:number,{offset:number,size:number}):void
 ```
 
@@ -277,13 +293,13 @@ A callback invoked when an item is measured.
 
 The return value is an object containing the following:
 
-- [items]()
-- [styles]()
-- [indexes]()
-- [resetFromIndex]()
-- [getMeasurementsAtIndex]()
-- [findIndexAtOffset]()
-- [getAlignedOffsetForIndex]()
+- [`items`](#items)
+- [`styles`](#styles)
+- [`indexes`](#indexes)
+- [`resetFromIndex`](#resetFromIndex)
+- [`getMeasurementsAtIndex`](#getMeasurementsAtIndex)
+- [`getIndexByOffset`](#getIndexByOffset)
+- [`getAlignedOffsetForIndex`](#getAlignedOffsetForIndex)
 
 <br>
 <br>
@@ -306,7 +322,7 @@ const {
 <br>
 <br>
 
-### items
+### `items`
 
 An array containing the currently rendered elements. The elements are based on the component specified in the useVirtualList options.
 
@@ -317,7 +333,6 @@ const options = {
 
 const virtualList = useVirtualList(options);
 
-// going to need a few more things to make scroll snapping possible.
 const { items, styles } = virtualList;
 
 return (
@@ -334,9 +349,9 @@ return (
 <br>
 <br>
 
-### styles
+### `styles`
 
-An object containing styles for both the container and spacer.
+An object containing styles for both the container and spacer if scrollable virtual list is used. This is not needed if virtual list is used with swiping.
 
 ```jsx
 const virtualList = useVirtualList(options);
@@ -357,9 +372,9 @@ return (
 <br>
 <br>
 
-### indexes
+### `indexes`
 
-```tsx
+```ts
 indexes:{ visible:[number,number],rendered:[number,number] }
 ```
 
@@ -369,11 +384,11 @@ An object containing the range of visible and rendered indexes.
 <br>
 <br>
 
-### resetFromIndex
+### `resetFromIndex`
 
 A helper function that resets all cached measurements from the provided index up to the highest measured index.
 
-```tsx
+```ts
 resetFromIndex(index:number, forceUpdate = true):void
 ```
 
@@ -381,23 +396,23 @@ resetFromIndex(index:number, forceUpdate = true):void
 <br>
 <br>
 
-### getMeasurementsAtIndex
+### `getMeasurementsAtIndex`
 
-A helper function that returns an object containing the offset and size of the provided index.
+A helper function that returns an object containing the offset and size of the provided index. The unit type will match what is configured in the options. However, it maybe necessary to convert to pixels if using a virtual list for swipe functionality with snapping.
 
 ```tsx
-getMeasurementsAtIndex(index:number):{offset:number,size:number}
+getMeasurementsAtIndex(index:number, unitType:"%" | "px"):{offset:number,size:number}
 ```
 
 <br>
 <br>
 <br>
 
-### findIndexAtOffset
+### `getIndexByOffset`
 
 A helper function that returns the closest index to a provided offset.
 
-```tsx
+```ts
 findIndexAtOffset(offset:number):number
 ```
 
@@ -405,7 +420,7 @@ findIndexAtOffset(offset:number):number
 <br>
 <br>
 
-### getAlignedOffsetForIndex
+### `getAlignedOffsetForIndex`
 
 A helper function that returns the offset for an index with the offset adjusted for the provided alignment. The available alignments are:
 
@@ -415,6 +430,6 @@ A helper function that returns the offset for an index with the offset adjusted 
 
 The primary use case for this function would be for scrolling or translating the containing element to a particular point.
 
-```tsx
+```ts
 getAlignedOffsetForIndex(index:number, alignment = 'start'):{x:number,y:number}
 ```
