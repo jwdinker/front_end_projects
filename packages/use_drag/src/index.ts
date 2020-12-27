@@ -4,23 +4,30 @@ import makeGetInteractionType from '@jwdinker/make-get-interaction-type';
 import { getTouchForceAtIndex } from '@jwdinker/touch-helpers';
 import * as React from 'react';
 
-import { dragStart, dragMove, dragEnd, INITIAL_STATE, reducer } from './actions';
+import {
+  dragStart,
+  dragMove,
+  dragEnd,
+  dragTo as dragToXY,
+  INITIAL_STATE,
+  reducer,
+} from './actions';
 
-import { UseDragProps, DragState } from './types';
+import { UseDragProps, DragReturn } from './types';
 import { getCoordinates } from './helpers';
 
-const { useMemo, useRef, useState } = React;
+const { useMemo, useRef, useState, useCallback } = React;
 
 function useDrag(
   element: DragElement,
   {
+    canDrag = () => true,
     mouse = true,
     touch = 1,
-    canDrag = () => true,
     passive = true,
     capture = false,
   }: UseDragProps = {}
-): DragState {
+): DragReturn {
   const startTime = useRef(0);
   const [state, setState] = useState(INITIAL_STATE);
 
@@ -67,6 +74,10 @@ function useDrag(
     setState((previousState) => reducer(previousState, dragEnd(duration)));
   };
 
+  const dragTo = useCallback(({ x = 0, y = 0 }) => {
+    setState((previousState) => reducer(previousState, dragToXY(x, y)));
+  }, []);
+
   useDragListener(element, {
     onStart: start,
     onMove: move,
@@ -78,7 +89,7 @@ function useDrag(
     capture,
   });
 
-  return state;
+  return [state, dragTo];
 }
 
 export default useDrag;

@@ -1,3 +1,4 @@
+import { angleToDirections } from '@jwdinker/angle-helpers';
 import { PHASES } from './constants';
 import {
   DragState,
@@ -8,12 +9,14 @@ import {
   Directions,
   DragEnd,
   Velocity,
+  DragTo,
 } from './types';
 import { getVelocity } from './helpers';
 
 const DRAG_START = 'DRAG_START';
 const DRAG_MOVE = 'DRAG_MOVE';
 const DRAG_END = 'DRAG_END';
+const DRAG_TO = 'DRAG_TO';
 
 export function dragStart(currentXY: Coordinates, timestamp: number): DragStart {
   return {
@@ -47,6 +50,15 @@ export function dragEnd(duration: number): DragEnd {
     type: DRAG_END,
     payload: {
       duration,
+    },
+  };
+}
+
+export function dragTo(x = 0, y = 0): DragTo {
+  return {
+    type: DRAG_TO,
+    payload: {
+      destination: [x, y],
     },
   };
 }
@@ -100,13 +112,6 @@ export function reducer(state = INITIAL_STATE, action: DragAction): DragState {
       (value, index) => value - currentXY[index]
     ) as Coordinates;
 
-    const direction = delta.map((value) => {
-      if (value === 0) {
-        return 0;
-      }
-      return value > 1 ? 1 : -1;
-    }) as Directions;
-
     const xy = state.xy.map((value, index) => value - delta[index]) as Coordinates;
 
     const move = currentXY.map(
@@ -115,6 +120,8 @@ export function reducer(state = INITIAL_STATE, action: DragAction): DragState {
 
     const timeSinceLast = timestamp - state.timestamp;
     const velocity = xy.map((value) => getVelocity(value, timeSinceLast)) as Velocity;
+
+    const direction = angleToDirections(state.move, move) as Directions;
 
     return {
       ...state,
@@ -142,6 +149,14 @@ export function reducer(state = INITIAL_STATE, action: DragAction): DragState {
       direction: [0, 0],
       duration: action.payload.duration,
       pressure: 0,
+    };
+  }
+
+  if (action.type === DRAG_TO) {
+    return {
+      ...state,
+      xy: action.payload.destination,
+      phase: PHASES.IDLE,
     };
   }
 
