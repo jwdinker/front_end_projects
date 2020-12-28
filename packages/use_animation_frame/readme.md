@@ -9,6 +9,39 @@
 <br>
 <br>
 
+# Table of Contents
+
+- [Installation](#Installation)
+- [Usage](#Usage)
+- [Arguments](#Arguments)
+
+  1. [`onFrame`](#1.-onFrame)
+  2. [`interval`](#2.-interval)
+
+- [Return Value](#Return-Value)
+  - [`start`](#start)
+  - [`stop`](#stop)
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+# Installation
+
+```
+npm install @jwdinker/use-animation-frame
+```
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 # Usage
 
 This example runs the request animation frame loop at every frame for the life of the component.
