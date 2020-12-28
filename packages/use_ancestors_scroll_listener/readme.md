@@ -15,13 +15,12 @@
 - [Usage](#Installation)
 - [Arguments](#Arguments)
 
-  - [Ref or Refs[]](#1.-Ref-or-Refs[])
-  - [Handler](#2.-Handler)
-  - [Options](#3.-Options)
-
-    - [`passive`](#passive)
-    - [`capture`](#capture)
-    - [`once`](#once)
+  1. [Ref or Refs[]](#1.-Ref-or-Refs[])
+  2. [Handler](#2.-Handler)
+  3. [Options](#3.-Options)
+     - [`passive`](#passive)
+     - [`capture`](#capture)
+     - [`once`](#once)
 
 <br>
 <br>
