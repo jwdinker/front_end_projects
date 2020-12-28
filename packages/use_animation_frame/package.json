@@ -1,7 +1,7 @@
 {
   "name": "@jwdinker/use-animation-frame",
   "version": "1.0.3",
-  "description": "A react hook for abstracting requestAnimationFrame",
+  "description": "A react hook for abstracting requestAnimationFrame for use in a loop",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -9,8 +9,6 @@
   "license": "MIT",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js"
   },
   "peerDependencies": {
     "react": "^16.8.0"
