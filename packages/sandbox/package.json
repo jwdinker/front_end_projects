@@ -8,6 +8,7 @@
   "dependencies": {
     "@jwdinker/calendar": "1.0.0",
     "@jwdinker/drag-and-drop": "1.0.0",
+    "@jwdinker/easing-fns": "1.0.0",
     "@jwdinker/event-store": "1.0.0",
     "@jwdinker/get-containing-block": "1.0.0",
     "@jwdinker/get-random-color": "1.0.0",
@@ -49,6 +50,7 @@
     "@jwdinker/use-scroll-size": "1.0.0",
     "@jwdinker/use-size": "3.0.0",
     "@jwdinker/use-ssr": "1.0.0",
+    "@jwdinker/use-swipe": "1.0.0",
     "@jwdinker/use-tether": "1.0.0",
     "@jwdinker/use-timeout": "1.0.0",
     "@jwdinker/use-toggle": "1.0.0",

@@ -13,12 +13,6 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../use_event_listener"
-    },
-    {
-      "path": "../use_coordinates"
-    },
-    {
       "path": "../../utilities/mouse_helpers"
     },
     {
@@ -34,13 +28,7 @@
       "path": "../../utilities/phase_helpers"
     },
     {
-      "path": "../use_ssr"
-    },
-    {
-      "path": "../use_velocity"
-    },
-    {
       "path": "../use_drag_listener"
-    }
+    },
   ]
 }

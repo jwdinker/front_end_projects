@@ -36,6 +36,20 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   const numberOfItems = getNumberOfItems(boundaries);
 
   /**
+   * getSafeOffset
+   * -------------------------------------------------------------------------
+   * @param offset - the number checked against infinite.  Used to protect
+   * against unintentional negative offsets.
+   * -------------------------------------------------------------------------
+   */
+  function getSafeOffset(offset: number) {
+    if (infinite) {
+      return offset;
+    }
+    return Math.max(0, offset);
+  }
+
+  /**
    * getSafeIndex
    * -------------------------------------------------------------------------
    * @param index - the index checked against the boundaries.  If the index
@@ -214,12 +228,13 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
    * -------------------------------------------------------------------------
    */
   function getMeasurements(index: number): Measurements {
+    const safeIndex = getSafeIndex(index);
     const { cache } = state.current;
-    const item = cache[index];
+    const item = cache[safeIndex];
     if (item) {
       return item;
     }
-    return measureToIndex(index);
+    return measureToIndex(safeIndex);
   }
 
   /**
@@ -232,24 +247,25 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
    *   offset argument is within the range that has already been measured.
    * -------------------------------------------------------------------------
    */
-  function findIndexAtOffset(offset: number): number {
+  function getIndexByOffset(offset: number): number {
+    const safeOffset = getSafeOffset(offset);
     const { indexed } = state.current;
 
-    const key = isForwards(offset) ? 1 : 0;
+    const key = isForwards(safeOffset) ? 1 : 0;
     const measuredFromIndex = indexed[key];
     const lastMeasuredOffset = getMeasurements(measuredFromIndex).offset;
-    const hasForwardMeasured = isForwards(offset) && offset <= lastMeasuredOffset;
-    const hasBackwardMeasured = isBackwards(offset) && offset > lastMeasuredOffset;
+    const hasForwardMeasured = isForwards(safeOffset) && safeOffset <= lastMeasuredOffset;
+    const hasBackwardMeasured = isBackwards(safeOffset) && safeOffset > lastMeasuredOffset;
     const inMeasuredRange = hasForwardMeasured || hasBackwardMeasured;
 
     if (inMeasuredRange) {
-      return binarySearch(indexed, offset, getMeasurements);
+      return binarySearch(indexed, safeOffset, getMeasurements);
     }
-    return measureToOffset(offset);
+    return measureToOffset(safeOffset);
   }
 
   /**
-   * findClosingIndex
+   * getEnclosingIndex
    * -------------------------------------------------------------------------
    * @param startIndex The index used to retreive the starting offset of the
    * accumlating size.
@@ -257,7 +273,8 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
    * determine the closing index.
    * -------------------------------------------------------------------------
    */
-  function findClosingIndex(startIndex: number, threshold: number): number {
+  function getEnclosingIndex(startIndex: number, threshold: number): number {
+    const safeThreshold = getSafeOffset(threshold);
     const { offset, size } = getMeasurements(startIndex);
 
     // The start index's bottom offset is used as a starting point
@@ -265,7 +282,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
     let endIndex = startIndex;
 
     // only the threshold will be used if infinite is enabled.
-    while (totalSize < threshold && inBounds(endIndex)) {
+    while (totalSize < safeThreshold && inBounds(endIndex)) {
       endIndex += 1;
       const currentSize = getMeasurements(endIndex).size;
       totalSize += currentSize;
@@ -287,8 +304,8 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
      zero must be offered up as an alternative when rubberband scrolling returns
      a negative value and the index doesn't exist. 
     */
-    const startIndex = findIndexAtOffset(startOffset) || 0;
-    const endIndex = findClosingIndex(startIndex, endOffset);
+    const startIndex = getIndexByOffset(startOffset) || 0;
+    const endIndex = getEnclosingIndex(startIndex, endOffset);
 
     return [startIndex, endIndex];
   }
@@ -306,6 +323,7 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
   function clear(): void {
     state.current = getInitialState();
     onClear();
+    force();
   }
 
   /**
@@ -376,8 +394,8 @@ function useMeasurementsIndexer(props: MeasurementsIndexerProps) {
     getMeasurements,
     getTotalSizeOfItems,
     getIndexRangeFromOffsets,
-    findIndexAtOffset,
-    findClosingIndex,
+    getIndexByOffset,
+    getEnclosingIndex,
     resetFromIndex,
     clear,
   };

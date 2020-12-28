@@ -63,4 +63,15 @@ export interface DragEnd {
   };
 }
 
-export type DragAction = DragStart | DragMove | DragEnd;
+export interface DragTo {
+  type: 'DRAG_TO';
+  payload: {
+    destination: Coordinates;
+  };
+}
+
+export type DragAction = DragStart | DragMove | DragEnd | DragTo;
+
+export type SetXY = (destination: Coordinates) => void;
+
+export type DragReturn = [DragState, SetXY];

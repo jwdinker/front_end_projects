@@ -4,40 +4,74 @@ import useEventListener from '@jwdinker/use-event-listener';
 import useRequestAnimationFrameState from '@jwdinker/use-request-animation-frame-state';
 import { getScrollCoordinates } from '@jwdinker/scroll-helpers';
 import useTimeout from '@jwdinker/use-timeout';
-import { EASING_TYPES } from '@jwdinker/easing-fns';
-import { ScrollElement, ScrollToOptions, UseScrollReturn } from './types';
+import easingFns, { EASING_TYPES } from '@jwdinker/easing-fns';
+import {
+  ScrollElement,
+  ScrollToCoord,
+  ScrollToOptions,
+  UseScrollReturn,
+  ScrollOptions,
+} from './types';
 import { INITIAL_STATE, handleStartOrMove, end } from './state';
-import { getElement, animateScroll } from './helpers';
+import { getElement } from './helpers';
+import { SCROLL_PROP_KEYS } from './constants';
 
-const { useEffect, useCallback } = React;
+const { useEffect, useCallback, useRef } = React;
 
-function useScroll(
-  element: ScrollElement = null,
-  { passive = true, capture = false, once = false, consolidate = true } = {}
-): UseScrollReturn {
+function useScroll(element: ScrollElement = null, options: ScrollOptions = {}): UseScrollReturn {
+  const {
+    passive = true,
+    capture = false,
+    once = false,
+    consolidate = false,
+    endDelay = 45,
+  } = options;
+
+  const rafId = useRef(0);
   const [scroll, setScroll] = useRequestAnimationFrameState(INITIAL_STATE);
 
-  const [start, clear] = useTimeout(() => {
+  const cancelAnimation = () => {
+    if (rafId.current) {
+      window.cancelAnimationFrame(rafId.current);
+      rafId.current = 0;
+    }
+  };
+
+  const [beginEndCountdown, clearEndTimeout] = useTimeout(() => {
     const _element = getElement(element);
     if (_element) {
       const coordinates = getScrollCoordinates(_element);
       setScroll((previousState) => end(previousState, coordinates));
     }
-  }, 45);
+  }, endDelay);
 
   const handler = (event: any) => {
-    clear();
-    start();
+    const isAnimating = !!rafId.current;
+    /*
+      Don't start the end timeout if the scroll is animating because the end
+      timeout can run prior to the animation finishing causing phases to switch
+      switch rapidly from 'start' to 'end'. 
+    */
+    if (!isAnimating) {
+      clearEndTimeout();
+      beginEndCountdown();
+    }
     const coordinates = getScrollCoordinates(event.target || event.currentTarget);
-    setScroll((previousState) => handleStartOrMove(previousState, coordinates));
+    setScroll((previousState) => handleStartOrMove(previousState, coordinates, isAnimating));
   };
 
-  const listener = useEventListener(element, 'scroll', handler, {
+  const scrollable = useEventListener(element, 'scroll', handler, {
     passive,
     capture,
     once,
     consolidate,
   });
+
+  /*
+    Cancel the animation if a user initiates a scroll while a scroll animation
+    is active.
+  */
+  const wheelable = useEventListener(element, 'wheel touchstart', cancelAnimation);
 
   const scrollTo = useCallback(
     (scrollToProps: ScrollToOptions) => {
@@ -45,28 +79,56 @@ function useScroll(
       const _element = getElement(element);
       if (_element) {
         const startCoordinates = getScrollCoordinates(_element);
-        const destinationCoordinates = { x, y };
+        const endCoordinates = { x, y };
 
         if (duration === 0) {
           _element.scrollTo(x, y);
         } else {
-          animateScroll({
-            startCoord: startCoordinates,
-            endCoord: destinationCoordinates,
-            duration,
-            easing,
-            callback: (xy) => _element.scrollTo(...xy),
-          });
+          const startTime = Date.now();
+          cancelAnimation();
+
+          const animate = () => {
+            const elapsed = Math.max(1, Date.now() - startTime);
+            const hasFinished = elapsed > duration;
+            const coordinates = SCROLL_PROP_KEYS.reduce(
+              (accumulator, key, index) => {
+                if (hasFinished) {
+                  accumulator[index] = Math.round(endCoordinates[key]);
+                } else {
+                  const ease = easingFns[easing](elapsed / duration);
+                  const remaining =
+                    startCoordinates[key] + (endCoordinates[key] - startCoordinates[key]) * ease;
+
+                  accumulator[index] = remaining;
+                }
+                return accumulator;
+              },
+              [0, 0] as ScrollToCoord
+            );
+
+            if (hasFinished) {
+              cancelAnimation();
+              beginEndCountdown();
+            } else {
+              rafId.current = window.requestAnimationFrame(animate);
+            }
+            _element.scrollTo(...coordinates);
+          };
+          animate();
         }
       }
     },
-    [element]
+    [beginEndCountdown, element]
   );
 
   useEffect(() => {
-    listener.attach();
-    return listener.detach;
-  }, [listener]);
+    scrollable.attach();
+    wheelable.attach();
+    return () => {
+      scrollable.attach();
+      wheelable.detach();
+    };
+  }, [scrollable, wheelable]);
 
   return [scroll, scrollTo];
 }

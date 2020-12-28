@@ -16,7 +16,6 @@
   "dependencies": {
     "@jwdinker/up-to": "1.0.0",
     "@jwdinker/use-measurements-indexer": "1.0.0",
-    "@jwdinker/use-previous": "1.0.0",
-    "@jwdinker/use-scroll": "4.0.1"
+    "@jwdinker/use-previous": "1.0.0"
   }
 }

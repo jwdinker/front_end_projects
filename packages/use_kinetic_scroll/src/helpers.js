@@ -133,8 +133,6 @@ Velocity has a magnitude (a value) and a direction.
 
 export const getVelocity = (velocity, delta, elapsed) => {
   return velocity.map((previousVelocity, index) => {
-    const amount = DEVICE_PIXEL_RATIO === 3 ? 1125 : 640;
-
     const currentVelocity = (ONE_SECOND * delta[index]) / Math.max(16.7, elapsed); // 1 + elapsed to avoid dividing by zero
 
     return 0.8 * currentVelocity + 0.2 * previousVelocity;

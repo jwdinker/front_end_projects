@@ -1,10 +1,19 @@
-import React, { useRef, useMemo, createElement, useEffect, useCallback, memo } from 'react';
+import React, {
+  useRef,
+  useMemo,
+  createElement,
+  useEffect,
+  useCallback,
+  memo,
+  useState,
+} from 'react';
 import { Box, Centered, Text, Absolute, Relative, Button } from '@jwdinker/styled-system';
 import useMeasurementsIndexer from '@jwdinker/use-measurements-indexer';
 import upTo from '@jwdinker/up-to';
 import { useSpring, animated } from 'react-spring';
 import useWindowSize from '@jwdinker/use-window-size';
 import useDrag from '@jwdinker/use-drag';
+
 
 import { withCoreProviders } from '../../hocs';
 
@@ -95,8 +104,13 @@ function Index() {
   const coordinate = xy[axis];
   const canRender = _window.width !== 0;
 
-  const offset = Math.max(0, coordinate * -1);
-  const indexes = canRender ? getIndexRangeFromOffsets(offset, offset + _window.height) : [0, 0];
+  const [index, setIndex] = useState(0);
+  const [offset, setOffset] = useState(0);
+
+  const indexes = canRender
+    ? getIndexRangeFromOffsets(Math.max(0, offset - _window.width), offset + _window.width)
+    : [0, 0];
+  const previousDirection = usePrevious(direction);
 
   const [startIndex, endIndex] = indexes;
 
@@ -104,8 +118,8 @@ function Index() {
     if (!canRender) {
       return [];
     }
-    return upTo(startIndex, endIndex, (index) => {
-      return createElement(MemoizedComponent, cachedProps.current[index]);
+    return upTo(startIndex, endIndex, (i) => {
+      return createElement(MemoizedComponent, cachedProps.current[i]);
     });
   }, [canRender, endIndex, startIndex]);
 
@@ -119,15 +133,26 @@ function Index() {
   console.log('totalSize: ', totalSize);
 
   let translate = 0;
-  const movingPoint = move[axis];
-  const snapPoint = getMeasurements(startIndex).offset;
-  const point = snapPoint + movingPoint;
+  const m = move[axis];
+  const snapPoint = getMeasurements(index).offset;
+  const d = previousDirection ? previousDirection[axis] : 0;
+  const point = snapPoint + m;
 
   if (phase === 'end') {
-    translate = Math.min(-snapPoint, 0);
+    translate = Math.min(-offset, 0);
   } else {
     translate = Math.min(0, Math.min(point, totalSize));
   }
+
+  const [nextIndex, nextOffset] =
+    phase === 'end' && Math.abs(m) > 100
+      ? [index + d, getMeasurements(index + d).offset]
+      : [index, offset];
+
+  useEffect(() => {
+    setIndex(nextIndex);
+    setOffset(nextOffset);
+  }, [nextIndex, nextOffset]);
 
   useEffect(() => {
     set(() => {

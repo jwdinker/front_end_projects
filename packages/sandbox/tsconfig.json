@@ -171,7 +171,12 @@
     {
       "path": "../use_virtual_list"
     },
-    
+    {
+      "path": "../../utilities/easing_fns"
+    },
+    {
+      "path": "../use_swipe"
+    },
   ],
   "exclude": ["node_modules"]
 }

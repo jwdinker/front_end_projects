@@ -70,7 +70,7 @@ function Index() {
 
   const [x, y] = scroll.xy;
 
-  const scrollOffset = Math.max(0, y);
+  const scrollOffset = y;
   const indexes = canRender
     ? getIndexRangeFromOffsets(scrollOffset, scrollOffset + _window.height)
     : [0, 0];

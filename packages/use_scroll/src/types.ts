@@ -12,6 +12,7 @@ export interface ScrollState extends ScrollCoordinates {
   isScrolling: boolean;
   direction: number;
   phase: ScrollPhase;
+  isAnimating: boolean;
 }
 
 export type ScrollElement =
@@ -35,14 +36,14 @@ export interface ScrollToOptions extends ScrollToAnimationProps {
 
 export type ScrollToCoord = [number, number];
 
-export interface AnimateScrollProps {
-  startCoord: ScrollCoordinates;
-  endCoord: ScrollCoordinates;
-  duration: number;
-  easing: EasingType;
-  callback: (xy: ScrollToCoord) => void;
-}
-
 export type ScrollTo = (options: ScrollToOptions) => void;
 
 export type UseScrollReturn = [ScrollState, ScrollTo];
+
+export type ScrollOptions = {
+  passive?: boolean;
+  capture?: boolean;
+  once?: boolean;
+  consolidate?: boolean;
+  endDelay?: number;
+};

@@ -12,8 +12,20 @@
   },
   "include": ["src"],
   "references": [
-    {"path": "../use_measurements_indexer" },
-    {"path": "../../utilities/up_to"}, 
-    {"path": "../use_previous"}, 
+    {
+      "path": "../use_event_listener"
+    },
+    {
+      "path": "../../utilities/touch_helpers"
+    },
+    {
+      "path": "../use_phaseable_listener"
+    },
+    {
+      "path": "../use_block_scroll"
+    },
+    {
+      "path": "../../utilities/angle_helpers"
+    }
   ]
 }
