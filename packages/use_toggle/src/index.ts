@@ -16,7 +16,7 @@ type ToggleReturn = [boolean, ToggleHelpers];
  * Handles active and inactive states and provides helpers for managing those
  * states.
  *
- * @param initialBool The initial value of the whether the toggler is active or
+ * @param initialValue The initial value of the whether the toggler is active or
  * inactive
  *
  */
