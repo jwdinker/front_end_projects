@@ -2,6 +2,7 @@
   "name": "@jwdinker/use-block-scroll",
   "version": "1.0.0",
   "private": false,
+  "description": "A react hook for preventing body scrolling for use in touch events",
   "author": "Jack Dinker",
   "main": "./dist/index.js",
   "files": [
