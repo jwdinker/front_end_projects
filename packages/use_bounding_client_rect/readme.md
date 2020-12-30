@@ -187,7 +187,7 @@ function Component() {
   }, [start, stop]);
 
   return (
-    <Container ref={ref}>
+    <Container>
       <Item ref={ref} />
     </Container>
   );
