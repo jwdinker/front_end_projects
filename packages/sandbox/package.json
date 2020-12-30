@@ -20,6 +20,7 @@
     "@jwdinker/styled-system": "2.0.0",
     "@jwdinker/title-case": "1.0.0",
     "@jwdinker/up-to": "1.0.0",
+    "@jwdinker/use-ancestors-scroll-listener": "1.0.0",
     "@jwdinker/use-animation-frame": "1.0.3",
     "@jwdinker/use-block-scroll": "1.0.0",
     "@jwdinker/use-boundaries": "1.0.0",

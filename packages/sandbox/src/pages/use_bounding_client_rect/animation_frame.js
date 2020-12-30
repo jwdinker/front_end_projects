@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
+import useAnimationFrame from '@jwdinker/use-animation-frame';
 import { withCoreProviders } from '../../hocs';
 
 const Container = styled.div`
@@ -23,14 +24,20 @@ const Item = styled.div`
   background: white;
 `;
 
-const { useRef } = React;
+const { useRef, useEffect } = React;
 
 function Component() {
   const ref = useRef();
 
   const [measurements, update] = useBoundingClientRect(ref);
 
+  const [start, stop] = useAnimationFrame(update, 16);
+
   console.log('measurements: ', JSON.stringify(measurements, null, 2));
+  useEffect(() => {
+    start();
+    return stop;
+  }, [start, stop]);
 
   return (
     <Container ref={ref}>
