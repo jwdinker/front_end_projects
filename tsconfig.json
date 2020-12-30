@@ -39,7 +39,6 @@
   "exclude": ["node_modules"],
   "references": [
     { "path": "packages/sandbox" },
-    { "path": "packages/edu" },
     { "path": "packages/use_rotatable" },
     { "path": "packages/use_scalable" },
     { "path": "utilities/get_element_or_reference" },

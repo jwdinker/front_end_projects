@@ -1,4 +1,3 @@
-import { StartFrameLoop, StopFrameLoop } from '@jwdinker/use-animation-frame';
 import { ElementOrReference } from '@jwdinker/get-element-or-reference';
 
 export type RectangleElement = ElementOrReference;
@@ -13,13 +12,10 @@ export interface Rectangle {
   x?: number;
   y?: number;
 }
-export interface UseBoundingClientRectHandlers {
-  update(): void;
-  watch: StartFrameLoop;
-  unwatch: StopFrameLoop;
-}
 
-export type UseBoundingClientRectReturn = [Rectangle, UseBoundingClientRectHandlers];
+export type UpdateBoundingClientRectMeasurements = () => void;
+
+export type UseBoundingClientRectReturn = [Rectangle, UpdateBoundingClientRectMeasurements];
 
 export type UseBoundingClientRect = (
   /**

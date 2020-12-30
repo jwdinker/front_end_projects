@@ -1,60 +1,33 @@
 import useAnimationFrame from '@jwdinker/use-animation-frame';
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { UseClockReturn, UpdateByType } from './types';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { FormatTime, CompareBy } from './types';
 import { makeCanUpdateTime } from './helpers';
 
-export { convertTo12Hour } from './helpers';
+export { get12Hour, timeOfDay, to00, nameOfDay } from './helpers';
 
-const PROPERTIES = {
-  seconds: 'getSeconds',
-  minutes: 'getMinutes',
-  hour: 'getHours',
-  year: 'getFullYear',
-  month: 'getMonth',
-  day: 'getDate',
-  dayOfWeek: 'getDay',
-  milliSeconds: 'getMilliseconds',
-};
-
-const PROPERTY_KEYS = Object.keys(PROPERTIES);
-
-function useClock(updateBy: UpdateByType = 'minute', interval = 100): UseClockReturn {
+function useClock<T>(format: FormatTime<T>, compareBy: CompareBy, interval = 100): T {
   const [time, setTime] = useState(() => new Date());
 
   const canUpdateTime = useMemo(() => {
-    return makeCanUpdateTime(updateBy);
-  }, [updateBy]);
+    return makeCanUpdateTime(compareBy);
+  }, [compareBy]);
 
   const savedTime = useRef(time);
   savedTime.current = time;
 
-  const handler = useCallback(() => {
+  const [start, clear] = useAnimationFrame(() => {
     const currentTime = new Date();
     if (canUpdateTime(savedTime.current, currentTime)) {
       setTime(currentTime);
     }
-  }, [canUpdateTime]);
-  const [start, clear] = useAnimationFrame(handler, interval);
+  }, interval);
 
   useEffect(() => {
     start();
     return clear;
   }, [clear, start]);
 
-  const value = PROPERTY_KEYS.reduce((accumulator, key, index) => {
-    const method = PROPERTIES[key];
-
-    accumulator[key] = time[method]();
-    if (index === 0) {
-      accumulator.date = time;
-    }
-
-    return accumulator;
-  }, {} as UseClockReturn);
-
-  value.period = value.hour > 11 ? 'pm' : 'am';
-
-  return value;
+  return format(time);
 }
 
 export default useClock;

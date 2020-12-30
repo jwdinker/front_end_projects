@@ -6,8 +6,6 @@ const Contents = () => {
   const _window = typeof window !== 'undefined' ? window : null;
   const [scroll, scrollTo] = useScroll(_window);
 
-  console.log('scroll: ', scroll);
-
   return <div style={{ height: '10000px', width: '100%' }} />;
 };
 

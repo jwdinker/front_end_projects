@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import useAnimationFrame from '@jwdinker/use-animation-frame';
+import * as React from 'react';
 import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
 import { HasChanged, UseBoundingClientRectReturn } from './types';
 
@@ -21,6 +20,8 @@ const MEASURABLE_PROPERTIES = ['top', 'left', 'height', 'width'] as const;
 const hasChanged: HasChanged = (previous, current) =>
   MEASURABLE_PROPERTIES.some((property) => previous[property] !== current[property]);
 
+const { useState, useEffect, useCallback } = React;
+
 const getMeasurements = (element: HTMLElement) => {
   const { top, bottom, left, right, height, width, x, y } = element.getBoundingClientRect();
   return {
@@ -36,24 +37,13 @@ const getMeasurements = (element: HTMLElement) => {
 };
 
 function useBoundingClientRect(element: ElementOrReference): UseBoundingClientRectReturn {
-  const hasInitiallyMeasured = useRef(false);
   const [measurements, setMeasurements] = useState(() => INITIAL_STATE);
 
-  const handler = (): void => {
+  const update = useCallback(() => {
     const _element = getElement(element);
 
     if (_element) {
-      const { top, bottom, left, right, height, width, x, y } = _element.getBoundingClientRect();
-      const nextMeasurements = {
-        top,
-        bottom,
-        left,
-        right,
-        height,
-        width,
-        x,
-        y,
-      };
+      const nextMeasurements = getMeasurements(_element);
 
       setMeasurements((previousMeasurements) => {
         return hasChanged(previousMeasurements, nextMeasurements)
@@ -61,24 +51,13 @@ function useBoundingClientRect(element: ElementOrReference): UseBoundingClientRe
           : previousMeasurements;
       });
     }
-  };
-
-  const [watch, unwatch] = useAnimationFrame(handler);
-
-  useEffect(() => {
-    const _element = getElement(element);
-    if (!hasInitiallyMeasured.current && _element) {
-      setMeasurements(getMeasurements(_element));
-    }
   }, [element]);
 
-  const handlers = {
-    update: handler,
-    watch,
-    unwatch,
-  };
+  useEffect(() => {
+    update();
+  }, [update]);
 
-  return [measurements, handlers];
+  return [measurements, update];
 }
 
 export default useBoundingClientRect;

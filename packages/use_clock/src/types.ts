@@ -1,22 +1,7 @@
-export type UpdateByType = 'minute' | 'second' | 'millisecond';
+export type CompareBy = 'minute' | 'second' | 'millisecond';
 
-export interface UseClockProps {
-  interval?: number;
-  updateBy?: UpdateByType;
-}
+export type FormatTime<T> = (date: Date) => T;
 
 export type TimePeriod = 'am' | 'pm';
 
-export interface UseClockReturn {
-  date: Date;
-  seconds: number;
-  minutes: number;
-  military: number;
-  hour: number;
-  year: number;
-  month: number;
-  day: number;
-  dayOfWeek: number;
-  milliseconds: number;
-  period: TimePeriod;
-}
+export type NameOfDayFormat = 'dd' | 'ddd' | 'dddd';

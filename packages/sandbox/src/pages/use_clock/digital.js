@@ -1,17 +1,22 @@
 import React from 'react';
-import useClock from '@jwdinker/use-clock';
+import useClock, { to00, get12Hour, timeOfDay, nameOfDay } from '@jwdinker/use-clock';
 import { Box, Centered, Text, Row, Column, Flex } from '@jwdinker/styled-system';
 
 import { withCoreProviders } from '../../hocs';
 
-const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
 function Index() {
-  const time = useClock('second');
+  const time = useClock((date) => {
+    return {
+      seconds: to00(date.getSeconds()),
+      hour: get12Hour(date),
+      minutes: to00(date.getMinutes()),
+      day: date.getDate(),
+      dayOfWeek: nameOfDay(date, 'ddd'),
+      period: timeOfDay(date),
+    };
+  }, 'second');
 
   const { hour, minutes, seconds, period, dayOfWeek } = time;
-
-  const formatted = [seconds, minutes, hour].map((value) => (value < 10 ? `0${value}` : value));
 
   return (
     <Box height="100vh" width={1} bg="#ebebeb">
@@ -24,7 +29,7 @@ function Index() {
                   <Text
                     color="white"
                     fontWeight="bold"
-                    fontSizeFluid={['50px', '100px']}>{`${formatted[2]}:${formatted[1]}`}</Text>
+                    fontSizeFluid={['50px', '100px']}>{`${hour}:${minutes}`}</Text>
                 </Flex>
               </Row>
               <Row flexShrink={0}>
@@ -39,7 +44,7 @@ function Index() {
                   <Row minWidth="20px">
                     <Centered>
                       <Text color="white" fontWeight="semiBold">
-                        {formatted[0]}
+                        {seconds}
                       </Text>
                     </Centered>
                   </Row>
@@ -48,7 +53,7 @@ function Index() {
             </Row>
             <Row>
               <Text color="white" fontWeight="semiBold">
-                {DAYS_OF_WEEK[dayOfWeek - 1]}
+                {dayOfWeek}
               </Text>
             </Row>
           </Column>

@@ -177,6 +177,9 @@
     {
       "path": "../use_swipe"
     },
+    {
+      "path": "../use_ancestors_scroll_listener"
+    },
   ],
   "exclude": ["node_modules"]
 }

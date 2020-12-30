@@ -5,11 +5,11 @@ import useAnimationFrame from '@jwdinker/use-animation-frame';
 function useAnimationFrameExample() {
   const [count, setCount] = useState(0);
 
-  const handleCount = (time, deltaTime) => {
+  const handleCount = (time, elapsedTime) => {
     setCount((previousCount) => previousCount + 1);
   };
 
-  const [start, stop] = useAnimationFrame(handleCount);
+  const [start, stop] = useAnimationFrame(handleCount, 2000);
 
   return (
     <div

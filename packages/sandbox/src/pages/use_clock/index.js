@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, forwardRef } from 'react';
-import useClock from '@jwdinker/use-clock';
+
 import { Box, Centered, Ratio, Absolute, Text } from '@jwdinker/styled-system';
+import useClock, { to00, get12Hour, timeOfDay, nameOfDay } from '@jwdinker/use-clock';
 import upTo from '@jwdinker/up-to';
 
 import { withCoreProviders } from '../../hocs';
@@ -95,7 +96,18 @@ const HourLabels = () => {
 };
 
 function AnalogClock() {
-  const time = useClock('second', 100);
+  const time = useClock((date) => {
+    return {
+      seconds: to00(date.getSeconds()),
+      hour: get12Hour(date),
+      minutes: to00(date.getMinutes()),
+      day: date.getDate(),
+      dayOfWeek: nameOfDay(date, 'ddd'),
+      period: timeOfDay(date),
+    };
+  }, 'second');
+
+  const { hour, minutes, seconds, period, dayOfWeek } = time;
 
   const minuteHand = useRef();
   const hourHand = useRef();

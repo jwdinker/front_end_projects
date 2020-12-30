@@ -23,10 +23,10 @@ function useAnimationFrame(onFrame = (): void => {}, interval = 0): UseAnimation
       const currentTime = Date.now();
       startTime.current = !startTime.current ? currentTime : startTime.current;
 
-      const deltaTime = currentTime - startTime.current;
+      const elapsedTime = currentTime - startTime.current;
 
-      if (deltaTime > interval && callback.current) {
-        callback.current(currentTime, deltaTime);
+      if (elapsedTime > interval && callback.current) {
+        callback.current(currentTime, elapsedTime);
         startTime.current = currentTime;
       }
       raf.current = requestAnimationFrame(start);
@@ -35,6 +35,7 @@ function useAnimationFrame(onFrame = (): void => {}, interval = 0): UseAnimation
 
   const stop = useCallback(() => {
     if (raf.current) {
+      startTime.current = 0;
       cancelAnimationFrame(raf.current);
     }
   }, []);
