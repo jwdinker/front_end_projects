@@ -81,7 +81,7 @@ A react reference to an HTML Element. This element scrollable parent's `top` and
 
 <br><br><br>
 
-## 2. `resizeDelay`.
+## 2. `resizeDelay`
 
 ```ts
 resizeDelay: number = 100;
