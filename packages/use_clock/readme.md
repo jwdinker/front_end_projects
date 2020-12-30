@@ -2,6 +2,12 @@
 
 `useClock` is a react hook that tracks the changing time at a specified interval and supplies the requested properties for building a clock interface.
 
+<br><br><br>
+
+<p align="center">
+  <img src="clock.gif" alt="analog clock inferface"/>
+</p>
+
 <br><br><br><br><br><br>
 
 # Table of Contents
