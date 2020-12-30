@@ -56,6 +56,7 @@ function useBoundaries(from: ElementOrReference = null, resizeDelay = 100): Boun
       }
       return formatRectangle(getWindowRectangle());
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const attach = () => {
