@@ -1,10 +1,12 @@
-import { useCallback, useState, useEffect } from 'react';
+import * as React from 'react';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
-import { getDimensions, hasDimensionChanged } from './helpers';
+import { getDimensions, hasDimensionChanged, getElement } from './helpers';
 
 import { UseScrollSizeReturn, ScrollableElement } from './types';
 
-function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): UseScrollSizeReturn {
+const { useState, useEffect } = React;
+
+function useScrollSize(element: ScrollableElement, interval = 1000): UseScrollSizeReturn {
   const [dimensions, setDimensions] = useState(() => ({
     height: 0,
     width: 0,
@@ -23,37 +25,24 @@ function useScrollSize(element: ScrollableElement, { interval = 200 } = {}): Use
     }
   }, [changed, element]);
 
-  const getElement = useCallback(() => {
-    return element && 'current' in element && element.current instanceof HTMLElement
-      ? element.current
-      : element instanceof HTMLElement || element === window
-      ? element
-      : null;
-  }, [element]);
-
-  const { height, width } = dimensions;
-  const handler = useCallback(() => {
-    const _element = getElement();
+  const [observe, unobserve] = useAnimationFrame(() => {
+    const _element = getElement(element);
 
     if (_element) {
       const current = getDimensions(_element);
-      if (hasDimensionChanged({ height, width }, current)) {
-        setDimensions(current);
-        setChanged(true);
-      }
+      setDimensions((previous) => {
+        if (hasDimensionChanged(previous, current)) {
+          return current;
+        }
+        return previous;
+      });
     }
-  }, [getElement, height, width]);
-
-  const [observe, unobserve] = useAnimationFrame(handler, interval);
+  }, interval);
 
   useEffect(() => {
-    const _element = getElement();
-
-    if (_element) {
-      observe();
-      return unobserve;
-    }
-  }, [element, getElement, observe, unobserve]);
+    observe();
+    return unobserve;
+  }, [observe, unobserve]);
 
   return [dimensions, changed];
 }

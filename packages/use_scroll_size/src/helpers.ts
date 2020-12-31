@@ -1,4 +1,4 @@
-import { GetDimensionsTarget, ScrollDimensions } from './types';
+import { GetDimensionsTarget, ScrollableElement, ScrollDimensions } from './types';
 
 const SIZE_PROPS = ['height', 'width'];
 
@@ -26,4 +26,12 @@ export function getDimensions(target: GetDimensionsTarget): ScrollDimensions {
     height: 0,
     width: 0,
   };
+}
+
+export function getElement(element: ScrollableElement) {
+  return element && 'current' in element && element.current instanceof HTMLElement
+    ? element.current
+    : element instanceof HTMLElement || element === window
+    ? element
+    : null;
 }
