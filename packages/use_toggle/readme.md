@@ -1,6 +1,6 @@
 # useToggle
 
-`useToggle` is a simple react hook for toggling between active and inactive states.
+`useToggle` is a simple react hook for toggling between active and inactive states. For latest documentation in an easily digestible format, [click here](https://www.notion.so/dinker/useToggle-500421cf46e24d52b96156e0051a7ab7).
 
 <br>
 <br>
