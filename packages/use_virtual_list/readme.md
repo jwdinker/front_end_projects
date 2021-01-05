@@ -1,6 +1,6 @@
 # useVirtualList
 
-useVirtualList is a react hook that virtualizes elements to improve performance of scrollable and swipe-able list when dealing with a large amount of elements. A virtualized list only renders elements in and around the virtual area to prevent the DOM from being overloaded with elements, consequently, slowing down the browser.
+useVirtualList is a react hook that virtualizes elements to improve performance of scrollable and swipe-able list when dealing with a large amount of elements. A virtualized list only renders elements in and around the virtual area to prevent the DOM from being overloaded with elements, consequently, slowing down the browser. For latest documentation in an easily digestible format, [click here](https://www.notion.so/dinker/useVirtualList-03616fc4f5c6494a8552817c43586a9b).
 
 ![virtual_list_explainer.png](virtual_list_explainer.png)
 
