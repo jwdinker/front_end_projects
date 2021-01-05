@@ -1,5 +1,6 @@
-import { AbbreviatedRectangle, Alignment } from '../../types';
-import { ALIGNMENTS_TYPES, ARROW_ROTATIONS } from '../../constants';
+import { ArrowableReturn, Arrowable } from '../../types';
+import { ARROW_ROTATIONS } from '../../constants';
+import inferAlignment from '../../helpers/infer_alignment';
 
 /*  
 To avoid using transform origin and account for different arrow sizes, The
@@ -21,15 +22,13 @@ _________^________
    |___________|
 */
 
-function arrowable(
-  offsets: AbbreviatedRectangle[],
-  alignment: Alignment = ALIGNMENTS_TYPES.bottom
-) {
+const arrowable: Arrowable = (tetherables, anchor) => {
+  const alignment = inferAlignment(anchor, tetherables[0]);
   const isLeft = alignment === 'left';
   const isRight = alignment === 'right';
   const isHorizontallyAligned = isLeft || isRight;
   const key = alignment === 'top' || alignment === 'bottom' ? 'top' : 'left';
-  const arrow = offsets[0];
+  const arrow = tetherables[0];
 
   let rectangleOffset = 0;
   let rotationOffset = 0;
@@ -43,20 +42,22 @@ function arrowable(
     rotationOffset = arrow.height / 2 - arrow.width / 2;
   }
 
-  const updated = offsets.map((offset, index) => {
-    if (index === 0) {
-      return {
-        ...offset,
-        rotate: ARROW_ROTATIONS[alignment],
-        [key]: isHorizontallyAligned ? arrow[key] - rotationOffset : arrow[key],
-      };
-    }
-    return {
+  const offsetWithArrow = {
+    ...tetherables[0],
+    rotate: ARROW_ROTATIONS[alignment],
+    [key]: isHorizontallyAligned ? arrow[key] - rotationOffset : arrow[key],
+  };
+
+  const updated: ArrowableReturn = [offsetWithArrow];
+  for (let i = 1; i < tetherables.length; i += 1) {
+    const offset = tetherables[i];
+    updated.push({
       ...offset,
       [key]: isHorizontallyAligned ? offset[key] + rectangleOffset : offset[key],
-    };
-  });
+    });
+  }
+
   return updated;
-}
+};
 
 export default arrowable;

@@ -1,8 +1,8 @@
 import { Padding } from '@jwdinker/prevent-overflow';
 import { ALIGNMENT_OPPOSITE_TYPES } from '../../constants';
-import { Alignment, AbbreviatedRectangle } from '../../types';
+import { Alignment, Measurements } from '../../types';
 
-export function getTetherablePadding(alignment: Alignment, arrow: AbbreviatedRectangle): Padding {
+export function getTetherablePadding(alignment: Alignment, arrow: Measurements): Padding {
   const padding = { top: 0, left: 0, bottom: 0, right: 0 };
   const isArrowBottomOrRight = alignment === 'top' || alignment === 'left';
   const operator = isArrowBottomOrRight ? -1 : 1;
@@ -13,8 +13,8 @@ export function getTetherablePadding(alignment: Alignment, arrow: AbbreviatedRec
 
 export const getArrowPadding = (
   alignment: Alignment,
-  arrow: AbbreviatedRectangle,
-  element: AbbreviatedRectangle
+  arrow: Measurements,
+  element: Measurements
 ) => {
   const isLeft = alignment === 'left';
   const isRight = alignment === 'right';

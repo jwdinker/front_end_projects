@@ -1,9 +1,6 @@
-import { AbbreviatedRectangle, Side, Alignment } from '../../types';
+import { Side, Alignment, Measurements } from '../../types';
 
-export function getOverflowingSides(
-  element: AbbreviatedRectangle,
-  boundaries: AbbreviatedRectangle
-) {
+export function getOverflowingSides(element: Measurements, boundaries: Measurements) {
   const overflowing: Side[] = [];
 
   const isTopOverflow = element.top <= boundaries.top;
@@ -30,10 +27,10 @@ export function getOverflowingSides(
 }
 
 export function getPerimeterOfElements(
-  anchor: AbbreviatedRectangle,
-  elements: AbbreviatedRectangle[],
+  anchor: Measurements,
+  elements: Measurements[],
   alignment: Alignment
-): AbbreviatedRectangle {
+): Measurements {
   let totalHeight = 0;
   let totalWidth = 0;
   let maxHeight = 0;

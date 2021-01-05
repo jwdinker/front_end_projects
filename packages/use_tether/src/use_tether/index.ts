@@ -1,7 +1,7 @@
-import useDimensionsList, { ElementOrReference } from '@jwdinker/use-dimensions-list';
+import useDimensionsList from '@jwdinker/use-dimensions-list';
 import * as React from 'react';
 import useDebounceCallback from '@jwdinker/use-debounce-callback';
-import { Alignment, UseTetherReturn } from '../types';
+import { UseTether } from '../types';
 
 import { makeTetheredOffsets } from './helpers';
 import { ALIGNMENTS_TYPES } from '../constants';
@@ -9,13 +9,9 @@ import useAnchor from '../use_anchor';
 
 const { useEffect, useCallback } = React;
 
-function useTether(
-  anchorReference: ElementOrReference,
-  tetheredReferences: ElementOrReference[],
-  alignment: Alignment = ALIGNMENTS_TYPES.bottom
-): UseTetherReturn {
-  const [anchorOffsets, updatePosition] = useAnchor(anchorReference, tetheredReferences);
-  const [dimensions, resizeElements] = useDimensionsList(tetheredReferences);
+const useTether: UseTether = (anchor, tetherables, alignment = ALIGNMENTS_TYPES.bottom) => {
+  const [anchorOffsets, updatePosition] = useAnchor(anchor, tetherables);
+  const [dimensions, resizeElements] = useDimensionsList(tetherables);
 
   const updateSizeAndPosition = useCallback(() => {
     updatePosition();
@@ -36,6 +32,6 @@ function useTether(
     anchorOffsets,
     updateSizeAndPosition,
   ];
-}
+};
 
 export default useTether;

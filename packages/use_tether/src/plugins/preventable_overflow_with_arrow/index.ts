@@ -1,21 +1,28 @@
 import preventOverflow from '@jwdinker/prevent-overflow';
 import { getTetherablePadding, getArrowPadding } from './helpers';
-import { AbbreviatedRectangle, Side, Alignment } from '../../types';
+import { PreventableOverflowWithArrowOptions, TetherableMeasurements } from '../../types';
+import inferAlignment from '../../helpers/infer_alignment';
 
 function preventableOverflowWithArrow(
-  offsets: AbbreviatedRectangle[],
-  boundaries: AbbreviatedRectangle,
-  alignment: Alignment = 'bottom',
-  allow: Side[] = []
-) {
-  const [arrow, element] = offsets;
+  options: PreventableOverflowWithArrowOptions
+): TetherableMeasurements {
+  const { anchor, tetherables, boundaries, allow } = options;
+  const [arrow, element] = tetherables;
 
-  return offsets.map((offset, index) => {
+  const alignment = inferAlignment(anchor, tetherables[0]);
+
+  return tetherables.map((measurements, index) => {
     const padding =
       index === 0
         ? getArrowPadding(alignment, arrow, element)
         : getTetherablePadding(alignment, arrow);
-    return preventOverflow({ element: offset, boundaries, padding, allow })[0];
+
+    return preventOverflow({
+      element: measurements,
+      boundaries,
+      allow,
+      padding,
+    })[0];
   });
 }
 

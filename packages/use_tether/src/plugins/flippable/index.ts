@@ -1,14 +1,16 @@
 import { getPerimeterOfElements, getOverflowingSides } from './helpers';
 
-import { DEFAULT_FLIP, SIDE_OPPOSITES } from '../../constants';
-import { FlipOptions, AbbreviatedRectangle } from '../../types';
+import { BOUNDARY_FLIP_ALTERNATIVES, SIDE_OPPOSITES } from '../../constants';
+import { FlippableOptions } from '../../types';
 
-function flippable(
-  anchorOffsets: AbbreviatedRectangle,
-  tetheredOffsets: AbbreviatedRectangle[],
-  boundaries: AbbreviatedRectangle,
-  { flip = DEFAULT_FLIP, preference = 'bottom' }: FlipOptions = {}
-) {
+function flippable(options: FlippableOptions) {
+  const {
+    anchor,
+    tetherables,
+    boundaries,
+    at = BOUNDARY_FLIP_ALTERNATIVES,
+    preference = 'bottom',
+  } = options;
   let alignment = preference;
 
   /*
@@ -18,9 +20,7 @@ function flippable(
     will show where the popover will and will not fit.
   */
   const perimeter =
-    tetheredOffsets.length > 0
-      ? getPerimeterOfElements(anchorOffsets, tetheredOffsets, preference)
-      : anchorOffsets;
+    tetherables.length > 0 ? getPerimeterOfElements(anchor, tetherables, preference) : anchor;
 
   const overflowing = getOverflowingSides(perimeter, boundaries);
 
@@ -31,13 +31,11 @@ function flippable(
     overflowing.changed is checked.  
     */
 
-  if (overflowing.length === 0) {
-    alignment = preference;
-  } else {
+  if (overflowing.length > 0) {
     for (let index = 0; index <= overflowing.length; index += 1) {
       const side = overflowing[index];
 
-      const alternatives = flip[side];
+      const alternatives = at[side];
 
       if (alternatives) {
         const replacement = alternatives.find((alternative) => {

@@ -1,4 +1,4 @@
-import { Alignment, DefaultFlip } from './types';
+import { At } from './types';
 
 export const ALIGNMENTS_KEYS = {
   top: ['centerX', 'top'] as const,
@@ -7,7 +7,7 @@ export const ALIGNMENTS_KEYS = {
   bottom: ['centerX', 'bottom'] as const,
 };
 
-export const SIDES: Alignment[] = ['top', 'bottom', 'left', 'right'];
+export const SIDES = ['top', 'bottom', 'left', 'right'] as const;
 
 export const ALIGNMENTS_TYPES = {
   top: 'top',
@@ -30,11 +30,11 @@ export const DEFAULT_ANCHOR_MEASUEMENTS = {
   width: 0,
 };
 
-export const DEFAULT_FLIP: DefaultFlip = {
-  top: ['bottom', 'left', 'right'],
-  left: ['right', 'top', 'bottom'],
-  right: ['left', 'top', 'bottom'],
-  bottom: ['top', 'left', 'right'],
+export const BOUNDARY_FLIP_ALTERNATIVES: At = {
+  top: ['bottom'],
+  bottom: ['top'],
+  left: ['right'],
+  right: ['left'],
 };
 
 export const SIDE_OPPOSITES = {
@@ -49,4 +49,9 @@ export const ARROW_ROTATIONS = {
   left: 90,
   right: -90,
   bottom: 0,
+} as const;
+
+export const PREVENT_OVERFLOW_BEHAVIOR = {
+  STACK: 'stack',
+  COLLAPSE: 'collapse',
 } as const;

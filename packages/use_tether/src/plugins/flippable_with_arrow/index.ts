@@ -1,29 +1,27 @@
-import { DEFAULT_FLIP } from '../../constants';
-import { FlipOptions, AbbreviatedRectangle } from '../../types';
+import { FlippableOptions } from '../../types';
 import flippable from '../flippable';
 
-function flippableWithArrow(
-  anchorOffsets: AbbreviatedRectangle,
-  tetheredOffsets: AbbreviatedRectangle[],
-  boundaries: AbbreviatedRectangle,
-  options: FlipOptions = {}
-) {
-  const { flip = DEFAULT_FLIP, preference = 'bottom' } = options;
+function flippableWithArrow(options: FlippableOptions) {
+  const { tetherables, preference = 'bottom' } = options;
 
   const isLeft = preference === 'left';
   const isRight = preference === 'right';
   const isX = isLeft || isRight;
-  const hasTetheredElements = tetheredOffsets.length > 0;
+  const hasTetheredElements = tetherables.length > 0;
 
   if (isX && hasTetheredElements) {
-    const [originalArrow, ...elements] = tetheredOffsets;
+    const [originalArrow, ...elements] = tetherables;
     const arrow = { ...originalArrow };
     arrow.height = originalArrow.width;
     arrow.width = originalArrow.height;
 
     const updatedTethered = [arrow, ...elements];
-    return flippable(anchorOffsets, updatedTethered, boundaries, { flip, preference });
+
+    return flippable({
+      ...options,
+      tetherables: updatedTethered,
+    });
   }
-  return flippable(anchorOffsets, tetheredOffsets, boundaries, options);
+  return flippable(options);
 }
 export default flippableWithArrow;

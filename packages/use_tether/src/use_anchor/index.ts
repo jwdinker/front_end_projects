@@ -4,9 +4,9 @@ import useAncestorScrollListener from '@jwdinker/use-ancestors-scroll-listener';
 import { getContainingBlock } from '@jwdinker/get-containing-block';
 import useRequestAnimationFrameState from '@jwdinker/use-request-animation-frame-state';
 import makeHasChanged from '@jwdinker/make-has-changed';
-import { ElementOrReference, getElementOrReference } from '@jwdinker/use-dimensions-list';
+import { getElementOrReference } from '@jwdinker/use-dimensions-list';
 import { getAnchorMeasurements } from './helpers';
-import { UseAnchorReturn } from '../types';
+import { UseAnchor } from '../types';
 
 const ABBREVIEATED_RECT_PROPS = ['top', 'left', 'height', 'width'];
 const hasChanged = makeHasChanged(ABBREVIEATED_RECT_PROPS);
@@ -54,7 +54,7 @@ const INITIAL_MEASUREMENTS = { top: 0, left: 0, height: 0, width: 0 };
        are returned in order to prevent rerenders.
   */
 
-function useAnchor(anchor: ElementOrReference, elements: ElementOrReference[]): UseAnchorReturn {
+const useAnchor: UseAnchor = (anchor, elements) => {
   const container = useRef<Element | null>();
   const [state, setState] = useRequestAnimationFrameState(INITIAL_MEASUREMENTS);
 
@@ -85,11 +85,12 @@ function useAnchor(anchor: ElementOrReference, elements: ElementOrReference[]): 
       };
     }
     update();
+    return undefined;
   }, [firstElement, update, anchor]);
 
   useAncestorScrollListener(references, update);
 
   return [state, update];
-}
+};
 
 export default useAnchor;
