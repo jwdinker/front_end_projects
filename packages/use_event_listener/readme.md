@@ -1,6 +1,6 @@
 # useEventListener
 
-`useEventListener` is a React hook that abstracts attaching/detaching event listeners with the option to consolidate event listeners.
+`useEventListener` is a React hook that abstracts attaching/detaching event listeners with the option to consolidate event listeners. For latest documentation in an easily digestible format, [click here](https://www.notion.so/dinker/useEventListener-b198ef0007a64a33856d6d18b90429c9).
 
 <br>
 <br>

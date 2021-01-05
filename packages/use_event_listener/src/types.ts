@@ -23,10 +23,10 @@ export interface EventListenerOptions {
   storeName?: string;
 }
 
-type Attach = () => void;
-type Detach = () => void;
+type AttachListener = () => void;
+type DetachListener = () => void;
 
 export interface UseEventListenerReturn {
-  attach: Attach;
-  detach: Detach;
+  attach: AttachListener;
+  detach: DetachListener;
 }
