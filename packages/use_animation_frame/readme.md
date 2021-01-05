@@ -1,6 +1,6 @@
 # useAnimationFrame
 
-`useAnimationFrame` is a react hook that provides the ability to invoke a callback at a specified interval.
+`useAnimationFrame` is a react hook that provides the ability to invoke a callback at a specified interval. For latest documentation in an easily digestible format, [click here](https://www.notion.so/dinker/useAnimationFrame-8b83a032824247e98c029bfd1f0b347c).
 
 <br>
 <br>
