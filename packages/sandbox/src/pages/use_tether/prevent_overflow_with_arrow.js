@@ -1,6 +1,11 @@
 import React, { useRef } from 'react';
 
-import useTether, { useTetheredTransform, arrowable } from '@jwdinker/use-tether';
+import useTether, {
+  useTetheredTransform,
+  preventableOverflowWithArrow,
+  arrowable,
+} from '@jwdinker/use-tether';
+import useBoundaries from '@jwdinker/use-boundaries';
 
 import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
@@ -71,26 +76,41 @@ const Arrow = styled.div`
 `;
 
 function Component() {
+  // create anchor ref that tooltip and arrow will derive position from.
   const anchorRef = useRef();
 
+  // create arrow and element refs for getting size and original position.
   const arrowRef = useRef();
   const toolTipRef = useRef();
 
+  // create boundaries to constrain tetherables
+  const boundaryRef = useRef();
+  const boundaries = useBoundaries(boundaryRef);
+
+  // put tetherable refs into an array
   const elements = [arrowRef, toolTipRef];
 
+  // compute size and positions for tetherables and anchor
   const [tetherables, anchor] = useTether(anchorRef, elements, 'bottom');
 
-  const measurementsWithArrow = arrowable(tetherables, anchor);
+  // adjust positions of tetherables for arrow rotation
+  const measurementsAdjustedForArrow = arrowable(tetherables, anchor);
 
-  useTetheredTransform(elements, measurementsWithArrow);
+  const preventedOverflowMeasurements = preventableOverflowWithArrow({
+    tetherables: measurementsAdjustedForArrow,
+    anchor,
+    boundaries,
+  });
+
+  useTetheredTransform(elements, preventedOverflowMeasurements);
 
   return (
     <Page>
       <Arrow ref={arrowRef} />
-      <Tooltip ref={toolTipRef}>tooltip</Tooltip>
+      <Tooltip ref={toolTipRef}>item 2</Tooltip>
 
       <Scroller>
-        <Container>
+        <Container ref={boundaryRef}>
           <Anchor ref={anchorRef}>anchor</Anchor>
         </Container>
       </Scroller>
@@ -99,5 +119,5 @@ function Component() {
 }
 
 const Example = withCoreProviders(Component);
-Example.displayName = 'ArrowableExample';
+Example.displayName = 'TetherExample';
 export default Example;

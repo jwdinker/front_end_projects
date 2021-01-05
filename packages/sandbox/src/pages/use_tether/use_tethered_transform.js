@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import useTether, { useTetheredTransform, arrowable } from '@jwdinker/use-tether';
+import useTether, { useTetheredTransform } from '@jwdinker/use-tether';
 
 import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
@@ -40,54 +40,41 @@ const Anchor = styled.div`
   font-weight: bold;
 `;
 
-const Tooltip = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  height: 75px;
+const Item1 = styled.div`
+  height: 150px;
   width: 150px;
   box-sizing: border-box;
+  border-radius: 8px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  background: #007bff;
+  background: #00a1ff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
-  color: white;
 `;
 
-const Arrow = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 20px 20px 20px;
-  border-color: transparent transparent #007bff transparent;
-  z-index: 1;
+const Item2 = styled(Item1)`
+  width: 300px;
+  background: #ffe43a;
 `;
 
 function Component() {
   const anchorRef = useRef();
 
-  const arrowRef = useRef();
-  const toolTipRef = useRef();
+  const item1Ref = useRef();
+  const item2Ref = useRef();
 
-  const elements = [arrowRef, toolTipRef];
+  const elements = [item1Ref, item2Ref];
 
-  const [tetherables, anchor] = useTether(anchorRef, elements, 'bottom');
+  const [measurements] = useTether(anchorRef, elements, 'bottom');
 
-  const measurementsWithArrow = arrowable(tetherables, anchor);
-
-  useTetheredTransform(elements, measurementsWithArrow);
+  useTetheredTransform(elements, measurements);
 
   return (
     <Page>
-      <Arrow ref={arrowRef} />
-      <Tooltip ref={toolTipRef}>tooltip</Tooltip>
+      <Item1 ref={item1Ref}>item 1</Item1>
+      <Item2 ref={item2Ref}>item 2</Item2>
 
       <Scroller>
         <Container>
@@ -99,5 +86,5 @@ function Component() {
 }
 
 const Example = withCoreProviders(Component);
-Example.displayName = 'ArrowableExample';
+Example.displayName = 'TetherExample';
 export default Example;

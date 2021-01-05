@@ -1,6 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
-import useTether, { useTetheredTransform, arrowable } from '@jwdinker/use-tether';
+import useTether, {
+  useTetheredTransform,
+  useAlignment,
+  arrowable,
+  flippableWithArrow,
+} from '@jwdinker/use-tether';
+import useBoundaries from '@jwdinker/use-boundaries';
 
 import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
@@ -71,26 +77,55 @@ const Arrow = styled.div`
 `;
 
 function Component() {
+  // create anchor ref that tooltip and arrow will derive position from.
   const anchorRef = useRef();
 
+  // create arrow and element refs for getting size and original position.
   const arrowRef = useRef();
   const toolTipRef = useRef();
 
+  // create boundaries to constrain tetherables
+  const boundaryRef = useRef();
+  const boundaries = useBoundaries(boundaryRef);
+
+  // put tetherable refs into an array
   const elements = [arrowRef, toolTipRef];
 
-  const [tetherables, anchor] = useTether(anchorRef, elements, 'bottom');
+  // track alignment for flipping
+  const [alignment, align] = useAlignment('bottom');
 
-  const measurementsWithArrow = arrowable(tetherables, anchor);
+  // compute size and positions for tetherables and anchor
+  const [tetherables, anchor] = useTether(anchorRef, elements, alignment);
 
-  useTetheredTransform(elements, measurementsWithArrow);
+  // adjust positions of tetherables for arrow rotation
+  const measurementsAdjustedForArrow = arrowable(tetherables, anchor);
+
+  // get next alignment based on boundaries
+  const nextAlignment = flippableWithArrow({
+    tetherables: measurementsAdjustedForArrow,
+    anchor,
+    boundaries,
+    at: {
+      bottom: ['top', 'left', 'right'], // at bottom boundary flip top, left, right
+      top: ['bottom'], // at top boundary, flip bottom
+    },
+    preference: 'bottom',
+  });
+
+  useEffect(() => {
+    // if alignment changes update it.
+    align(nextAlignment);
+  }, [align, nextAlignment]);
+
+  useTetheredTransform(elements, measurementsAdjustedForArrow);
 
   return (
     <Page>
       <Arrow ref={arrowRef} />
-      <Tooltip ref={toolTipRef}>tooltip</Tooltip>
+      <Tooltip ref={toolTipRef}>item 2</Tooltip>
 
       <Scroller>
-        <Container>
+        <Container ref={boundaryRef}>
           <Anchor ref={anchorRef}>anchor</Anchor>
         </Container>
       </Scroller>
@@ -99,5 +134,5 @@ function Component() {
 }
 
 const Example = withCoreProviders(Component);
-Example.displayName = 'ArrowableExample';
+Example.displayName = 'TetherExample';
 export default Example;

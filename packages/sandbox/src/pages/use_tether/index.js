@@ -1,85 +1,98 @@
-import React, { forwardRef, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Box, Triangle, Button, Centered, Text, Flex } from '@jwdinker/styled-system';
-import useToggle from '@jwdinker/use-toggle';
-import useTether, { flippable, getTransform, useAlignment } from '@jwdinker/use-tether';
-import { useSpring, animated, useTransition } from 'react-spring';
-import usePortal from '@jwdinker/use-portal';
+import React, { useRef, useLayoutEffect, useMemo, useEffect } from 'react';
+
+import useTether, { useTetheredTransform, useAlignment, modify } from '@jwdinker/use-tether';
 import useBoundaries from '@jwdinker/use-boundaries';
-import styleObjectToString from '@jwdinker/style-object-to-string';
+
+import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
 
-const SCROLLABLE_AREA_STYLE = {
-  height: '300vh',
-  width: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
+const Page = styled.div`
+  height: 100vh;
+  width: 100vw;
+`;
 
-function useElementRefs() {
-  const references = useRef(new Map());
+const ScrollingContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  overflow: scroll;
+  background: #f8f9f9;
+`;
 
-  const setReference = useCallback((key) => {
-    return () => {};
-  }, []);
-}
+const NestedElement = styled.div`
+  height: 300vh;
+  width: 300%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
-function MyComponent() {
-  const anchorReference = useRef();
+const Anchor = styled.div`
+  height: 50px;
+  width: 75px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+`;
 
-  const box1Ref = useRef();
-  const box2Ref = useRef();
+const RandomElement = styled.div`
+  height: 100vh;
+  width: 100%;
+`;
 
-  const [tetheredOffsets, anchorOffsets] = useTether(anchorReference, [box1Ref, box2Ref], 'bottom');
+const Item1 = styled.div`
+  height: 150px;
+  width: 150px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background: #00a1ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+`;
 
-  const styles = tetheredOffsets.map(({ top, left }) => {
-    return {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      padding: '10px',
-      background: 'gray',
-      transform: `translate3d(${left}px,${top}px,0px)`,
-    };
-  });
+const Item2 = styled(Item1)`
+  width: 300px;
+  background: #ffe43a;
+`;
 
-  useEffect(() => {
-    const refs = [box1Ref, box2Ref];
-    refs.forEach((ref, index) => {
-      const measurements = tetheredOffsets[index];
-      console.log('MEASUREMENTS: ', measurements);
-      ref.current.style = styleObjectToString({
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        transform: getTransform(measurements),
-      });
-    });
-  });
+function Component() {
+  const anchor = useRef();
+
+  const item1 = useRef();
+  const item2 = useRef();
+
+  const tetherables = [item1, item2];
+
+  const [measurements] = useTether(anchor, tetherables, 'bottom');
+
+  useTetheredTransform(tetherables, measurements);
 
   return (
-    <div>
-      <div style={{ height: '100%', width: '100%', overflow: 'scroll' }}>
-        <div
-          style={{
-            height: '300vh',
-            width: '100%',
-            display: 'flex',
+    <Page>
+      <Item1 ref={item1}>item 1</Item1>
+      <Item2 ref={item2}>item 2</Item2>
 
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <div ref={anchorReference}>anchor</div>
-        </div>
-      </div>
-
-      <div ref={box1Ref}>box 1</div>
-
-      <div ref={box2Ref}>box2</div>
-    </div>
+      <ScrollingContainer>
+        <RandomElement />
+        <NestedElement>
+          <Anchor ref={anchor}>anchor</Anchor>
+        </NestedElement>
+        <RandomElement />
+      </ScrollingContainer>
+    </Page>
   );
 }
 
-const TetherExample = withCoreProviders(MyComponent);
+const TetherExample = withCoreProviders(Component);
 TetherExample.displayName = 'TetherExample';
 export default TetherExample;

@@ -1,9 +1,14 @@
-import React, { useRef } from 'react';
+import * as React from 'react';
 
-import useTether, { useTetheredTransform, arrowable } from '@jwdinker/use-tether';
+import { useSprings, animated } from 'react-spring';
+
+import useTether, { getTransform, modify, useAlignment } from '@jwdinker/use-tether';
+import useBoundaries from '@jwdinker/use-boundaries';
 
 import styled from 'styled-components';
 import { withCoreProviders } from '../../hocs';
+
+const { useEffect, useRef } = React;
 
 const Page = styled.div`
   height: 100vh;
@@ -40,7 +45,7 @@ const Anchor = styled.div`
   font-weight: bold;
 `;
 
-const Tooltip = styled.div`
+const Tooltip = styled(animated.div)`
   position: absolute;
   top: 0;
   left: 0;
@@ -56,9 +61,10 @@ const Tooltip = styled.div`
   font-size: 12px;
   font-weight: bold;
   color: white;
+  pointer-events: none;
 `;
 
-const Arrow = styled.div`
+const Arrow = styled(animated.div)`
   position: absolute;
   top: 0;
   left: 0;
@@ -68,29 +74,60 @@ const Arrow = styled.div`
   border-width: 0 20px 20px 20px;
   border-color: transparent transparent #007bff transparent;
   z-index: 1;
+  pointer-events: none;
 `;
 
 function Component() {
+  // create anchor ref that tooltip and arrow will derive position from.
   const anchorRef = useRef();
 
+  // create arrow and element refs for getting size and original position.
   const arrowRef = useRef();
   const toolTipRef = useRef();
 
+  // create boundaries to constrain tetherables
+  const boundaryRef = useRef();
+  const boundaries = useBoundaries(boundaryRef);
+
+  // put tetherable refs into an array
   const elements = [arrowRef, toolTipRef];
 
-  const [tetherables, anchor] = useTether(anchorRef, elements, 'bottom');
+  const [alignment, align] = useAlignment('bottom');
 
-  const measurementsWithArrow = arrowable(tetherables, anchor);
+  // compute size and positions for tetherables and anchor
+  const [tetherables, anchor] = useTether(anchorRef, elements, alignment);
 
-  useTetheredTransform(elements, measurementsWithArrow);
+  const [measurements, nextAlignment] = modify({
+    anchor,
+    tetherables,
+    boundaries,
+    hasArrow: true,
+  });
+
+  const [animations, set] = useSprings(2, (index) => ({
+    transform: getTransform(measurements[index]),
+  }));
+
+  useEffect(() => {
+    // if alignment changes update it.
+    align(nextAlignment);
+  }, [align, nextAlignment]);
+
+  useEffect(() => {
+    set((index) => ({
+      transform: getTransform(measurements[index]),
+    }));
+  });
 
   return (
     <Page>
-      <Arrow ref={arrowRef} />
-      <Tooltip ref={toolTipRef}>tooltip</Tooltip>
+      <Arrow ref={arrowRef} style={animations[0]} />
+      <Tooltip ref={toolTipRef} style={animations[1]}>
+        tooltip
+      </Tooltip>
 
       <Scroller>
-        <Container>
+        <Container ref={boundaryRef}>
           <Anchor ref={anchorRef}>anchor</Anchor>
         </Container>
       </Scroller>
