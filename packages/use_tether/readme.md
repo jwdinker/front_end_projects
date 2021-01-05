@@ -1,6 +1,9 @@
 # useTether
 
-`useTether` is a
+`useTether` is React hook for deriving position of elements based off an anchor element.
+
+Full documentation can be [found here](https://www.notion.so/dinker/useTether-8ca63e23c8274ecca67cfe6b4c756a15).
+<br>
 
 <br><br><br><br><br><br>
 
@@ -10,7 +13,7 @@
 npm install @jwdinker/use-tether
 ```
 
-<br><br><br><br><br><br>
+<br><br><br>
 
 # Usage
 
@@ -45,6 +48,3 @@ function Component() {
   );
 }
 ```
-
-For full documentation, [click here](https://www.notion.so/dinker/useTether-8ca63e23c8274ecca67cfe6b4c756a15).
-<br>
