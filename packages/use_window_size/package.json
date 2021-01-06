@@ -24,7 +24,9 @@
     "react-dom": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
-  "scripts": {},
+  "scripts": {
+    "clean": "rm -rf ./dist"
+  },
   "dependencies": {
     "@jwdinker/get-window-rectangle": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",

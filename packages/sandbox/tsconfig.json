@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    
+
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
@@ -87,15 +87,10 @@
     {
       "path": "../use_velocity"
     },
-    {
-      "path": "../calendar"
-    },
+
     {
       "path": "../use_block_scroll"
     },
-    // {
-    //   "path": "../use_virtual_scroll"
-    // },
     {
       "path": "../use_clock"
     },
@@ -180,6 +175,9 @@
     {
       "path": "../use_ancestors_scroll_listener"
     },
+    {
+      "path": "../use_tether"
+    }
   ],
   "exclude": ["node_modules"]
 }

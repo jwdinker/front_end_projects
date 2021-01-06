@@ -24,10 +24,7 @@
   },
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "clean": "rm -rf ./dist",
-    "build": "yarn clean & NODE_ENV=production webpack --config ./webpack.config.js",
-    "dev": "yarn clean & NODE_ENV=development webpack --config ./webpack.config.js",
-    "babel:dev": "yarn clean & babel --watch src -d dist --copy-files"
+    "clean": "rm -rf ./dist"
   },
   "dependencies": {
     "@jwdinker/offset-helpers": "1.0.0",

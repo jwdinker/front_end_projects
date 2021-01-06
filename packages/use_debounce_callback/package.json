@@ -24,7 +24,9 @@
     "react-dom": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
-  "scripts": {},
+  "scripts": {
+    "clean": "rm -rf ./dist"
+  },
   "dependencies": {
     "@jwdinker/use-timeout": "1.0.0",
     "tslib": "^1.10.0"

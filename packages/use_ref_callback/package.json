@@ -10,6 +10,9 @@
       "email": "jwdinker.accounts@gmail.com"
     }
   ],
+  "scripts": {
+    "clean": "rm -rf ./dist"
+  },
   "peerDependencies": {
     "react": "^16.8.x"
   },

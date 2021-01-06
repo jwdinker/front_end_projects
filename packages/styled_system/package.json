@@ -8,10 +8,7 @@
   "license": "MIT",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "clean": "rm -rf ./dist",
-    "transpile": "NODE_ENV=production babel src -d dist --copy-files",
-    "prepublishOnly": "npm run transpile",
-    "build": "NODE_ENV=development webpack --config ./webpack.config.js"
+    "clean": "rm -rf ./dist"
   },
   "peerDependencies": {
     "styled-components": "^5.0.0",

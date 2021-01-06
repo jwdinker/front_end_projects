@@ -8,7 +8,9 @@
   ],
   "license": "MIT",
   "browserslist": "> 0.25%, not dead",
-  "scripts": {},
+  "scripts": {
+    "clean": "rm -rf ./dist"
+  },
   "peerDependencies": {
     "react": "^16.8.0",
     "react-dom": "^16.8.0"

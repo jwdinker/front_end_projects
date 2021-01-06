@@ -6,8 +6,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@jwdinker/calendar": "1.0.0",
-    "@jwdinker/drag-and-drop": "1.0.0",
     "@jwdinker/easing-fns": "1.0.0",
     "@jwdinker/event-store": "1.0.0",
     "@jwdinker/get-containing-block": "1.0.0",

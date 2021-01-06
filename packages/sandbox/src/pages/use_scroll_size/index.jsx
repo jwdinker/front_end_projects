@@ -1,70 +1,31 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useLayoutEffect,
-  useCallback,
-} from 'react';
-import {
-  Box,
-  Row,
-  Text,
-  Centered,
-  Fixed,
-  Absolute,
-  Relative,
-  Column,
-  Button,
-  Image,
-} from '@jwdinker/styled-system';
+import React, { useRef } from 'react';
+
+import styled from 'styled-components';
 import useScrollSize from '@jwdinker/use-scroll-size';
 
 import { withCoreProviders } from '../../hocs';
 import { dummyImages } from '../../dummy_data';
 
-const Contents = () => {
-  const container = useRef();
-  const [items, setItems] = useState(dummyImages);
+const Container = styled.div`
+  height: 100vh;
+  width: 100%;
+  overflow: scroll;
+`;
 
-  const [dimensions, changed] = useScrollSize(typeof window !== 'undefined' ? window : null);
+const Component = () => {
+  const ref = useRef();
 
-  const remove = useCallback(() => {
-    setItems((_items) => {
-      if (_items.length > 1) {
-        return _items.filter((item, index) => {
-          return index !== 0;
-        });
-      }
-      return _items;
-    });
-  }, []);
+  const [dimensions, changed] = useScrollSize(ref, 1000);
 
-  const reset = useCallback(() => {
-    setItems(dummyImages);
-  });
+  console.log('STATE:', JSON.stringify({ dimensions, changed }, null, 2));
 
-  console.log('STATE', JSON.stringify({ ...dimensions, changed }, null, 2));
-
-  return useMemo(
-    () => (
-      <Box height="100%" maxWidth="50%">
-        <Absolute>
-          <Button onClick={remove}>Remove First Image</Button>
-          <Button onClick={reset}>Reset Images</Button>
-        </Absolute>
-        <Centered height="100%" width={1}>
-          <Box ref={container}>
-            {items.map(({ key, text, image }, index) => {
-              return <Image key={key} src={image} />;
-            })}
-          </Box>
-        </Centered>
-      </Box>
-    ),
-    [items, remove, reset]
+  return (
+    <Container ref={ref}>
+      {dummyImages.map(({ key, image }) => {
+        return <img key={key} src={image} />;
+      })}
+    </Container>
   );
 };
 
-export default withCoreProviders(Contents);
+export default withCoreProviders(Component);
