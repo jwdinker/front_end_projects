@@ -1,2 +1,3 @@
-export { default, isClockwise, isCounterClockwise } from './use_rotatable';
-export { Point, UseRotatableReturnState } from './types';
+export { default } from './use_rotatable';
+export { Point, RotatableState, RotateTo } from './types';
+export { isClockwise, isCounterClockwise } from './helpers';

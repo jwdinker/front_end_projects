@@ -1,5 +1,3 @@
-import { RefObject } from 'react';
-
 export type Point = number[];
 
 export type RotationDirection = -1 | 0 | 1;
@@ -9,25 +7,37 @@ export interface UseRotatableOptions {
 }
 
 export interface UseRotatableState {
+  isRotating: boolean;
   radians: number;
   totalRadians: number;
   direction: RotationDirection;
 }
 
-export type RotatableElement = RefObject<HTMLElement | undefined>;
+export type RotatableElement = React.RefObject<HTMLElement | undefined>;
 
 export type SetRotationHandler = Function;
 
-export interface UseRotatableHandlers {
-  start(point: Point, center: Point): void;
-  move(point: Point, center: Point): void;
-  end(): void;
+export type RotateTo = (degrees: number) => void;
+
+export type StartRotation = (point: Point, center: Point) => void;
+export type MoveRotation = (point: Point, center: Point) => void;
+export type EndRotation = () => void;
+
+export interface RotatableHandlers {
+  start: StartRotation;
+  move: MoveRotation;
+  end: EndRotation;
+  rotateTo: RotateTo;
 }
 
-export interface UseRotatableReturnState {
-  radians: number;
+export interface RotatableState {
+  isRotating: boolean;
   angle: number;
   direction: RotationDirection;
 }
 
-export type UseRotatableReturn = [UseRotatableReturnState, UseRotatableHandlers];
+export type UseRotatableReturn = [RotatableState, RotatableHandlers];
+
+export type UseRotatable = (initialAngle: number) => UseRotatableReturn;
+
+export type RotateCallback = (point: Point, center: Point) => void;
