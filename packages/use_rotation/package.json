@@ -18,16 +18,12 @@
     "react-dom": "^16.8.0"
   },
   "dependencies": {
+    "@jwdinker/get-2-touch-coordinates": "1.0.0",
     "@jwdinker/get-element-or-reference": "1.0.0",
-    "@jwdinker/make-get-interaction-type": "1.0.0",
-    "@jwdinker/mouse-helpers": "1.0.0",
-    "@jwdinker/phase-helpers": "1.0.0",
-    "@jwdinker/touch-helpers": "1.0.0",
-    "@jwdinker/use-event-listener": "3.0.3",
+    "@jwdinker/get-mouse-coordinates": "1.0.0",
+    "@jwdinker/use-drag-listener": "1.0.0",
     "@jwdinker/use-offsets": "1.0.5",
     "@jwdinker/use-rotatable": "1.0.0",
-    "@jwdinker/use-ssr": "1.0.0",
-    "@jwdinker/use-toggle": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

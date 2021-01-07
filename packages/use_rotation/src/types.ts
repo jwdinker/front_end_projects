@@ -1,17 +1,17 @@
-import { UseRotatableReturnState, Point } from '@jwdinker/use-rotatable';
+import { RotatableState, RotateTo } from '@jwdinker/use-rotatable';
 
+export type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
+
+export type TouchToTrigger = 1 | 2;
 export interface UseRotationOptions {
   initialAngle?: number;
   mouse?: boolean;
-  touch?: number;
+  touch?: TouchToTrigger;
 }
 
-export type Rotate = (point: Point, center: Point) => void;
+export type RotationReturn = [RotatableState, RotateTo];
 
-export interface UseRotationReturn extends UseRotatableReturnState {
-  /** Boolean indicating whether the rotation is active or inactive. */
-  active: boolean;
-
-  /** Handler for manually computing the rotation value given a 2 points.  */
-  rotate: Rotate;
-}
+export type UseRotation = (
+  element: RotatableElement,
+  options: UseRotationOptions
+) => RotationReturn;
