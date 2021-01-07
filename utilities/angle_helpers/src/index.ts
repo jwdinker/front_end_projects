@@ -7,7 +7,7 @@ export const radiansToDegrees = (radians: number): number => {
   return rotation;
 };
 
-export function angleToRadians(angle: number): number {
+export function degreesToRadians(angle: number): number {
   return angle * RADIAN;
 }
 
