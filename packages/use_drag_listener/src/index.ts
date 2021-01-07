@@ -1,128 +1,126 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
 import useSSR from '@jwdinker/use-ssr';
-import { UseDragListenerProps, DragEvent, DragElement } from './types';
+import { UseDragListenerProps, DragElement } from './types';
 
 export * from './types';
 
 function useDragListener(
   element: DragElement,
   {
-    onStart = () => {},
-    onMove = () => {},
-    onEnd = () => {},
-    onKeyUp = () => {},
-    onKeyDown = () => {},
+    onTouchStart = () => {},
+    onTouchMove = () => {},
+    onTouchEnd = () => {},
+    onMouseDown = () => {},
+    onMouseMove = () => {},
+    onMouseUp = () => {},
     mouse = true,
     touch = true,
-    pointer = true,
     once = false,
-    passive = true,
+    passive = false,
     capture = false,
-  }: UseDragListenerProps
+  }: UseDragListenerProps = {}
 ): void {
   const { isBrowser } = useSSR();
   const canDrag = useRef(false);
 
-  const listeners = useRef<UseEventListenerReturn[]>([]);
-
-  const handlers = {
-    listen: (): void => {
-      canDrag.current = true;
-    },
-    unlisten: (): void => {
-      canDrag.current = false;
-    },
+  const enable = () => {
+    canDrag.current = true;
   };
 
-  const start = useCallback(
-    (event) => {
-      onStart(event as DragEvent, handlers);
-    },
-    [handlers, onStart]
-  );
-
-  const move = useCallback(
-    (event) => {
-      if (canDrag.current) {
-        onMove(event as DragEvent, handlers);
-      }
-    },
-    [handlers, onMove]
-  );
-
-  const end = useCallback(
-    (event) => {
-      if (canDrag.current) {
-        onEnd(event as DragEvent, handlers);
-      }
-    },
-    [handlers, onEnd]
-  );
-
-  const key = useCallback(
-    (event) => {
-      if (event.type === 'keydown') {
-        onKeyDown(event as KeyboardEvent, handlers);
-      }
-      if (event.type === 'keyup') {
-        onKeyUp(event as KeyboardEvent, handlers);
-      }
-    },
-    [handlers, onKeyDown, onKeyUp]
-  );
+  const disable = () => {
+    canDrag.current = false;
+  };
 
   const _element = element || (isBrowser ? window : null);
 
   const _window = isBrowser ? window : null;
-  const keyable = useEventListener(_window, 'keyup keydown', key);
 
   const options = { once, passive, capture };
 
-  const touchstart = useEventListener(_element, 'touchstart', start, options);
-  const touchmove = useEventListener(_element, 'touchmove', move, options);
-  const touchend = useEventListener(_element, 'touchend touchcancel', end, options);
+  const windowOptions = { once, passive, capture, consolidate: true };
 
-  const pointerDown = useEventListener(_element, 'pointerdown', start, options);
-  const pointerMove = useEventListener(_element, 'pointermove', move, options);
-  const pointerUp = useEventListener(_element, 'pointerup', end, options);
+  const touchstart = useEventListener(
+    _element,
+    'touchstart',
+    (event) => {
+      onTouchStart(event as TouchEvent, enable);
+    },
+    options
+  );
 
-  const mousedown = useEventListener(_element, 'mousedown', start);
-  const mousemove = useEventListener(_window, 'mousemove', move);
-  const mouseup = useEventListener(_window, 'mouseup', end);
+  const touchmove = useEventListener(
+    _element,
+    'touchmove',
+    (event) => {
+      if (canDrag.current) {
+        return onTouchMove(event as TouchEvent);
+      }
+      return undefined;
+    },
+    options
+  );
+
+  const touchend = useEventListener(
+    _element,
+    'touchend touchcancel',
+    (event) => {
+      if (canDrag.current) {
+        return onTouchEnd(event as TouchEvent, disable);
+      }
+      return undefined;
+    },
+    options
+  );
+
+  const mousedown = useEventListener(
+    _element,
+    'mousedown',
+    (event) => {
+      return onMouseDown(event as MouseEvent, enable);
+    },
+    options
+  );
+
+  const mousemove = useEventListener(
+    _window,
+    'mousemove',
+    (event) => {
+      if (canDrag.current) {
+        return onMouseMove(event as MouseEvent);
+      }
+      return undefined;
+    },
+    windowOptions
+  );
+
+  const mouseup = useEventListener(
+    _window,
+    'mouseup',
+    (event) => {
+      if (canDrag.current) {
+        return onMouseUp(event as MouseEvent, disable);
+      }
+      return undefined;
+    },
+    windowOptions
+  );
 
   useEffect(() => {
-    if (pointer) {
-      listeners.current.push(pointerDown, pointerMove, pointerUp);
-    }
-
+    const listeners: UseEventListenerReturn[] = [];
     if (mouse) {
-      listeners.current.push(mousedown, mousemove, mouseup);
+      listeners.push(mousedown, mousemove, mouseup);
     }
 
     if (touch) {
-      listeners.current.push(touchstart, touchmove, touchend);
+      listeners.push(touchstart, touchmove, touchend);
     }
 
-    listeners.current.forEach((listener) => listener.attach());
+    listeners.forEach((listener) => listener.attach());
     return () => {
-      listeners.current.forEach((listener) => listener.detach());
+      listeners.forEach((listener) => listener.detach());
     };
-  }, [
-    keyable,
-    mouse,
-    mousedown,
-    mousemove,
-    mouseup,
-    pointer,
-    pointerDown,
-    pointerMove,
-    pointerUp,
-    touch,
-    touchend,
-    touchmove,
-    touchstart,
-  ]);
+  }, [mouse, mousedown, mousemove, mouseup, touch, touchend, touchmove, touchstart]);
 }
 
 export default useDragListener;

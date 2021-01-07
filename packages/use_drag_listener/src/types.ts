@@ -1,32 +1,44 @@
 import { RefObject } from 'react';
 
-export type DragEvent = globalThis.MouseEvent | globalThis.TouchEvent | globalThis.PointerEvent;
+export type EnableMove = () => void;
+export type DisableMove = () => void;
 
-export interface OnDragListenerHandlers {
-  listen(): void;
-  unlisten(): void;
-}
+export type OnMouseDown = (
+  event: globalThis.MouseEvent,
+  enable: EnableMove
+) => undefined | boolean | void;
 
-export type DragCallback = (event: DragEvent, handlers: OnDragListenerHandlers) => void;
-export type KeyboardCallback = (event: KeyboardEvent, handlers: OnDragListenerHandlers) => void;
+export type OnMouseMove = (event: globalThis.MouseEvent) => undefined | boolean | void;
+
+export type OnMouseUp = (
+  event: globalThis.MouseEvent,
+  disable: DisableMove
+) => undefined | boolean | void;
+
+export type OnTouchStart = (
+  event: globalThis.TouchEvent,
+  enable: EnableMove
+) => undefined | boolean | void;
+
+export type OnTouchMove = (event: globalThis.TouchEvent) => undefined | boolean | void;
+
+export type OnTouchEnd = (
+  event: globalThis.TouchEvent,
+  disable: DisableMove
+) => undefined | boolean | void;
 
 export interface UseDragListenerProps {
-  onStart?: DragCallback;
-  onMove?: DragCallback;
-  onEnd?: DragCallback;
-  onKeyUp?: KeyboardCallback;
-  onKeyDown?: KeyboardCallback;
+  onMouseDown?: OnMouseDown;
+  onMouseMove?: OnMouseMove;
+  onMouseUp?: OnMouseUp;
+  onTouchStart?: OnTouchStart;
+  onTouchMove?: OnTouchMove;
+  onTouchEnd?: OnTouchEnd;
   mouse?: boolean;
   touch?: boolean;
-  pointer?: boolean;
   once?: boolean;
   passive?: boolean;
   capture?: boolean;
-}
-
-export interface UseDragListenerReturn {
-  listen(): void;
-  unlisten(): void;
 }
 
 export type DragElement = RefObject<HTMLElement | undefined | null>;
