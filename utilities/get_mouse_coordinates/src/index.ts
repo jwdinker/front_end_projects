@@ -1,6 +1,11 @@
 export type MouseCoordinates = number[];
 
-function getMouseCoordinates(event: MouseEvent, coordinateType = 'page'): MouseCoordinates {
+export type CoordinateType = 'page' | 'client' | 'screen';
+
+function getMouseCoordinates(
+  event: MouseEvent,
+  coordinateType: CoordinateType = 'page'
+): MouseCoordinates {
   const x = `${coordinateType}X`;
   const y = `${coordinateType}Y`;
   return [event[x], event[y]];
