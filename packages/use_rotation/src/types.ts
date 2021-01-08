@@ -4,7 +4,7 @@ export type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
 
 export type TouchToTrigger = 1 | 2;
 export interface UseRotationOptions {
-  initialAngle?: number;
+  initialDegrees?: number;
   mouse?: boolean;
   touch?: TouchToTrigger;
 }

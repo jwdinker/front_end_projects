@@ -15,11 +15,11 @@ import { getTouchRotation, makeCenterPoint } from './helpers';
  */
 
 const useRotation: UseRotation = (element, options) => {
-  const { initialAngle = 0, mouse = false, touch = 2 } = options;
+  const { initialDegrees = 0, mouse = false, touch = 2 } = options;
   // useOffsets is used to make the center point
   const [offsets] = useOffsets(element);
 
-  const [rotation, { start, move, end, rotateTo }] = useRotatable(initialAngle);
+  const [rotation, { start, move, end, rotateTo }] = useRotatable(initialDegrees);
 
   useDragListener(element, {
     onMouseDown: (event, enableMove) => {

@@ -5,13 +5,12 @@
 # Installation
 
 ```
-npm install @jwdinker/use-rotation 
+npm install @jwdinker/use-rotation
 ```
 
 # Usage
 
 ```jsx
-
 import useRotation from '@jwdinker/use-rotation';
 
 const Component = () => {
@@ -33,54 +32,55 @@ const Component = () => {
 
 # Arguments
 
-`useRotation` accepts a react reference to an HTML Element and an options object as arguments. 
+`useRotation` accepts a react reference to an HTML Element and an options object as arguments.
 
 ---
 
 - element `object`
 
-    ```tsx
-    type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
-    ```
+  ```tsx
+  type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
+  ```
 
-    The react reference to an HTMLElement used as the rotatable element.
+  The react reference to an HTMLElement used as the rotatable element.
 
 ---
 
 - options `object`
-    - initialAngle `number`
-    *default:* `0`
 
-        The initial angle of the rotation.
+  - initialDegrees `number`
+    _default:_ `0`
 
-    ---
+        The initial degrees of the rotation.
 
-    - mouse `boolean`
-    *default:* `false`
+  ***
+
+  - mouse `boolean`
+    _default:_ `false`
 
         Enables the mouse events to trigger rotation.   The rotation is computed with the mouse coordinates along the element's center point.
 
-    ---
+  ***
 
-    - touch `number`
-    *default:* 2
+  - touch `number`
+    _default:_ 2
 
         ```tsx
         type TouchToTrigger = 1 | 2
         ```
 
-        The number of touches needed to trigger a rotation event.  
+        The number of touches needed to trigger a rotation event.
 
         - If a single touch is used,  the rotation is computed with the touch coordinates along the element's center point.
         - If 2 touches are used, the rotation is computed between the center point of the 2 touches.
 
-    ---
+  ***
 
 ---
 
 # Return Value
 
-`array`  
+`array`
 
 The return value is tuple containing the `rotation` state object and a `rotate` handler function.
 
@@ -88,22 +88,22 @@ The return value is tuple containing the `rotation` state object and a `rotate` 
 
 - rotation `object`
 
-    ```tsx
-    interface Rotation {
-    	isRotating:boolean;
-      direction:1 | 0 | -1;
-      angle:number;
-    }
-    ```
+  ```tsx
+  interface Rotation {
+    isRotating: boolean;
+    direction: 1 | 0 | -1;
+    degrees: number;
+  }
+  ```
 
 ---
 
 - rotate `function`
 
-    ```tsx
-    type RotateTo = (degrees: number) => void;
-    ```
+  ```tsx
+  type RotateTo = (degrees: number) => void;
+  ```
 
-    A handler function that manually sets the current rotation.
+  A handler function that manually sets the current rotation.
 
 ---
