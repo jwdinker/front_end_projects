@@ -2,11 +2,15 @@
 
 `useRotation` is a React hook that provides rotation values of an element from a mouse, touch, or multi-touch event.
 
+<br><br><br><br><br><br>
+
 # Installation
 
 ```
 npm install @jwdinker/use-rotation
 ```
+
+<br><br><br><br><br><br>
 
 # Usage
 
@@ -30,53 +34,82 @@ const Component = () => {
 };
 ```
 
+<br>
+
+![rotation.gif](rotation.gif)
+
+<br><br><br><br><br><br>
+
 # Arguments
 
 `useRotation` accepts a react reference to an HTML Element and an options object as arguments.
 
----
+<br>
 
-- element `object`
+## element
 
-  ```tsx
-  type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
-  ```
+`object`
 
-  The react reference to an HTMLElement used as the rotatable element.
+```ts
+type RotatableElement = React.RefObject<HTMLElement | null | undefined>;
+```
 
----
+The react reference to an HTMLElement used as the rotatable element.
 
-- options `object`
+<br><br>
 
-  - initialDegrees `number`
-    _default:_ `0`
+## options
 
-        The initial degrees of the rotation.
+`object`
 
-  ***
-
-  - mouse `boolean`
-    _default:_ `false`
-
-        Enables the mouse events to trigger rotation.   The rotation is computed with the mouse coordinates along the element's center point.
-
-  ***
-
-  - touch `number`
-    _default:_ 2
-
-        ```tsx
-        type TouchToTrigger = 1 | 2
-        ```
-
-        The number of touches needed to trigger a rotation event.
-
-        - If a single touch is used,  the rotation is computed with the touch coordinates along the element's center point.
-        - If 2 touches are used, the rotation is computed between the center point of the 2 touches.
-
-  ***
+<br>
 
 ---
+
+<br>
+
+initialDegrees `number`
+<br>
+_default:_ `0`
+
+The initial angle of the rotation.
+
+<br>
+
+---
+
+<br>
+
+mouse `boolean`
+<br>
+_default:_ `false`
+
+Enables the mouse events to trigger rotation. The rotation is computed with the mouse coordinates along the element's center point.
+
+<br>
+
+---
+
+<br>
+
+touch `number`
+<br>
+_default:_ 2
+
+```ts
+type TouchToTrigger = 0 | 1 | 2;
+```
+
+The number of touches needed to trigger a rotation event.
+
+- If a single touch is used, the rotation is computed with the touch coordinates along the element's center point.
+- If 2 touches are used, the rotation is computed between the center point of the 2 touches.
+
+<br>
+
+---
+
+<br><br><br><br><br><br>
 
 # Return Value
 
@@ -84,26 +117,36 @@ const Component = () => {
 
 The return value is tuple containing the `rotation` state object and a `rotate` handler function.
 
----
-
-- rotation `object`
-
-  ```tsx
-  interface Rotation {
-    isRotating: boolean;
-    direction: 1 | 0 | -1;
-    degrees: number;
-  }
-  ```
+<br>
 
 ---
 
-- rotate `function`
+<br>
 
-  ```tsx
-  type RotateTo = (degrees: number) => void;
-  ```
+rotation `object`
 
-  A handler function that manually sets the current rotation.
+```ts
+interface Rotation {
+  isRotating: boolean;
+  direction: 1 | 0 | -1;
+  degrees: number;
+}
+```
+
+<br>
+
+---
+
+<br>
+
+rotate `function`
+
+```ts
+type RotateTo = (degrees: number) => void;
+```
+
+A handler function that manually sets the current rotation.
+
+<br>
 
 ---
