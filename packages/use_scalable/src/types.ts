@@ -1,58 +1,41 @@
 export type Point = number[];
 
-export type Dimensions = [number, number];
+export type DistanceFromCenter = number[];
+export type XYZ = number[];
 
-export type Distance = number[];
-export type Vector = number[];
-
-export interface UseScalableOptions {
+export interface ScalableOptions {
   /**
    * The initial [x,y,z] scale values.
    */
-  initialScale?: Vector;
+  initialScale?: XYZ;
 
   /**
    * Minimum scale for the x,y,z axis.
    */
-  min?: Vector;
+  min?: XYZ;
 
   /**
    * Maximum scale for the x,y,z axis.
    */
-  max?: Vector;
-
-  /**
-   * Initial height of the element used in conjunction with the top coordinate to calculate the center y coordinate.  Note: This is only needed if you are calculating from a single coordinate.
-   */
-  height?: number;
-
-  /**
-   * Initial width of the element used in conjunction with the left coordinate to calculate the center x coordinate.  Note: This is only needed if you are calculating from a single coordinate.  Note: This is only needed if you are calculating from a single coordinate
-   */
-  width?: number;
-
-  /**
-   * Initial top coordinate of the element used in conjunction with the height dimension to calculate the center y coordinate.  Note: This is only needed if you are calculating from a single coordinate.
-   */
-  top?: number;
-
-  /**
-   * Initial left coordinate of the element used in conjunction with the width dimension to calculate the center x coordinate.  Note: This is only needed if you are calculating from a single coordinate.
-   */
-  left?: number;
+  max?: XYZ;
 }
 
-export interface UseScalableState {
-  vector: Vector;
-  distance: Distance;
+export interface ScaleState {
+  isScaling: boolean;
+  xyz: number[];
+  distanceFromCenter: DistanceFromCenter;
 }
 
-export type UseScalableHandler = (point: Point, center?: Point) => void;
+export type ScaleStart = (point: Point, center: Point) => void;
+export type ScaleMove = (point: Point, center: Point) => void;
+export type ScaleEnd = () => void;
+export type ScaleTo = (xyz: number[]) => void;
 
-export interface UseScalableHandlers {
-  start: UseScalableHandler;
-  move: UseScalableHandler;
-  end(): void;
+export interface ScalableHandlers {
+  start: ScaleStart;
+  move: ScaleMove;
+  end: ScaleEnd;
+  scaleTo: ScaleTo;
 }
 
-export type UseScalableReturn = [UseScalableState, UseScalableHandlers];
+export type ScalableReturn = [ScaleState, ScalableHandlers];

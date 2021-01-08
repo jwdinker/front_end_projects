@@ -1,81 +1,81 @@
-import { useState } from 'react';
+import * as React from 'react';
 
 import getDistanceFromPoints from '@jwdinker/get-distance-from-points';
-import {
-  UseScalableState,
-  UseScalableHandler,
-  UseScalableReturn,
-  UseScalableOptions,
-  Dimensions,
-} from './types';
-import { getScale, constrain, makeCenterPoint } from './helpers';
+import { ScalableReturn, ScalableOptions, ScaleState, ScaleStart, ScaleMove } from './types';
+import { getScale, constrain } from './helpers';
 import { DEFAULTS } from './constants';
+
+const { useState, useCallback } = React;
 
 /**
  *
  * @param options.initialScale - Initial x,y,z of the scale.
  * @param options.min - Minimum scale for the x,y,z axis.
  * @param options.max - Maximum scale for the x,y,z axis.
- * @param options.height - Initial height of the element used in conjunction with the top coordinate to calculate the center y coordinate.  Note: This is only needed if you are calculating from a single coordinate.
- * @param options.width - Initial width of the element used in conjunction with the left coordinate to calculate the center x coordinate.  Note: This is only needed if you are calculating from a single coordinate.  Note: This is only needed if you are calculating from a single coordinate
- * @param options.top - Initial top coordinate of the element used in conjunction with the height dimension to calculate the center y coordinate.  Note: This is only needed if you are calculating from a single coordinate.
- * @param options.left - Initial left coordinate of the element used in conjunction with the width dimension to calculate the center x coordinate.  Note: This is only needed if you are calculating from a single coordinate.
  */
 function useScalable({
   initialScale = DEFAULTS.INITIAL_SCALE,
   min = DEFAULTS.MIN_SCALE,
   max = DEFAULTS.MAX_SCALE,
-  height = 0,
-  width = 0,
-  top = 0,
-  left = 0,
-}: UseScalableOptions = {}): UseScalableReturn {
-  const [scale, setScale] = useState<UseScalableState>(() => ({
-    distance: [0, 0, 0],
-    vector: initialScale,
+}: ScalableOptions = {}): ScalableReturn {
+  const [state, setState] = useState<ScaleState>(() => ({
+    isScaling: false,
+    distanceFromCenter: [0, 0, 0],
+    xyz: initialScale,
   }));
 
-  const dimensions: Dimensions = [width, height];
+  const scaleTo = useCallback((xyz: number[]) => {
+    setState((previous) => ({
+      ...previous,
+      xyz,
+    }));
+  }, []);
 
-  const coordinates = [top, left];
-
-  const start: UseScalableHandler = (point, center) => {
-    const _center = center || makeCenterPoint(dimensions, coordinates);
-    setScale((previous) => {
-      const distance = getDistanceFromPoints(point, _center);
+  const start = useCallback<ScaleStart>((point, center) => {
+    setState((previous) => {
+      const distanceFromCenter = getDistanceFromPoints(point, center);
 
       return {
         ...previous,
-        distance,
+        isScaling: true,
+        distanceFromCenter,
       };
     });
-  };
+  }, []);
 
-  const move: UseScalableHandler = (point, center) => {
-    const _center = center || makeCenterPoint(dimensions, coordinates);
-    setScale((state) => {
-      const { distance: lastDistance, vector } = state;
+  const move = useCallback<ScaleMove>(
+    (point, center) => {
+      setState((previous) => {
+        const { distanceFromCenter: lastDistance, xyz: lastXYZ } = previous;
 
-      const distance = getDistanceFromPoints(point, _center);
+        const distance = getDistanceFromPoints(point, center);
 
-      const _vector = vector.map((value, index) => {
-        return constrain(
-          min[index],
-          max[index],
-          getScale(value, distance[index], lastDistance[index])
-        );
+        const xyz = lastXYZ.map((value, index) => {
+          return constrain(
+            min[index],
+            max[index],
+            getScale(value, distance[index], lastDistance[index])
+          );
+        });
+
+        return {
+          ...previous,
+          distanceFromCenter: distance.map((d, i) => (d <= 0 ? lastDistance[i] : d)),
+          xyz,
+        };
       });
+    },
+    [min, max]
+  );
 
-      return {
-        distance: distance.map((d, i) => (d <= 0 ? lastDistance[i] : d)),
-        vector: _vector,
-      };
-    });
-  };
+  const end = useCallback(() => {
+    setState((previous) => ({
+      ...previous,
+      isScaling: false,
+    }));
+  }, []);
 
-  const end = (): void => {};
-
-  return [scale, { start, move, end }];
+  return [state, { start, move, end, scaleTo }];
 }
 
 export default useScalable;

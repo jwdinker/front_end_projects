@@ -1,12 +1,12 @@
-import { Point, Dimensions } from './types';
+import { Point } from './types';
 
 export function hasChanged(previous: number[], current: number[]): boolean {
   return current.some((val, i) => previous[i] !== val);
 }
 
-export function makeCenterPoint(dimensions: Dimensions, coordinates: Point): Point {
-  const y = coordinates[0] + dimensions[0] / 2;
-  const x = coordinates[1] + dimensions[1] / 2;
+export function makeCenterPoint(height: number, width: number, coordinates: Point): Point {
+  const y = coordinates[0] + height / 2;
+  const x = coordinates[1] + width / 2;
   return [x, y];
 }
 
