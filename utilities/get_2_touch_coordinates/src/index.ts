@@ -1,5 +1,7 @@
 export type TouchCoordinates = number[];
 
+export type CoordinateType = 'page' | 'client' | 'screen';
+
 function getFarthestRightCoordinate(coordinates: TouchCoordinates[]): TouchCoordinates {
   if (coordinates.length === 2) {
     return coordinates[1];
@@ -13,14 +15,17 @@ function getFarthestRightCoordinate(coordinates: TouchCoordinates[]): TouchCoord
 function getTouchCoordinates(
   touches: TouchList,
   index = 0,
-  coordinateType = 'page'
+  coordinateType: CoordinateType = 'page'
 ): TouchCoordinates {
   const x = `${coordinateType}X`;
   const y = `${coordinateType}Y`;
   return [touches[index][x], touches[index][y]];
 }
 
-function makeTouchCoordinates(touches: TouchList, coordinateType = 'page'): TouchCoordinates[] {
+function makeTouchCoordinates(
+  touches: TouchList,
+  coordinateType: CoordinateType = 'page'
+): TouchCoordinates[] {
   const coordinates: TouchCoordinates[] = [];
   for (let index = 0; index < touches.length; index += 1) {
     coordinates.push(getTouchCoordinates(touches, index, coordinateType));
@@ -28,7 +33,10 @@ function makeTouchCoordinates(touches: TouchList, coordinateType = 'page'): Touc
   return coordinates;
 }
 
-function get2TouchCoordinates(event: TouchEvent, coordinateType = 'page'): TouchCoordinates[] {
+function get2TouchCoordinates(
+  event: TouchEvent,
+  coordinateType: CoordinateType = 'page'
+): TouchCoordinates[] {
   const { touches } = event;
   const coordinates = makeTouchCoordinates(touches, coordinateType);
   return [coordinates[0], getFarthestRightCoordinate(coordinates)];
