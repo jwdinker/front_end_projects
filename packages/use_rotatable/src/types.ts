@@ -32,7 +32,7 @@ export interface RotatableHandlers {
 
 export interface RotatableState {
   isRotating: boolean;
-  angle: number;
+  degrees: number;
   direction: RotationDirection;
 }
 

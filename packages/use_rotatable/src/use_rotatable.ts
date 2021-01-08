@@ -3,11 +3,11 @@ import { getRadians, radiansToDegrees, degreesToRadians } from '@jwdinker/angle-
 import { UseRotatableReturn, Point, RotationDirection } from './types';
 import { getRotatableState } from './helpers';
 
-function useRotatable(initialAngle: number): UseRotatableReturn {
+function useRotatable(initialDegrees: number): UseRotatableReturn {
   const [state, setState] = useState(() => ({
     isRotating: false,
-    radians: degreesToRadians(initialAngle),
-    totalRadians: degreesToRadians(initialAngle),
+    radians: degreesToRadians(initialDegrees),
+    totalRadians: degreesToRadians(initialDegrees),
     direction: 0 as RotationDirection,
   }));
 
@@ -52,7 +52,7 @@ function useRotatable(initialAngle: number): UseRotatableReturn {
     {
       isRotating,
       direction,
-      angle: radiansToDegrees(totalRadians),
+      degrees: radiansToDegrees(totalRadians),
     },
     { start, move, end, rotateTo },
   ];
