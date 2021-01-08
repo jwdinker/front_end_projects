@@ -1,16 +1,14 @@
-import { UseScalableState, Point, UseScalableOptions } from '@jwdinker/use-scalable';
+import { ScalableOptions, ScaleState, ScaleTo } from '@jwdinker/use-scalable';
 
-export interface UseScaleOptions extends UseScalableOptions {
+export type TouchToTrigger = 0 | 1 | 2;
+
+export interface ScaleOptions extends ScalableOptions {
   mouse?: boolean;
-  touch?: number;
+  touch?: TouchToTrigger;
 }
 
-export type Scale = (point: Point, center: Point) => void;
+export type ScaleReturn = [ScaleState, ScaleTo];
 
-export interface UseScaleReturn extends UseScalableState {
-  /** Boolean indicating whether the scaling is active or inactive. */
-  isScaling: boolean;
+export type ScalableElement = React.RefObject<HTMLElement | null>;
 
-  /** Handler for manually computing the scale value given a 2 points.  */
-  scale: Scale;
-}
+export type UseScale = (element: ScalableElement, options: ScaleOptions) => ScaleReturn;

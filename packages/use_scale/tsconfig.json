@@ -12,15 +12,10 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../use_toggle" },
-    { "path": "../use_ssr" },
-    { "path": "../use_event_listener" },
-    { "path": "../use_rotatable" },
-    { "path": "../../utilities/get_element_or_reference" },
-    { "path": "../../utilities/touch_helpers" },
-    { "path": "../../utilities/make_get_interaction_type" },
-    { "path": "../../utilities/mouse_helpers" },
-    { "path": "../../utilities/phase_helpers" },
-    { "path": "../use_offsets" }
+    { "path": "../use_offsets" },
+    { "path": "../use_drag_listener" },
+    {"path": "../../utilities/get_1_touch_coordinates"},
+    {"path": "../../utilities/get_2_touch_coordinates"},
+    {"path": "../../utilities/get_mouse_coordinates"}
   ]
 }
