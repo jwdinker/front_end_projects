@@ -6,28 +6,32 @@ import getWindowRectangle, { WindowRectangle } from '@jwdinker/get-window-rectan
 
 export { WindowRectangle } from '@jwdinker/get-window-rectangle';
 
-/**
- *
- * @param endDelay The duration of time waited between window resize events before the end is set to end.
- *
- */
-function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
-  const { isBrowser } = useSSR();
-  const [resized, setResized] = useState(false);
+export type WindowSizeReturn = [WindowRectangle, boolean];
 
-  const [size, setSize] = useState(() => {
-    return {
-      height: 0,
-      width: 0,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-    };
+/**
+ * @param endDelay The duration of time waited between window resize events before the end is set to end.
+ */
+function useWindowSize(endDelay = 200): WindowSizeReturn {
+  const { isBrowser } = useSSR();
+
+  const [state, setState] = useState(() => {
+    return [
+      {
+        height: 0,
+        width: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
+      false,
+    ];
   });
 
   const end = useCallback(() => {
-    setResized(true);
+    setState((previous) => {
+      return [previous[0], true];
+    });
   }, []);
 
   const [start, clear] = useTimeout(end, endDelay);
@@ -35,12 +39,12 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
   const handler = useCallback(() => {
     clear();
     start();
-    setSize(getWindowRectangle());
+    setState(() => [getWindowRectangle(), false]);
   }, [clear, start]);
 
   useEffect(() => {
     if (isBrowser) {
-      setSize(getWindowRectangle());
+      setState(() => [getWindowRectangle(), false]);
     }
   }, [isBrowser]);
 
@@ -51,9 +55,10 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
   back to false when it is a true for ease of use. 
   */
 
+  const resized = state[1];
   useEffect(() => {
     if (resized) {
-      setResized(false);
+      setState((previous) => [previous[0], false]);
     }
   }, [resized]);
 
@@ -73,7 +78,7 @@ function useWindowSize(endDelay = 200): [WindowRectangle, boolean] {
     return detach;
   }, [attach, detach]);
 
-  return [size, resized];
+  return state as WindowSizeReturn;
 }
 
 export default useWindowSize;
