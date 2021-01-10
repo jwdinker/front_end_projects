@@ -1,37 +1,11 @@
 # useBoundaries
 
-`useBoundaries` is a react hook that automagically updates and provides the position and size values of an element's parent boundary, relative to the viewport. The element can be nested anywhere in the DOM hierarchy.
+`useBoundaries` is a React hook that automagically updates and provides the position and size values of any element's overflow boundary, relative to the viewport. The element can be nested anywhere in the DOM hierarchy. This package pairs well with visibility utilities and packages like [useTether](https://www.notion.so/useTether-8ca63e23c8274ecca67cfe6b4c756a15).
 
 <br>
+<br>
 
-<p align="center">
-  <img src="depiction.gif" alt="useBoundaries hook depiction"/>
-</p>
-
-<br><br><br><br><br><br>
-
-# Table of Contents
-
-- [Installation](#Installation)
-- [Usage](#Usage)
-  <br>
-- [Arguments](#Arguments)
-
-  1. [fromRef](#.1-fromRef)
-
-  2. [resizeDelay](#.2-resizeDelay)
-
-* [Return Value](#Return-Value)
-
-  - [Boundaries](#Boundaries)
-
-    - [top](#.1-top)
-
-    - [left](#.1-left)
-
-    - [height](#.1-height)
-
-    - [width](#.1-width)
+![depiction of useBoundaries](depiction.gif)
 
 <br><br><br><br><br><br>
 
@@ -45,7 +19,7 @@ npm install @jwdinker/use-boundaries
 
 # Usage
 
-In this example, `<OverflowScrollingContainer>`'s position and size will be monitored, not `<Item>`.
+In this example, `<OverflowScrollingContainer>`'s position and size will be monitored anytime a window scroll or resize event occurs.
 
 ```jsx
 import useBoundaries from '@jwdinker/use-boundaries';
@@ -57,7 +31,13 @@ function Component() {
 
   return (
     <OverflowScrollingContainer>
-      <Item ref={ref} />
+			<OtherContainer>
+				<NestedWrapper>
+
+		      <Item ref={ref} />
+
+				<NestedWrapper>
+			</OtherContainer>
     </OverflowScrollingContainer>
   );
 }
@@ -67,80 +47,46 @@ function Component() {
 
 # Arguments
 
-useBoundaries accepts 2 arguments:
-
-<br><br><br>
-
-## 1. `fromRef`
-
-```ts
- element:React.RefObject<HTMLElement>
-```
-
-A react reference to an HTML Element. This element scrollable parent's `top` and `left` properties will be monitored for position changes.
-
-<br><br><br>
-
-## 2. `resizeDelay`
-
-```ts
-resizeDelay: number = 100;
-```
-
-The wait time after the last window resize event when the size and position will be updated.
-
-<br><br><br><br><br><br>
-
-# Return Value
-
-The return value is a `boundaries` object containing the `top`, `left`, `height` and `width` of the referenced HTML Element's parent boundary.
-
-```ts
-const boundaries = useBoundaries(ref);
-
-const { top, left, height, width } = boundaries;
-```
-
-<br><br><br>
-
-## `Boundaries`
+`useBoundaries` accepts a React reference to an HTML element and a resizeDelay as arguments.
 
 <br>
 
-### `top`
+## element `object`
 
 ```ts
-top: number = 0;
+type BoundableElement = React.RefObject<HTMLElement | null> | undefined | null;
 ```
 
-The `top` value of closest boundary relative to the viewport.
+A React reference to an HTML Element. This element scrollable parent's `top` and `left` properties will be monitored for position changes.
 
-<br><br><br>
+<br>
 
-### `left`
+## resizeDelay `number`
 
-```ts
-left: number = 0;
-```
+The wait time in milliseconds after the last window resize event when the size and position will be updated.
 
-The `left` value of closest boundary relative to the viewport.
+<br><br><br><br><br>
 
-<br><br><br>
+# Return Value
 
-### `height`
+The return value is a boundaries object.
 
-```ts
-height: number = 0;
-```
+<br>
 
-The `height` of referenced HTML Element.
+## boundaries `object`
 
-<br><br><br>
+The boundaries object adapts its position and size when:
 
-### `width`
+- scroll event from a scrollable ancestor occurs.
+- a window resize event occurs.
 
-The `width` of referenced HTML Element.
+<br>
 
 ```ts
-width: number = 0;
+interface Boundaries {
+  top: number;
+  left: number;
+  height: number;
+  width: number;
+}
 ```

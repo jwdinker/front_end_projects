@@ -11,6 +11,8 @@ import useDebounceCallback from '@jwdinker/use-debounce-callback';
 
 const { useRef, useEffect, useCallback } = React;
 
+export type BoundableElement = React.RefObject<HTMLElement | null> | undefined | null;
+
 export interface Boundaries {
   top: number;
   left: number;
@@ -34,7 +36,7 @@ const INITIAL_MEASUREMENTS = {
   width: 0,
 };
 
-function useBoundaries(from: ElementOrReference = null, resizeDelay = 100): Boundaries {
+function useBoundaries(from: BoundableElement = null, resizeDelay = 100): Boundaries {
   const scrollers = useRef<ScrollableAncestors>([]);
   const scrollParentOfReference = useRef<HTMLElement>();
 
