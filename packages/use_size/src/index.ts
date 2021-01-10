@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-// import ResizeObserver from 'resize-observer-polyfill';
 import { ResizeObserver } from '@juggle/resize-observer';
 import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
-import { unstable_batchedUpdates as batch } from 'react-dom';
-import { Rectangle, UseSizeValue } from './types';
+import { InitialContentRect, UseSizeValue } from './types';
 
 const DEFAULT_CONTENT_RECTANGLE = {
   bottom: 0,
@@ -16,14 +14,21 @@ const DEFAULT_CONTENT_RECTANGLE = {
   y: 0,
 };
 
-function useSize(element: ElementOrReference, initialState?: Rectangle): UseSizeValue {
+function useSize(
+  element: ElementOrReference,
+  initialContentRect: InitialContentRect = {}
+): UseSizeValue {
   const resizeObserver = useRef<ResizeObserver | null>();
-  const [changed, setChanged] = useState(false);
 
-  const [state, setState] = useState<Rectangle>(() => ({
-    ...DEFAULT_CONTENT_RECTANGLE,
-    ...initialState,
-  }));
+  const [state, setState] = useState<UseSizeValue>(() => {
+    return [
+      {
+        ...DEFAULT_CONTENT_RECTANGLE,
+        ...initialContentRect,
+      },
+      false,
+    ];
+  });
 
   useEffect(() => {
     const _element = getElement(element);
@@ -44,10 +49,7 @@ function useSize(element: ElementOrReference, initialState?: Rectangle): UseSize
           x,
           y,
         };
-        batch(() => {
-          setState(nextState);
-          setChanged(true);
-        });
+        setState([nextState, true]);
       });
 
       resizeObserver.current.observe(_element);
@@ -58,15 +60,20 @@ function useSize(element: ElementOrReference, initialState?: Rectangle): UseSize
         }
       };
     }
+    return undefined;
   }, [element]);
+
+  const changed = state[1];
 
   useEffect(() => {
     if (changed) {
-      setChanged(false);
+      setState((previous) => {
+        return [previous[0], false];
+      });
     }
   }, [changed]);
 
-  return [state, changed];
+  return state;
 }
 
 export default useSize;
