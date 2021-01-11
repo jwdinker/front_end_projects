@@ -1,6 +1,4 @@
-import { ElementOrReference } from '@jwdinker/get-element-or-reference';
-
-export type RectangleElement = ElementOrReference;
+export type DOMRectangleElement = React.RefObject<HTMLElement | null> | null | undefined;
 
 export interface Rectangle {
   top: number;
@@ -21,7 +19,7 @@ export type UseBoundingClientRect = (
   /**
    * An HTML element or React reference containing a HTML Element.
    */
-  element: RectangleElement
+  element: DOMRectangleElement
 ) => UseBoundingClientRectReturn;
 
 export type HasChanged = (previous: Rectangle, current: Rectangle) => boolean;

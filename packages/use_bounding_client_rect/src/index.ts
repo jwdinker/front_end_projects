@@ -1,6 +1,6 @@
 import * as React from 'react';
-import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
-import { HasChanged, UseBoundingClientRectReturn } from './types';
+import getElement from '@jwdinker/get-element-or-reference';
+import { DOMRectangleElement, HasChanged, UseBoundingClientRectReturn } from './types';
 
 export * from './types';
 
@@ -36,7 +36,7 @@ const getMeasurements = (element: HTMLElement) => {
   };
 };
 
-function useBoundingClientRect(element: ElementOrReference): UseBoundingClientRectReturn {
+function useBoundingClientRect(element: DOMRectangleElement): UseBoundingClientRectReturn {
   const [measurements, setMeasurements] = useState(() => INITIAL_STATE);
 
   const update = useCallback(() => {

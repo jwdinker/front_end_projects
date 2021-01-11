@@ -1,44 +1,14 @@
-# useBlockScroll
+# useBoundingClientRect
 
-`useBoundingClientRect` is a simple react hook for managing and updating the size and position of an HTML Element relative to the viewport.
+`useBoundingClientRect` is a React hook for persisting and updating the [DOMRect](https://developer.mozilla.org/en-US/docs/Web/API/DOMRect) measurements of an element.
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-# Table of Contents
-
-- [Installation](#Installation)
-- [Usage](#Usage)
-- [Arguments](#Arguments)
-  - [`ref`](#1.-ref)
-- [Return Value](#Return-Value)
-  - [`measurements`](#measurements)
-  - [`update`](#update)
-- [Example](#Example)
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Installation
 
 ```
 npm install @jwdinker/use-bounding-client-rect
 ```
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
 # Usage
 
@@ -54,125 +24,72 @@ function Component() {
 }
 ```
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Arguments
 
-`useBoundingClientRect` accepts a single argument of a react ref:
+`useBoundingClientRect` accepts a single React reference to an HTML element as an argument.
 
 <br>
 
-## `ref`
+## element
+
+`object`
 
 ```ts
-element:React.RefObject<HTMLElement | null | undefined>
+type ElementReference = React.RefObject<HTMLElement | null> | undefined | null;
 ```
 
-<br>
-
-```jsx
-const ref = useRef();
-const [measurements, update] = useBoundingClientRect(ref);
-
-return <div ref={ref}></div>;
-```
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Return Value
 
-The return value is a tuple containing the rectangle measurements and an update function.
-<br>
+`array`
 
-```jsx
-const [measurements, update] = useBoundingClientRect(ref);
-```
+The return value is a tuple containing the DOMRect `measurements` and an `update` function.
 
-<br>
-<br>
-<br>
+The update function is already called in the first useEffect, so an initial update is not necessary.
 
-## `measurements`
+<br><br>
+
+## measurements
+
+`object`
 
 ```ts
-measurements:{
-    height:number = 0,
-    width:number = 0,
-    top:number = 0,
-    left:number = 0,
-    right:number = 0,
-    bottom:number = 0,
-    x:number = 0,
-    y:number = 0
+interface Rectangle {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  height: number;
+  width: number;
+  x?: number;
+  y?: number;
 }
 ```
 
-<br>
-<br>
-<br>
+<br><br>
 
-## `update`
+## update
 
-```ts
-update = () => void;
+`function`
+
+```tsx
+update() => void;
 ```
 
-The update function invokes the `getBoundingClientRect` method on the referenced HTML element and updates the measured state. If the rectangle size and position has not change, there will be no re-render.
+The update function recomputes the DOMRect. If any of the property's value have changed, the state will be updated, triggering a re-render.
 
-<br>
+<br><br><br><br><br><br>
 
-> Note: The update function is already invoked in the first call to useEffect, so an initial update is not necessary.
+# Examples
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-# Example
-
-In this example, the size and position of the `<Item>` is updated on every requestAnimationFrame. Any change, will trigger a re-render.
-
-<br>
+In this example, the <Item/> component has its position and size constantly updated anytime it changes.
 
 ```jsx
-import * as React from 'react';
-import styled from 'styled-components';
-
 import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
 import useAnimationFrame from '@jwdinker/use-animation-frame';
-
-const Container = styled.div`
-  height: 300vh;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  background: #f8f9f9;
-`;
-
-const Item = styled.div`
-  height: 150px;
-  width: 150px;
-  box-sizing: border-box;
-  border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  background: white;
-`;
-
-const { useRef, useEffect } = React;
 
 function Component() {
   const ref = useRef();
@@ -187,9 +104,9 @@ function Component() {
   }, [start, stop]);
 
   return (
-    <Container>
+    <Scroller>
       <Item ref={ref} />
-    </Container>
+    </Scroller>
   );
 }
 ```
