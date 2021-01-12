@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import useElementReferencesChange, {
-  ElementOrReference,
+  HTMLElementReference,
   ReferenceCallback,
-  ChangedElementReferences,
+  getHTMLElementFromReference,
 } from '@jwdinker/use-element-references-change';
 
 import {
@@ -15,7 +15,10 @@ import {
 
 export { Offsets, OffsetType } from '@jwdinker/offset-helpers';
 
-export { ElementOrReference, getElementOrReference } from '@jwdinker/use-element-references-change';
+export {
+  HTMLElementReference,
+  getHTMLElementFromReference,
+} from '@jwdinker/use-element-references-change';
 
 export type Remeasure = () => void;
 export type UseOffsetsReturn = [Offsets[], Remeasure];
@@ -29,27 +32,20 @@ export const INITIAL_OFFSETS = {
   width: 0,
 };
 
-function getOffsetsOfElements(elements: ChangedElementReferences[], type: OffsetType): Offsets[] {
-  const offsets: Offsets[] = [];
-  for (let i = 0; i < elements.length; i += 1) {
-    const [key, element] = elements[i];
-    if (element) {
-      offsets.push(getOffsets(element, type));
-    } else {
-      offsets.push(INITIAL_OFFSETS);
-    }
-  }
-  return offsets;
-}
-
-const { useState, useCallback } = React;
+const { useState, useCallback, useRef, useEffect } = React;
 
 function useOffsetsList(
-  elements: ElementOrReference[],
+  elements: HTMLElementReference[],
   type: OffsetType = OFFSET_TYPES.RELATIVE
 ): UseOffsetsReturn {
   const [offsets, setOffsets] = useState<Offsets[]>(() => {
     return elements.map(() => INITIAL_OFFSETS);
+  });
+
+  const savedElements = useRef(elements);
+
+  useEffect(() => {
+    savedElements.current = elements;
   });
 
   const onReference: ReferenceCallback = (referencedElements) => {
@@ -65,7 +61,7 @@ function useOffsetsList(
     });
   };
 
-  const onRemove: ReferenceCallback = (removedReferences) => {
+  const onDereference: ReferenceCallback = (removedReferences) => {
     setOffsets((previous) => {
       return previous.filter((offset, index) => {
         return removedReferences.some(([removeIndex]) => removeIndex === index);
@@ -73,17 +69,25 @@ function useOffsetsList(
     });
   };
 
-  useElementReferencesChange(elements, { onReference, onRemove });
+  useElementReferencesChange(elements, { onReference, onDereference });
 
   // Dependencies are hard coded in order to spread dependencies of elements.
-  const remeasure = useCallback(() => {
-    // const nextOffsets = getOffsetsOfElements(_savedElements.current, type);
-    // console.log('NEXT OFFSETS: ', nextOffsets);
-    // setOffsets((previousOffsets) => {
-    //   return haveOffsetsChanged(previousOffsets, nextOffsets) ? nextOffsets : previousOffsets;
-    // });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const remeasure = useCallback(
+    (atIndex = -1) => {
+      return setOffsets((previousState) => {
+        return previousState.map((dimensions, index) => {
+          const element = getHTMLElementFromReference(savedElements.current[index]);
+          if (element) {
+            if (index === -1 || (index > -1 && index === atIndex)) {
+              return getOffsets(element, type);
+            }
+          }
+          return dimensions;
+        });
+      });
+    },
+    [type]
+  );
 
   return [offsets, remeasure];
 }
