@@ -1,7 +1,7 @@
 import * as React from 'react';
 import useElementReferencesChange, {
   ReferenceCallback,
-  ElementOrReference,
+  HTMLElementReference,
 } from '@jwdinker/use-element-references-change';
 import { getAllScrollableAncestors, ScrollableAncestors } from '@jwdinker/get-scrollable-ancestor';
 import getWindowRectangle from '@jwdinker/get-window-rectangle';
@@ -10,8 +10,6 @@ import makeHasChanged from '@jwdinker/make-has-changed';
 import useDebounceCallback from '@jwdinker/use-debounce-callback';
 
 const { useRef, useEffect, useCallback } = React;
-
-export type BoundableElement = React.RefObject<HTMLElement | null> | undefined | null;
 
 export interface Boundaries {
   top: number;
@@ -36,7 +34,7 @@ const INITIAL_MEASUREMENTS = {
   width: 0,
 };
 
-function useBoundaries(from: BoundableElement = null, resizeDelay = 100): Boundaries {
+function useBoundaries(from: HTMLElementReference, resizeDelay = 100): Boundaries {
   const scrollers = useRef<ScrollableAncestors>([]);
   const scrollParentOfReference = useRef<HTMLElement>();
 
