@@ -2,7 +2,11 @@ export type ReferenceIndex = number;
 
 export type ReferencedElement = [ReferenceIndex, HTMLElement];
 
+export type DereferencedElement = [ReferenceIndex, HTMLElement];
+
 export type ReferenceCallback = (referencedElements: ReferencedElement[]) => void;
+
+export type DereferenceCallback = (dereferencedElements: DereferencedElement) => void;
 
 export interface UseElementReferencesOptions {
   /**

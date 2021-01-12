@@ -1,11 +1,17 @@
 import * as React from 'react';
-import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
+
+import getHTMLElementFromReference, {
+  HTMLElementReference,
+} from '@jwdinker/get-html-element-from-reference';
 import { ReferencedElement, UseElementReferencesOptions } from './types';
+
+export {
+  default as getHTMLElementFromReference,
+  HTMLElementReference,
+} from '@jwdinker/get-html-element-from-reference';
 
 const { useRef, useEffect } = React;
 
-export { ElementOrReference } from '@jwdinker/get-element-or-reference';
-export { default as getElementOrReference } from '@jwdinker/get-element-or-reference';
 export * from './types';
 
 /**
@@ -26,7 +32,7 @@ export * from './types';
  * @param options.onUnmount A callback invoked when the hook executes the final cleanup.
  */
 function useElementReferencesChange(
-  references: ElementOrReference | ElementOrReference[],
+  references: HTMLElementReference | HTMLElementReference[],
   options: UseElementReferencesOptions
 ) {
   const { onReference = () => {}, onDereference = () => {}, onUnmount = () => {} } = options;
@@ -36,7 +42,7 @@ function useElementReferencesChange(
   const lastSingleReference = useRef<HTMLElement | null>();
   const handleUnmount = useRef(onUnmount);
 
-  const onMultiReferenced = (referencedElements: ElementOrReference[]) => {
+  const onMultiReferenced = (referencedElements: HTMLElementReference[]) => {
     const nextReferences = [];
 
     const referenced: ReferencedElement[] = [];
@@ -46,7 +52,7 @@ function useElementReferencesChange(
       const lastReference = previousReferences.current[index];
 
       const reference = referencedElements[index];
-      const element = getElement(reference);
+      const element = getHTMLElementFromReference(reference);
 
       if (element instanceof HTMLElement) {
         /*
@@ -83,8 +89,8 @@ function useElementReferencesChange(
     previousReferences.current = nextReferences;
   };
 
-  const onSingleReference = (singleReference: ElementOrReference) => {
-    const element = getElement(singleReference);
+  const onSingleReference = (singleReference: HTMLElementReference) => {
+    const element = getHTMLElementFromReference(singleReference);
 
     const hasChanged = lastSingleReference.current !== element;
     if (hasChanged) {
