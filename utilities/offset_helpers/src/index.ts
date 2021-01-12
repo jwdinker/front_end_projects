@@ -45,7 +45,12 @@ export const getPosition = (node: HTMLElement): { top: number; left: number } =>
   };
 };
 
-// recursively combines offsets of all the parents
+/**
+ *
+ * @param element  The HTML element object from which the offsets are taken.
+ *
+ * @description Traverses the DOM tree and recursively accumulates the offsets of the element and all the element's parent nodes.
+ */
 export const getAbsoluteOffsets = (element: HTMLElement): Offsets => {
   const { top, left } = getPosition(element);
   const { offsetHeight, offsetWidth } = element;
@@ -61,6 +66,12 @@ export const getAbsoluteOffsets = (element: HTMLElement): Offsets => {
   };
 };
 
+/**
+ *
+ * @param element  The HTML element object from which the offsets are taken.
+ *
+ * @description Computes the distance of the outer border of the current element relative to the inner border of the  offsetParent node.
+ */
 export const getRelativeOffsets = (element: HTMLElement) => {
   const { offsetTop, offsetLeft, offsetHeight, offsetWidth } = element;
   const height = offsetHeight;
@@ -75,6 +86,12 @@ export const getRelativeOffsets = (element: HTMLElement) => {
   };
 };
 
+/**
+ *
+ * @param element The HTML element object from which the offsets are taken
+ *
+ * @description Returns the offset height and offset width of an element.
+ */
 export const getOffsetDimensions = (element: HTMLElement): Dimensions => {
   return {
     height: element.offsetHeight,
@@ -82,6 +99,16 @@ export const getOffsetDimensions = (element: HTMLElement): Dimensions => {
   };
 };
 
+/**
+ *
+ * @param element The HTML element object from which the offsets are taken.
+ * @param offsetType "absolute" traverses the DOM tree and recursively
+ * accumulates the offsets of the element and all the element's parent nodes.
+ * "relative" computes the distance of the outer border of the current element
+ * relative to the inner border of the offsetParent node.
+ *
+ * @description Computes the offsets of the supplied array of HTML elements at either a relative or absolute position.
+ */
 export const getElementOffsets = (
   element: HTMLElement,
   offsetType: OffsetType = OFFSET_TYPES.RELATIVE
@@ -91,6 +118,17 @@ export const getElementOffsets = (
     : getRelativeOffsets(element);
 };
 
+/**
+ *
+ * @param elements An array of HTML elements from which the offsets are taken.
+ * @param offsetType "absolute" traverses the DOM tree and recursively
+ * accumulates the offsets of the element and all the element's parent nodes.
+ * "relative" computes the distance of the outer border of the current element
+ * relative to the inner border of the offsetParent node.
+ *
+ * @description Computes the offsets of the supplied array of HTML elements at
+ * either a relative or absolute position.
+ */
 export const getOffsetsOfElements = (
   elements: HTMLElement[],
   offsetType: OffsetType = OFFSET_TYPES.RELATIVE
@@ -103,6 +141,14 @@ export const getOffsetsOfElements = (
   return offsets;
 };
 
+/**
+ *
+ * @param previous an array of offset measurements compared against the
+ * properties of the current offset measurements.
+ * @param current an array of offset measurements compared against the
+ * previous offset measurements.
+ * @description Compares offsets or array of offsets against each other to see if any of the properties' values have changed.
+ */
 export const haveOffsetsChanged = (
   previous: Offsets | Offsets[],
   current: Offsets | Offsets[]
