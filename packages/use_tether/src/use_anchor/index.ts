@@ -4,7 +4,7 @@ import useAncestorScrollListener from '@jwdinker/use-ancestors-scroll-listener';
 import { getContainingBlock } from '@jwdinker/get-containing-block';
 import useRequestAnimationFrameState from '@jwdinker/use-request-animation-frame-state';
 import makeHasChanged from '@jwdinker/make-has-changed';
-import { getElementOrReference } from '@jwdinker/use-dimensions-list';
+import { getHTMLElementFromReference } from '@jwdinker/use-dimensions-list';
 import { getAnchorMeasurements } from './helpers';
 import { UseAnchor } from '../types';
 
@@ -60,11 +60,11 @@ const useAnchor: UseAnchor = (anchor, elements) => {
 
   const references = [anchor, ...elements];
 
-  const firstElement = getElementOrReference(elements[0]);
+  const firstElement = getHTMLElementFromReference(elements[0]);
 
   const update = useCallback(() => {
     setState((previousMeasurements) => {
-      const anchorElement = getElementOrReference(anchor);
+      const anchorElement = getHTMLElementFromReference(anchor);
 
       if (anchorElement && container.current) {
         const measurements = getAnchorMeasurements(anchorElement, container.current);

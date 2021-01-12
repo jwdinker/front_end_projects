@@ -13,4 +13,4 @@ export { default as modify } from './helpers/modify';
 export { default as getStyles } from './helpers/get_styles';
 export { default as getTransform } from './helpers/get_transform';
 
-export { ElementOrReference } from '@jwdinker/use-dimensions-list';
+export { HTMLElementReference } from '@jwdinker/use-dimensions-list';
