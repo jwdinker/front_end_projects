@@ -1,8 +1,8 @@
-export type Remeasure = () => void;
+export type MeasureAtIndex = (index?: number) => void;
 
 export interface Dimensions {
   height: number;
   width: number;
 }
 
-export type UseDimensionsListReturn = [Dimensions[], Remeasure];
+export type UseDimensionsListReturn = [Dimensions[], MeasureAtIndex];

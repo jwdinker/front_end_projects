@@ -1,15 +1,18 @@
 import * as React from 'react';
 
 import useElementReferencesChange, {
-  ElementOrReference,
+  getHTMLElementFromReference,
   ReferenceCallback,
-  getElementOrReference,
+  HTMLElementReference,
 } from '@jwdinker/use-element-references-change';
 
 import { Dimensions, UseDimensionsListReturn } from './types';
-import { handleMatchingReferenceIndex, getDimensions } from './helpers';
+import { getDimensions } from './helpers';
 
-export { ElementOrReference, getElementOrReference } from '@jwdinker/use-element-references-change';
+export {
+  getHTMLElementFromReference,
+  HTMLElementReference,
+} from '@jwdinker/use-element-references-change';
 
 export const INITIAL_DIMENSIONS = {
   height: 0,
@@ -20,7 +23,7 @@ export * from './types';
 
 const { useState, useRef, useEffect, useCallback } = React;
 
-function useDimensionsList(elementReferences: ElementOrReference[]): UseDimensionsListReturn {
+function useDimensionsList(elementReferences: HTMLElementReference[]): UseDimensionsListReturn {
   /**
    * The initial state is an array of height and width values set to 0.
    */
@@ -49,9 +52,15 @@ function useDimensionsList(elementReferences: ElementOrReference[]): UseDimensio
    *   that index are returned.
    */
   const onReference: ReferenceCallback = (referencedElements) => {
-    setState((previousState) =>
-      handleMatchingReferenceIndex(previousState, referencedElements, getDimensions)
-    );
+    setState((previousState) => {
+      return previousState.map((value, index) => {
+        const item = referencedElements.find(([i]) => i === index);
+        if (item) {
+          return getDimensions(item[1]);
+        }
+        return value;
+      });
+    });
   };
 
   /**
@@ -63,9 +72,15 @@ function useDimensionsList(elementReferences: ElementOrReference[]): UseDimensio
    *   reference index back to the initial dimensions.
    */
   const onDereference: ReferenceCallback = (removedReferences) => {
-    setState((previousState) =>
-      handleMatchingReferenceIndex(previousState, removedReferences, () => INITIAL_DIMENSIONS)
-    );
+    setState((previousState) => {
+      return previousState.map((value, index) => {
+        const item = removedReferences.find(([i]) => i === index);
+        if (item) {
+          return INITIAL_DIMENSIONS;
+        }
+        return value;
+      });
+    });
   };
 
   /**
@@ -84,10 +99,10 @@ function useDimensionsList(elementReferences: ElementOrReference[]): UseDimensio
    * an index is not provided, all the dimensions that have a coresponding
    * element will be measured.
    */
-  const remeasure = useCallback((atIndex = -1) => {
+  const measureAtIndex = useCallback((atIndex = -1) => {
     return setState((previousState) => {
       return previousState.map((dimensions, index) => {
-        const element = getElementOrReference(savedElements.current[index]);
+        const element = getHTMLElementFromReference(savedElements.current[index]);
         if (element) {
           if (index === -1 || (index > -1 && index === atIndex)) {
             return getDimensions(element);
@@ -98,7 +113,7 @@ function useDimensionsList(elementReferences: ElementOrReference[]): UseDimensio
     });
   }, []);
 
-  return [state, remeasure];
+  return [state, measureAtIndex];
 }
 
 export default useDimensionsList;
