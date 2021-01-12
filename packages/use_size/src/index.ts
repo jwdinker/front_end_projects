@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { ResizeObserver } from '@juggle/resize-observer';
-import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
+import getHTMLElementReference, {
+  HTMLElementReference,
+} from '@jwdinker/get-html-element-from-reference';
 import { InitialContentRect, UseSizeValue } from './types';
 
 const DEFAULT_CONTENT_RECTANGLE = {
@@ -15,7 +17,7 @@ const DEFAULT_CONTENT_RECTANGLE = {
 };
 
 function useSize(
-  element: ElementOrReference,
+  element: HTMLElementReference,
   initialContentRect: InitialContentRect = {}
 ): UseSizeValue {
   const resizeObserver = useRef<ResizeObserver | null>();
@@ -31,7 +33,7 @@ function useSize(
   });
 
   useEffect(() => {
-    const _element = getElement(element);
+    const _element = getHTMLElementReference(element);
 
     if (_element) {
       resizeObserver.current = new ResizeObserver((entries) => {

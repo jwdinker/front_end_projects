@@ -17,7 +17,7 @@
   "devDependencies": {},
   "dependencies": {
     "@juggle/resize-observer": "^3.1.3",
-    "@jwdinker/get-element-or-reference": "1.0.0",
+    "@jwdinker/get-html-element-from-reference": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

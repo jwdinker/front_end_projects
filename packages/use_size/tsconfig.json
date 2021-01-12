@@ -11,5 +11,5 @@
     "module": "commonjs"
   },
   "include": ["src"],
-  "references": [{ "path": "../../utilities/get_element_or_reference" }]
+  "references": [{ "path": "../../utilities/get_html_element_from_reference" }]
 }

@@ -41,7 +41,7 @@ function Component(){
 ## element `object`
 
 ```tsx
-React.RefObject<HTMLElement | null> | null | undefined
+React.RefObject<HTMLElement | null | undefined> | null | undefined
 ```
 
 A react reference to an HTML element. The element will be observed for the life of the component.
