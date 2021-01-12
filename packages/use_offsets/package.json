@@ -2,7 +2,7 @@
   "name": "@jwdinker/use-offsets",
   "version": "1.0.5",
   "main": "./dist/index.js",
-  "description": "A react hook for recursively calculating an element's offsets relative to the document.",
+  "description": "A react hook for recursively calculating an element's offsets relative to the document or just the parentNode.",
   "keywords": [
     "react",
     "measurements",
@@ -27,7 +27,7 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@jwdinker/get-element-or-reference": "1.0.0",
+    "@jwdinker/get-html-element-from-reference": "1.0.0",
     "@jwdinker/make-has-changed": "1.0.0",
     "@jwdinker/offset-helpers": "1.0.0",
     "tslib": "^1.10.0"

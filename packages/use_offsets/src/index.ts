@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import getElement, { ElementOrReference } from '@jwdinker/get-element-or-reference';
 import {
   haveOffsetsChanged,
   getElementOffsets,
@@ -9,7 +8,9 @@ import {
   OffsetType,
 } from '@jwdinker/offset-helpers';
 
-export { ElementOrReference } from '@jwdinker/get-element-or-reference';
+import getHTMLElementFromReference, {
+  HTMLElementReference,
+} from '@jwdinker/get-html-element-from-reference';
 
 const { useState, useCallback, useEffect } = React;
 
@@ -22,47 +23,34 @@ export const INITIAL_OFFSETS = {
   width: 0,
 };
 
-export interface OffsetHandlers {
-  measure(): void;
-  reset(): void;
-}
+export type MeasureOffsets = () => void;
 
-export type UseOffsetsReturn = [Offsets, OffsetHandlers];
+export type UseOffsetsReturn = [Offsets, MeasureOffsets];
 export { Offsets, OFFSET_TYPES } from '@jwdinker/offset-helpers';
 
 function useOffsets(
-  element: ElementOrReference,
+  element: HTMLElementReference,
   type: OffsetType = OFFSET_TYPES.RELATIVE
 ): UseOffsetsReturn {
   const [offsets, setOffsets] = useState(() => {
     return INITIAL_OFFSETS;
   });
 
-  const destructuredElement = getElement(element);
-
   const measure = useCallback(() => {
-    if (destructuredElement) {
-      const nextOffsets = getElementOffsets(destructuredElement, type);
+    const _element = getHTMLElementFromReference(element);
+    if (_element) {
+      const nextOffsets = getElementOffsets(_element, type);
       setOffsets((previousOffsets) => {
         return haveOffsetsChanged(previousOffsets, nextOffsets) ? nextOffsets : previousOffsets;
       });
     }
-  }, [destructuredElement, type]);
-
-  const reset = useCallback(() => {
-    setOffsets(INITIAL_OFFSETS);
-  }, []);
+  }, [element, type]);
 
   useEffect(() => {
     measure();
   }, [measure]);
 
-  const handlers = {
-    measure,
-    reset,
-  };
-
-  return [offsets, handlers];
+  return [offsets, measure];
 }
 
 export default useOffsets;
