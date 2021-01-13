@@ -8,49 +8,36 @@ import {
   DragMove,
   Directions,
   DragEnd,
-  Velocity,
   DragTo,
 } from './types';
-import { getVelocity } from './helpers';
 
 const DRAG_START = 'DRAG_START';
 const DRAG_MOVE = 'DRAG_MOVE';
 const DRAG_END = 'DRAG_END';
 const DRAG_TO = 'DRAG_TO';
 
-export function dragStart(currentXY: Coordinates, timestamp: number): DragStart {
+export function dragStart(xy: Coordinates): DragStart {
   return {
     type: DRAG_START,
     payload: {
-      currentXY,
-      timestamp,
+      xy,
     },
   };
 }
 
-export function dragMove(
-  currentXY: Coordinates,
-  pressure = 0,
-  duration: number,
-  timestamp: number
-): DragMove {
+export function dragMove(xy: Coordinates): DragMove {
   return {
     type: DRAG_MOVE,
     payload: {
-      currentXY,
-      pressure,
-      duration,
-      timestamp,
+      xy,
     },
   };
 }
 
-export function dragEnd(duration: number): DragEnd {
+export function dragEnd(): DragEnd {
   return {
     type: DRAG_END,
-    payload: {
-      duration,
-    },
+    payload: null,
   };
 }
 
@@ -64,99 +51,68 @@ export function dragTo(x = 0, y = 0): DragTo {
 }
 
 export const INITIAL_STATE: DragState = {
-  active: false,
+  isDragging: false,
   phase: PHASES.IDLE,
-  coordinates: {
-    initial: [0, 0],
-    origin: [0, 0],
-    last: [0, 0],
-    current: [0, 0],
-    delta: [0, 0],
-  },
+  initial: [0, 0],
+  origin: [0, 0],
   xy: [0, 0],
+  delta: [0, 0],
+  translate: [0, 0],
   move: [0, 0],
-  pressure: 0,
   direction: [0, 0],
-  velocity: [0, 0],
-  duration: 0,
-  timestamp: 0,
 };
 
 export function reducer(state = INITIAL_STATE, action: DragAction): DragState {
   if (action.type === DRAG_START) {
-    const { currentXY, timestamp } = action.payload;
-    const isInitial = state.coordinates.initial.every((value) => value === 0);
-    const initial = isInitial ? currentXY : state.coordinates.initial;
+    const { xy } = action.payload;
+    const isInitial = state.initial.every((value) => value === 0);
+    const initial = isInitial ? xy : state.initial;
     return {
       ...state,
-      active: true,
+      isDragging: true,
       phase: PHASES.START,
-      coordinates: {
-        ...state.coordinates,
-        initial,
-        origin: currentXY,
-        delta: state.coordinates.delta,
-        current: currentXY,
-      },
+      initial,
+      origin: xy,
+      xy,
       move: [0, 0],
-      velocity: [0, 0],
-      duration: 0,
-      timestamp,
     };
   }
 
   if (action.type === DRAG_MOVE) {
-    const { currentXY, duration, timestamp } = action.payload;
+    const { xy } = action.payload;
 
-    const delta = state.coordinates.current.map(
-      (value, index) => value - currentXY[index]
-    ) as Coordinates;
-
-    const xy = state.xy.map((value, index) => value - delta[index]) as Coordinates;
-
-    const move = currentXY.map(
-      (value, index) => value - state.coordinates.origin[index]
-    ) as Coordinates;
-
-    const timeSinceLast = timestamp - state.timestamp;
-    const velocity = xy.map((value) => getVelocity(value, timeSinceLast)) as Velocity;
-
+    const delta = state.xy.map((value, index) => value - xy[index]);
+    const translate = state.translate.map((value, index) => value - delta[index]);
+    const move = xy.map((value, index) => value - state.origin[index]);
     const direction = angleToDirections(state.move, move) as Directions;
 
     return {
       ...state,
       phase: PHASES.MOVE,
-      coordinates: {
-        ...state.coordinates,
-        delta,
-        last: delta,
-        current: currentXY,
-      },
+      delta,
+      translate,
       xy,
       move,
       direction,
-      velocity,
-      duration,
-      timestamp,
     };
   }
 
   if (action.type === DRAG_END) {
     return {
       ...state,
-      active: false,
+      isDragging: false,
       phase: PHASES.END,
       direction: [0, 0],
-      duration: action.payload.duration,
-      pressure: 0,
     };
   }
 
   if (action.type === DRAG_TO) {
+    const { destination } = action.payload;
+
     return {
       ...state,
-      xy: action.payload.destination,
       phase: PHASES.IDLE,
+      translate: destination,
     };
   }
 

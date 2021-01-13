@@ -1,7 +1,7 @@
-import useDragListener, { DragCallback, DragElement } from '@jwdinker/use-drag-listener';
-import makeGetInteractionType from '@jwdinker/make-get-interaction-type';
+import useDragListener, { DragElement, EnableMove, DisableMove } from '@jwdinker/use-drag-listener';
+import get1TouchCoordinates from '@jwdinker/get-1-touch-coordinates';
+import getMouseCoordinates from '@jwdinker/get-mouse-coordinates';
 
-import { getTouchForceAtIndex } from '@jwdinker/touch-helpers';
 import * as React from 'react';
 
 import {
@@ -14,79 +14,76 @@ import {
 } from './actions';
 
 import { UseDragProps, DragReturn } from './types';
-import { getCoordinates } from './helpers';
 
-const { useMemo, useRef, useState, useCallback } = React;
+const { useState, useCallback } = React;
 
 function useDrag(
   element: DragElement,
   {
     canDrag = () => true,
+    initialTranslate = [0, 0],
     mouse = true,
-    touch = 1,
+    touch = true,
     passive = true,
     capture = false,
   }: UseDragProps = {}
 ): DragReturn {
-  const startTime = useRef(0);
-  const [state, setState] = useState(INITIAL_STATE);
+  const [state, setState] = useState(() => {
+    return {
+      ...INITIAL_STATE,
+      translate: initialTranslate,
+    };
+  });
 
-  const getInteractionType = useMemo(() => makeGetInteractionType(mouse, touch), [mouse, touch]);
+  const dragTo = useCallback(({ x = 0, y = 0 }) => {
+    setState((previousState) => reducer(previousState, dragToXY(x, y)));
+  }, []);
 
-  const start: DragCallback = (event, listeners) => {
+  function onStart(event: TouchEvent | MouseEvent, enableMove: EnableMove) {
     setState((previousState) => {
-      const interactionType = getInteractionType(event);
-      const coordinates = getCoordinates(event, interactionType);
-      const timestamp = Date.now();
-      startTime.current = timestamp;
+      const coordinates =
+        event instanceof MouseEvent ? getMouseCoordinates(event) : get1TouchCoordinates(event);
 
-      const startState = reducer(previousState, dragStart(coordinates, timestamp));
+      const startState = reducer(previousState, dragStart(coordinates));
       if (canDrag(startState, event)) {
-        listeners.listen();
-        startTime.current = timestamp;
+        enableMove();
+
         return startState;
       }
       return previousState;
     });
-  };
+  }
 
-  const move: DragCallback = (event) => {
+  function onMove(event: TouchEvent | MouseEvent) {
     setState((previousState) => {
-      const interactionType = getInteractionType(event);
-      const coordinates = getCoordinates(event, interactionType);
-      const timestamp = Date.now();
-      const duration = timestamp - startTime.current;
-      const moveState = reducer(
-        previousState,
-        dragMove(coordinates, getTouchForceAtIndex(event), duration, timestamp)
-      );
+      const coordinates =
+        event instanceof MouseEvent ? getMouseCoordinates(event) : get1TouchCoordinates(event);
+      const moveState = reducer(previousState, dragMove(coordinates));
       if (canDrag(moveState, event)) {
         return moveState;
       }
 
       return previousState;
     });
-  };
+  }
 
-  const end: DragCallback = (event, listeners) => {
-    listeners.unlisten();
-    const duration = Date.now() - startTime.current;
-    setState((previousState) => reducer(previousState, dragEnd(duration)));
-  };
+  function onEnd(event: TouchEvent | MouseEvent, disableMove: DisableMove) {
+    disableMove();
 
-  const dragTo = useCallback(({ x = 0, y = 0 }) => {
-    setState((previousState) => reducer(previousState, dragToXY(x, y)));
-  }, []);
+    setState((previousState) => reducer(previousState, dragEnd()));
+  }
 
   useDragListener(element, {
-    onStart: start,
-    onMove: move,
-    onEnd: end,
-    touch: touch > 0,
-    pointer: false,
-    mouse: true,
-    passive,
+    onTouchStart: onStart,
+    onTouchMove: onMove,
+    onTouchEnd: onEnd,
+    onMouseDown: onStart,
+    onMouseMove: onMove,
+    onMouseUp: onEnd,
+    mouse,
+    touch,
     capture,
+    passive,
   });
 
   return [state, dragTo];

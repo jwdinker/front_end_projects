@@ -1,39 +1,32 @@
-import { DragEvent } from '@jwdinker/use-drag-listener';
 import { PHASES } from './constants';
 
 export type DragPhase = typeof PHASES[keyof typeof PHASES];
 
-export type Coordinates = [number, number];
+export type DragEvent = globalThis.TouchEvent | globalThis.MouseEvent;
+
+export type Coordinates = number[];
 export type Direction = 1 | 0 | -1;
 export type Directions = [Direction, Direction];
-export type Velocity = [number, number];
 
 export interface DragState {
-  active: boolean;
+  isDragging: boolean;
   phase: DragPhase;
-  coordinates: {
-    initial: Coordinates;
-    origin: Coordinates;
-    last: Coordinates;
-    delta: Coordinates;
-    current: Coordinates;
-  };
+  initial: Coordinates;
+  origin: Coordinates;
+  delta: Coordinates;
   xy: Coordinates;
+  translate: Coordinates;
   move: Coordinates;
-  pressure: number;
   direction: Directions;
-  velocity: Velocity;
-  duration: number;
-  timestamp: number;
 }
 
 export type CanDrag = (dragState: DragState, event: DragEvent) => boolean;
 
 export interface UseDragProps {
-  touch?: 0 | 1 | 2;
+  touch?: boolean;
   mouse?: boolean;
   canDrag?: CanDrag;
-  initialCoordinates?: Coordinates;
+  initialTranslate?: Coordinates;
   passive?: boolean;
   capture?: boolean;
 }
@@ -41,26 +34,20 @@ export interface UseDragProps {
 export interface DragStart {
   type: 'DRAG_START';
   payload: {
-    currentXY: Coordinates;
-    timestamp: number;
+    xy: Coordinates;
   };
 }
 
 export interface DragMove {
   type: 'DRAG_MOVE';
   payload: {
-    currentXY: Coordinates;
-    pressure: number;
-    duration: number;
-    timestamp: number;
+    xy: Coordinates;
   };
 }
 
 export interface DragEnd {
   type: 'DRAG_END';
-  payload: {
-    duration: number;
-  };
+  payload: null;
 }
 
 export interface DragTo {

@@ -18,12 +18,8 @@
   },
   "dependencies": {
     "@jwdinker/angle-helpers": "1.0.0",
-    "@jwdinker/get-element-or-reference": "1.0.0",
-    "@jwdinker/make-get-interaction-type": "1.0.0",
-    "@jwdinker/mouse-helpers": "1.0.0",
-    "@jwdinker/phase-helpers": "1.0.0",
-    "@jwdinker/scroll-helpers": "1.0.0",
-    "@jwdinker/touch-helpers": "1.0.0",
+    "@jwdinker/get-1-touch-coordinates": "1.0.0",
+    "@jwdinker/get-mouse-coordinates": "1.0.0",
     "@jwdinker/use-drag-listener": "1.0.0",
     "tslib": "^1.10.0"
   }
