@@ -167,7 +167,7 @@ type TouchToTrigger = 0 | 1 | 2;
 
 `array`
 
-The return value is tuple containing the `rotation` state object and a `rotate` handler function.
+The return value is tuple containing the `scale` state object and a `scaleTo` handler function.
 
 <br>
 
