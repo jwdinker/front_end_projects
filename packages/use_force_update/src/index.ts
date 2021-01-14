@@ -3,7 +3,6 @@ import * as React from 'react';
 const { useState, useCallback, useRef, useEffect } = React;
 
 export type ForceUpdate = () => void;
-export type NumberOfForcedUpdates = number;
 export type ForceUpdateReturn = [ForceUpdate, boolean];
 
 function useForceUpdate(): ForceUpdateReturn {
