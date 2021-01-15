@@ -1,5 +1,3 @@
-/* eslint-disable react/static-property-placement */
-
 import * as React from 'react';
 import useForceUpdate from '@jwdinker/use-force-update';
 import { IndexRange, Measurements, MeasurementsIndexerProps } from './types';

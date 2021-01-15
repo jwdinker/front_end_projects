@@ -1,6 +1,6 @@
 # useMeasurementsIndexer
 
-`useMeasurementsIndexer` is a react hook that abstracts caching measurements of items given a dynamically changing offset, providing helper functions that make the items easily searchable for use in a view. It also allows for 'infinitely' cacheable indexes & items to account for both +/- dynamic offsets.
+`useMeasurementsIndexer` is a React hook that abstracts caching measurements of items given a dynamically changing offset, providing helper functions that make the items easily searchable for use in a view. It also allows for 'infinitely' cacheable indexes & items to account for both +/- dynamic offsets. For web based documentation, [click here](https://www.notion.so/dinker/useMeasurementsIndexer-fb7a42415b544b7591756c702909c6fc).
 
 <br>
 <br>
@@ -11,7 +11,7 @@
 
 # Installation
 
-```bash
+```
 npm install @jwdinker/use-measurements-indexer
 ```
 
@@ -208,7 +208,7 @@ A helper function that returns the index closest to the provided index with the 
 ### `resetFromIndex`
 
 ```ts
-resetFromIndex(index:number):[start:number, end:number]
+resetFromIndex(index:number, canForceUpdate = true):[start:number, end:number]
 ```
 
 A helper function that clears the cached offsets and sizes from the provided index through the max measured index.
