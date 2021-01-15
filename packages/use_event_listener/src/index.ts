@@ -56,7 +56,7 @@ function useEventListener(
 
   const listener = useRef<Listener | null>(null);
   const savedHandler = useRef<EventHandler>();
-  const caller = useRef<EventHandler>();
+  const caller = useRef<EventHandler | null>(handler);
 
   /*
     Handlers are saved so useCallback hell can be avoided and listeners are not
@@ -65,7 +65,7 @@ function useEventListener(
   useEffect(() => {
     caller.current = handler;
     return () => {
-      caller.current = undefined;
+      caller.current = null;
     };
   }, [handler]);
 
@@ -123,12 +123,6 @@ function useEventListener(
       }
     }
   }, [capture, consolidate, once, passive, storeName, target, type]);
-
-  useEffect(() => {
-    return () => {
-      savedHandler.current = undefined;
-    };
-  }, []);
 
   const value = useMemo((): UseEventListenerReturn => {
     return {
