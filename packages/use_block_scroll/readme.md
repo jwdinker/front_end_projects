@@ -1,40 +1,13 @@
 # useBlockScroll
 
-`useBlockScroll` is a react hook for enabling and disabling document.body rubberband scrolling on mobile devices when interacting with a overflowabling child that reaches an edge.
+`useBlockScroll` is a React hook for preventing rubber band effects on the document body from bubbling touch events.
 
-![Block Scroll Depiction](block_scroll.gif)
+- Targets iOS devices to prevent the rubber band effect on the body when scrolling an overflowing HTML element.
+- Useful for nested scrolling and touch interactions such a swiping through elements.
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+For web documentation, [click here](https://www.notion.so/dinker/useBlockScroll-705077f03b784a3180b6c97dac4124fd).
 
-# Table of Contents
-
-- [Installation](#Installation)
-- [Usage](#Usage)
-- [Arguments](#Arguments)
-
-  1. [`ref`](#1.-ref)
-  2. [`options`](#2.-options)
-
-     - [`axis`](#axis)
-     - [`onBlock`](#onBlock)
-     - [`onUnblock`](#onUnblock)
-
-- [Return Value](#Return-Value)
-  - [`enable`](#enable)
-  - [`disable`](#enable)
-- [Example](#Example)
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Installation
 
@@ -42,223 +15,139 @@
 npm install @jwdinker/use-block-scroll
 ```
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Usage
 
 ```jsx
 import useBlockScroll from '@jwdinker/use-block-scroll';
+import useToggle from '@jwdinker/use-toggle';
 
-function Component() {
-  const ref = useRef();
+function BlockScrollExample() {
+  const element = useRef();
 
-  const [enable, disable] = useBlockScroll(ref);
+  const [isBlocking, { activate, deactivate }] = useToggle();
+
+  const [enable, disable] = useBlockScroll(element, { onBlock: activate, onUnblock: deactivate });
 
   useEffect(() => {
     enable();
     return disable;
   }, [disable, enable]);
 
+  const color = isBlocking ? '#79ff64' : '#ff6f83';
+
   return (
-    <div ref={ref} id="scrollable_container">
-      <Items />
-    </div>
+    <>
+      <Details style={{ color }}>{isBlocking ? 'blocked' : 'not blocked'}</Details>
+      <Page>
+        <Container ref={element}>
+          <Items />
+        </Container>
+      </Page>
+    </>
   );
 }
 ```
 
 <br>
-<br>
-<br>
-<br>
-<br>
-<br>
+
+![useBlockScroll depiction.gif](depiction.gif)
+
+<br><br><br>
 
 # Arguments
 
-`useBlockScroll` accepts 2 arguments:
+`useBlockScroll` accepts a React reference to an HTML `element` and an `options` object as arguments.
 
 <br>
 
-## 1. `ref`
+## element
 
-```ts
-element:React.RefObject<HTMLElement> | HTMLElement
+`object`
+
+```tsx
+type HTMLElementReference = React.RefObject<HTMLElement | null | undefined>;
 ```
 
-The first argument is a reference to an HTMLElement that when it.
+The react reference to an over-flowable HTML element. The `element` will be monitored for content egressing its boundaries.
+
+<br><br>
+
+## options
+
+`object`
+
+---
 
 <br>
 
-```jsx
-const ref = useRef();
-const [enable, disable] = useBlockScroll(ref);
+axis `string`
 
-return <div ref={ref}></div>;
+_default:_ `'y'`
+
+```tsx
+type BlockableAxis = 'x' | 'y' | 'xy';
 ```
 
-<br>
-<br>
-<br>
-
-## 2. `options`
-
-The options object contains the following configurable properties:
-
-- [`axis`](#axis)
-- [`onBlock`](#onBlock)
-- [`onUnblock`](#onUnblock)
+The axis monitored for blocking.
 
 <br>
-<br>
-<br>
 
-### `axis`
-
-```ts
-axis:'x' | 'y' | 'xy' = 'y'
-```
-
-The axis the scroll blocking is applied to.
+---
 
 <br>
-<br>
-<br>
 
-### `onBlock`
+onBlock `function`
 
-The callback invoked when the body scroll blocking begins. At this point, the HTML element scroll has reached its edge boundary and a continuation in the same scroll direction would trigger a scroll event on the body.
+Callback invoked when the next direction of the pointer movement would push the contents of the `element` outside its boundaries and trigger a rubber band effect on the document body.
 
 <br>
-<br>
-<br>
 
-### `onUnblock`
-
-The callback invoked when the blocking ends. At this point, the direction of the scroll would not supersede the size constraint.
+---
 
 <br>
+
+onUnblock `function`
+
+Callback invoked when the next direction of the pointer movement would _not_ push the contents of the `element` outside its boundaries and any movement prior was being blocked.
+
 <br>
-<br>
-<br>
-<br>
-<br>
+
+---
+
+<br><br><br><br><br><br>
 
 # Return Value
 
-The return value is a tuple containing a enable and disable function.
-<br>
+`array`
+
+The return value is tuple containing the `enable` and `disable` handler function.
 
 ```jsx
-const [enable, disable] = useBlockScroll(ref);
+const [enable, disable] = useBlockScroll(element);
 ```
 
-<br>
-<br>
-<br>
+<br><br>
 
-## `enable`
+## enable
+
+`function`
 
 ```ts
-enable = () => void;
+type EnableBodyScroll = () => void;
 ```
 
-The `enable` function enables the blocking of the rubber band effect on the document body. A `touchmove` event listener is added to both the document body and the useBlockScroll element in order to monitor the scroll position of the useBlockScroll element.
+Enables the blocking of the rubber band effect on the document body.
 
-The block is triggered if:
+<br><br>
 
-- the scroll left or scroll top property exceeds the boundaries of the scrollable area.
-- the direction of the swipe would cause the scroll left or scroll top property to exceed the scrollable area.
+## disable
 
-<br>
-
-> Note: The function also adds an overflow property to the body element for the duration of the block.
-
-<br>
-<br>
-<br>
-
-## `disable`
+`function`
 
 ```ts
-disable = () => void;
+type DisableBodyScroll = () => void;
 ```
 
-The disable function removes:
-
-- the touchmove event listener from both the document body and the referenced element.
-- the `hidden` value from `overflow` property of document.body.style.
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-# Example
-
-In this example:
-
-- the `<Page>` component is larger than the viewport forcing the body to be scrollable.
-- The `<Items>` component has children that are larger than the `<Container>`, forcing the container to also be scrollable.
-- Since the ref is applied to the `<Container>`, anytime the `<Container>` is scrolling up and scrollTop is less than or equal to 0, or scrolling down and scrollTop is greater than or equal to scrollTop + `<Container>` size, overflow will be added to the document body and any future scrolll on the document.body will be prevented until the subsequent `touchend` event is invoked.
-
-<br>
-
-```jsx
-import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import useBlockScroll from '@jwdinker/use-block-scroll';
-import upTo from '@jwdinker/up-to';
-
-const Page = styled.div`
-  height: 200vh;
-  width: 100vw;
-`;
-
-const Container = styled.div`
-  height: 50vh;
-  width: 100vw;
-  overflow: scroll;
-  -webkit-overflow-scrolling: touch;
-`;
-
-const Item = styled.div`
-  height: 20%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 30px;
-  box-sizing: border-box;
-  border: solid 1px black;
-`;
-
-const Items = () => upTo(0, 20, (key) => <Item key={key}>{key}</Item>);
-
-function Component() {
-  const element = useRef();
-
-  const [enable, disable] = useBlockScroll(element, { axis: 'y' });
-
-  useEffect(() => {
-    enable();
-    return disable;
-  }, [disable, enable]);
-
-  return (
-    <Page>
-      <Container ref={element}>
-        <Items />
-      </Container>
-    </Page>
-  );
-}
-```
+Disables the blocking of the rubber band effect on the document body.

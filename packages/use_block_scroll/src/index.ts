@@ -1,5 +1,5 @@
 import * as React from 'react';
-import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
+import useEventListener from '@jwdinker/use-event-listener';
 import useTimeout from '@jwdinker/use-timeout';
 import { UseBlockScrollOptions, UseBlockScrollReturn, BlockableElement } from './types';
 import { makeBlockable, getCoordinates } from './helpers';
@@ -45,6 +45,7 @@ function useBlockScroll(
 ): UseBlockScrollReturn {
   const coordinates = useRef({ x: 0, y: 0 });
   const isBlocking = useRef(false);
+  const isEnabled = useRef(false);
 
   const [startTimeout, removeTimeout] = useTimeout(() => {
     if (isBlocking.current) {
@@ -54,17 +55,16 @@ function useBlockScroll(
     }
   }, 100);
 
-  const listeners = useRef<UseEventListenerReturn[]>([]);
-
   const isBlockable = useMemo(() => makeBlockable(axis), [axis]);
 
   const overflow = useOverflowPrevention();
 
   const preventMoveOnBody = (event: any) => {
-    if (isBlocking.current) {
+    if (isBlocking.current && isEnabled.current) {
       event.preventDefault();
       return false;
     }
+    return true;
   };
 
   const start = (event: any) => {
@@ -74,10 +74,11 @@ function useBlockScroll(
   const move = (event: any): boolean => {
     const { currentTarget, targetTouches } = event;
 
-    if (currentTarget instanceof HTMLElement) {
+    if (currentTarget instanceof HTMLElement && isEnabled.current) {
       const nextCoordinates = getCoordinates(targetTouches);
       const lastCoordinates = coordinates.current;
-      const canBlock = isBlockable(currentTarget, nextCoordinates, lastCoordinates);
+      const canBlock =
+        isEnabled.current && isBlockable(currentTarget, nextCoordinates, lastCoordinates);
       coordinates.current = nextCoordinates;
 
       const hasBlockStarted = canBlock && !isBlocking.current;
@@ -127,11 +128,14 @@ function useBlockScroll(
   const touchstart = useEventListener(element, TOUCH_START, start);
   const touchmove = useEventListener(element, TOUCH_MOVE, move);
 
-  // @ts-ignore
   const documentTouchMove = useEventListener(body, TOUCH_MOVE, preventMoveOnBody, OPTIONS);
 
   useEffect(() => {
-    listeners.current = [touchstart, touchmove, documentTouchMove];
+    const listeners = [touchstart, touchmove, documentTouchMove];
+    listeners.forEach((listener) => listener.attach());
+    return () => {
+      listeners.forEach((listener) => listener.detach());
+    };
   }, [documentTouchMove, touchmove, touchstart]);
 
   /*
@@ -141,11 +145,11 @@ function useBlockScroll(
     and you end up blocking all touchmove events.
   */
   const enable = useCallback(() => {
-    listeners.current.forEach((listener) => listener.attach());
+    isEnabled.current = true;
   }, []);
 
   const disable = useCallback(() => {
-    listeners.current.forEach((listener) => listener.detach());
+    isEnabled.current = false;
   }, []);
 
   return [enable, disable];
