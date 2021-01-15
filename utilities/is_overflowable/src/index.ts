@@ -1,7 +1,7 @@
 export const OVERFLOW_VALUES = ['overflow-x', 'overflow-y', 'overflow'];
 
-function isOverflowable(element: unknown): boolean {
-  if (element instanceof HTMLElement) {
+function isOverflowable(element: Element): boolean {
+  if (element instanceof Element) {
     const style = window.getComputedStyle(element);
 
     return OVERFLOW_VALUES.some((property) => {
