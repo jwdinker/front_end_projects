@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { getAllScrollableAncestors, ScrollableAncestors } from '@jwdinker/get-scrollable-ancestor';
 import useElementReferencesChange, {
   ReferenceCallback,
-  ElementOrReference,
+  HTMLElementReference,
 } from '@jwdinker/use-element-references-change';
 import getSupportedEventOptions from '@jwdinker/get-supported-event-options';
 
@@ -34,7 +34,7 @@ const getScrollables = (elements: Element[]): ScrollableAncestors => {
 };
 
 function useAncestorsScrollListener(
-  element: ElementOrReference | ElementOrReference[],
+  element: HTMLElementReference | HTMLElementReference[],
   callback: ScrollHandler,
   { passive = true, capture = true, once = false }: AddEventListenerOptions = {}
 ): void {
@@ -54,6 +54,9 @@ function useAncestorsScrollListener(
   // The callback is saved in a reference on each effect.
   useEffect(() => {
     _callback.current = callback;
+    return () => {
+      _callback.current = null;
+    };
   }, [callback]);
 
   /**
