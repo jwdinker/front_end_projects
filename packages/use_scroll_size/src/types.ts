@@ -13,7 +13,6 @@ export type ScrollableElement =
   | Document
   | Window
   | null
-  | HTMLElement;
 
 /**
  * boolean true when the scroll dimensions have changed, false when scroll

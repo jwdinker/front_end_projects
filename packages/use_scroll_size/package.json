@@ -2,7 +2,7 @@
   "name": "@jwdinker/use-scroll-size",
   "version": "1.0.0",
   "main": "./dist/index.js",
-  "description": "A react hook for monitoring the scroll dimensions size.",
+  "description": "A react hook for monitoring the scroll dimensions.",
   "keywords": [
     "react",
     "measurements",
@@ -21,8 +21,7 @@
     }
   ],
   "peerDependencies": {
-    "react": "^16.8.x",
-    "react-dom": "^16.8.x"
+    "react": "^16.8.x"
   },
   "browserslist": "> 0.25%, not dead",
   "scripts": {
