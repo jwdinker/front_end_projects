@@ -14,9 +14,6 @@ export { default as getScrollableAncestor } from '@jwdinker/get-scrollable-ances
 
 const SCROLL_EVENT = 'scroll';
 
-export { ElementOrReference } from '@jwdinker/get-element-or-reference';
-export { default as getElement } from '@jwdinker/get-element-or-reference';
-
 // All scroll ancestors are gathered from the array of elements.  The duplicates
 // are removed.
 const getScrollables = (elements: Element[]): ScrollableAncestors => {
