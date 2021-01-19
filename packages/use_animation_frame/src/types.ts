@@ -9,3 +9,5 @@ export type StartFrameLoop = () => void;
 export type StopFrameLoop = () => void;
 
 export type UseAnimationFrameReturn = [StartFrameLoop, StopFrameLoop];
+
+export type OnFrame = (time: number, elapsed: number) => void;

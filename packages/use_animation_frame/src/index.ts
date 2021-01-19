@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { UseAnimationFrameReturn } from './types';
+import { UseAnimationFrameReturn, OnFrame } from './types';
 
 export * from './types';
 
@@ -8,7 +8,7 @@ export * from './types';
  * @param onFrame A callback executed on every animation frame while the loop is executed.
  * @param interval The interval at which each callback is executed.
  */
-function useAnimationFrame(onFrame = (): void => {}, interval = 0): UseAnimationFrameReturn {
+function useAnimationFrame(onFrame: OnFrame, interval = 0): UseAnimationFrameReturn {
   const raf = useRef<number | null>(null);
   const callback = useRef<Function>(onFrame);
   const startTime = useRef<number | null>(null);
