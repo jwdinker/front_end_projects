@@ -13,10 +13,7 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../use_event_listener"
-    },
-    {
-      "path": "../../utilities/touch_helpers"
+      "path": "../use_drag_listener",
     },
     {
       "path": "../use_phaseable_listener"
@@ -26,6 +23,9 @@
     },
     {
       "path": "../../utilities/angle_helpers"
+    },
+    {
+      "path": "../../utilities/get_1_touch_coordinates"
     }
   ]
 }

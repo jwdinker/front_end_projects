@@ -1,79 +1,35 @@
 # useSwipe
 
-`useSwipe` is a animation agnostic react hook that provides normalized, computed values from wheel and touch events for powering swipe animations.
+`useSwipe` is an animation agnostic react hook that provides normalized, computed values from wheel and touch events for powering swipe animations. For web documentation, [click here](https://www.notion.so/dinker/useSwipe-df24f1bc151046e2a916398304a32ceb).
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-# Table of Contents
-
-- [`Installation`](#Installation)
-- [`Usage`](#Usage)
-- [`Options`](#Options)
-  - [`wheel`](#wheel)
-  - [`touch`](#touch)
-  - [`canSwipe`](#canSwipe)
-- [`Return Value`](#Return-Value)
-
-  - [`State`](#State)
-    - [`phase`](#phase)
-    - [`isSwiping`](#isSwiping)
-    - [`xy`](#xy)
-    - [`direction`](#direction)
-    - [`current`](#current)
-    - [`origin`](#origin)
-    - [`move`](#move)
-  - [`Helpers`](#Helpers)
-    - [`snapTo`](#snapTo)
-  - [`Examples`](#Examples)
-
-    - [`Snap`](#Snap)
-
-
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+<br><br><br><br><br><br>
 
 # Installation
 
-```bash
+```
 npm install @jwdinker/use-swipe
 ```
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Usage
 
 ```jsx
 import useSwipe from '@jwdinker/use-swipe';
 import { useSpring, animated } from 'react-spring';
-import { withCoreProviders } from '../../hocs';
 
 function Component() {
   const ref = useRef();
 
-  const [
-    {
-      move: [moveX],
-      phase,
-    },
-    snapTo,
-  ] = useSwipe(ref, {
+  const [state, snapTo] = useSwipe(ref, {
     wheel: true,
     touch: 1,
   });
+
+  const {
+    move: [moveX, moveY],
+    phase,
+  } = state;
 
   const [animation, set] = useSpring(() => {
     return {
@@ -88,264 +44,184 @@ function Component() {
 
   set(() => ({
     border: '1px solid black',
-    transform: `translate3d(${moveX * -1}px,0px,0)`,
+    transform: `translate3d(0px,${moveY * -1}px,0)`,
   }));
 
   return (
-    <div ref={ref} id="swipe_container" style={{ overflow: 'hidden' }}>
-      <animated.div style={animation}>Move Me</animated.div>
-    </div>
+    <Page>
+      <Item ref={ref} style={animation} />
+    </Page>
   );
 }
 ```
 
 <br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
-# Options
+![useSwipe depiction](depiction.gif)
 
-`useSwipe` accepts two arguments. The first argument is a reference to the containing HTML element that listens for events. The second is an options object.
+<br><br><br><br><br><br>
 
-```jsx
-function Component() {
-  const ref = useRef();
+# Arguments
 
-  const options = {
-    wheel: true,
-    touch: true,
-    canSwipe: ({ xy: [x, y] }) => y >= 0,
-  };
-
-  const [state, snapTo] = useSwipe(ref, options);
-
-  return <div ref={ref} id="swipe_container" style={{ overflow: 'hidden' }}></div>;
-}
-```
+`useSwipe` accepts a React reference to an HTML element and an options object as arguments.
 
 <br>
-<br>
-<br>
 
-The options object has the following properties:
+## element
 
-- [`wheel`](#wheel)
-- [`touch`](#touch)
-- [`canSwipe`](#canSwipe)
-
-<br>
-<br>
-<br>
-
-### `wheel`
+`object`
 
 ```ts
-wheel: boolean = true;
+type SwipeableElement = React.RefObject<HTMLElement | null | undefined>;
 ```
+
+<br>
+
+## options
+
+`object`
+
+<br>
+
+---
+
+<br>
+
+wheel `boolean`
+
+_default:_ `true`
+
+<br>
 
 A boolean that determines whether wheel events will trigger swipe events.
 
 <br>
-<br>
+
+---
+
 <br>
 
-### `touch`
+touch `boolean`
 
-```ts
-touch: boolean = true;
-```
+_default:_ `true`
+
+<br>
 
 A boolean that determines whether touch events will trigger swipe events.
 
 <br>
-<br>
+
+---
+
 <br>
 
-### `canSwipe`
+canSwipe `function`
+
+_default:_ `() ⇒true`
+
+<br>
 
 ```ts
-canSwipe: (nextSwipeState) => boolean;
+type SwipeEvent = WheelEvent | TouchEvent;
+
+type Coordinates = [number, number];
+type Direction = 1 | 0 | -1;
+type Directions = [Direction, Direction];
+
+interface SwipeState {
+  isSwiping: boolean;
+  phase: DragPhase;
+  origin: [number, number];
+  move: [number, number];
+  xy: [number, number];
+  current: [number, number];
+  direction: [Direction, Direction];
+}
+
+type CanSwipe = (nextState: SwipeState, event: SwipeEvent) => boolean;
 ```
+
+<br>
 
 A callback function that determines whether a swipe is allowed. The function receives the potential next swipe state. If the `true` the swipe state will be updated, triggering a re-render. If `false` the state update will not occur and the component will not re-render.
 
 <br>
-<br>
-<br>
-<br>
-<br>
-<br>
+
+---
+
+<br><br><br><br><br><br>
 
 # Return Value
 
-The return value is an array containing the state and a snapTo helper function.
+`array`
 
-```jsx
-const [swipeState, snapTo] = useSwipe(ref);
-
-const {
-  phase,
-  isSwiping,
-  xy: [x, y],
-  direction: [directionX, directionY],
-  origin: [originX, originY],
-  current: [currentX, currentY],
-  move: [moveX, moveY],
-} = swipeState;
-```
+The return value is tuple containing the `swipe` state object and a `swipeTo` handler function.
 
 <br>
-<br>
-<br>
 
-## **State**
-
-The state is an object containing the following:
-
-- [`phase`](#phase)
-- [`isSwiping`](#isSwiping)
-- [`xy`](#xy)
-- [`direction`](#direction)
-- [`current`](#current)
-- [`origin`](#origin)
-- [`move`](#move)
+---
 
 <br>
-<br>
-<br>
 
-### `phase`
+swipe `object`
 
 ```ts
-phase:'idle' | 'start' | 'move' | 'end' = 'idle';
+interface SwipeState {
+  isSwiping: boolean;
+
+  //The current phase of the swipe.
+  phase: 'idle' | 'start' | 'move' | 'end';
+
+  // The origin x and y coordinates from the start of the swipe.
+  origin: [number, number];
+
+  // The continous x and y coordinates of movement that persists between swipes.
+  xy: [number, number];
+
+  // The difference in x and y coordinates from the origin x and y.
+  move: [number, number];
+
+  // The current x and y direction of the swipe.
+  current: [number, number];
+
+  // 1 for forwards.
+  // -1 for backwards.
+  // 0 for no change.
+  direction: [number, number];
+}
 ```
 
-A string denoting the current phase of the wheel or touch event.
-
-<br>
-<br>
 <br>
 
-### `isSwiping`
+---
+
+<br>
+
+swipeTo `function`
 
 ```ts
-isSwiping: boolean = false;
+type SwipeTo = ({x: number = 0, y: number = 0) => void;
 ```
 
-A boolean indicating whether or not a swipe event is occuring.
-
-<br>
-<br>
 <br>
 
-### `xy`
-
-```ts
-xy: [number, number] = [0, 0];
-```
-
-The continuous x and y values that persist between swipe events.
+A handler function that sets the `xy` values of the swipe.
 
 <br>
-<br>
-<br>
 
-### `direction`
+---
 
-```ts
-direction: [number, number] = [0, 0];
-```
-
-The current direction of the swipe movement for both x and y axis.
-
-- `1` indicates a forwards direction.
-- `-1` indicates a backwards direction.
-- `0` indicates no change in direction.
-
-<br>
-<br>
-<br>
-
-### `current`
-
-```ts
-current: [number, number] = [0, 0];
-```
-
-The current x and y coordinates of the swipe event.
-
-> _Note: does not reflect the x and y coordinates of the mouse if the event is triggered by a wheel event._
-
-<br>
-<br>
-<br>
-
-### `origin`
-
-```ts
-origin: [number, number] = [0, 0];
-```
-
-The origin x and y coordinates of the swipe event.
-
-> _Note: does not reflect the x and y coordinates of the mouse if the event is triggered by a wheel event._
-
-<br>
-<br>
-<br>
-
-### `move`
-
-```ts
-move: [number, number] = [0, 0];
-```
-
-The difference from the current x and y movement from the origin x and y coordinates.
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-## **Helpers**
-
-### `snapTo`
-
-```ts
-snapTo({x:number = 0,y:number = 0}):void
-```
-
-A helper function used to override and set the xy values in the state. This function is useful for snapping at the `end` phase of a swipe event.
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br><br><br><br><br><br>
 
 # Examples
-
-<br>
-<br>
-<br>
 
 ## Snap
 
 Below is trivial example of infinite swiping in both directions with snapping using the `react-spring` animation library.
 
-<br>
+If you intend to animate items that will be larger than the container, use the `CONTAINER_STYLE` and `TRANSLATOR_BASE_STYLE` with absolutely positioned children. This prevents the scrollbar from being triggered and messing with your animation. If percentages are used for animating items, the size will be based off of the `CONTAINER_STYLE` since it is relatively positioned.
 
-> If you intend to animate items that will be larger than the container, use the `CONTAINER_STYLE` and `TRANSLATOR_BASE_STYLE` with absolutely positioned children. This prevents the scrollbar from being triggered and messing with your animation. If percentages are used for animating items, the size will be based of the `CONTAINER_STYLE` since it is relatively positioned.
-
-<br>
-
-```jsx
+```tsx
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { useSpring, animated } from 'react-spring';

@@ -1,7 +1,8 @@
 import usePhaseableListener from '@jwdinker/use-phaseable-listener';
-import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
 import useBlockScroll from '@jwdinker/use-block-scroll';
 import * as React from 'react';
+import useDragListener from '@jwdinker/use-drag-listener';
+import get1TouchCoordinates from '@jwdinker/get-1-touch-coordinates';
 
 import { SwipeableElement, SwipeProps, SwipeState } from './types';
 import {
@@ -16,8 +17,6 @@ import {
   setTouchEnd,
 } from './state';
 
-import { getTouchCoordinates } from './helpers';
-
 const { useState, useEffect } = React;
 
 function useSwipe(container: SwipeableElement, props: SwipeProps = {}) {
@@ -31,109 +30,81 @@ function useSwipe(container: SwipeableElement, props: SwipeProps = {}) {
     return typeof canSwipe === 'function' ? canSwipe(nextState) : canSwipe;
   };
 
-  const touchStart = (event: TouchEvent) => {
-    const _event = event as TouchEvent;
-    const coordinates = getTouchCoordinates(_event);
-    // next state required for knowing when to block swiping.
-    setState((previousState) => {
-      const startState = reducer(previousState, setTouchStart(coordinates));
-      if (isSwipeAllowed(startState)) {
-        block();
-        return startState;
-      }
-      return previousState;
-    });
-  };
-
-  const touchMove = (event: TouchEvent) => {
-    const coordinates = getTouchCoordinates(event);
-    // next state required for knowing when to block swiping.
-    setState((previousState) => {
-      const moveState = reducer(previousState, setTouchMove(coordinates));
-      if (isSwipeAllowed(moveState)) {
-        return moveState;
-      }
-      return previousState;
-    });
-  };
-
-  const touchEnd = () => {
-    unblock();
-    setState((previousState) => {
-      return reducer(previousState, setTouchEnd());
-    });
-  };
-
-  const delegator = (event: any) => {
-    const { type } = event;
-    if (type === 'touchstart') {
-      return touchStart(event);
-    }
-    if (type === 'touchmove') {
-      return touchMove(event);
-    }
-    return touchEnd();
-  };
-
-  const wheelStart = (event: WheelEvent) => {
-    const { deltaX, deltaY } = event;
-    setState((previousState) => {
-      const startState = reducer(previousState, setWheelStart([deltaX, deltaY]));
-      if (isSwipeAllowed(startState)) {
-        return startState;
-      }
-      return previousState;
-    });
-  };
-
-  const wheelMove = (event: WheelEvent) => {
-    const { deltaX, deltaY } = event;
-    setState((previousState) => {
-      const moveState = reducer(previousState, setWheelMove([deltaX, deltaY]));
-      if (isSwipeAllowed(moveState)) {
-        return moveState;
-      }
-      return previousState;
-    });
-  };
-
-  const wheelEnd = () => {
-    setState((previousState) => reducer(previousState, setWheelEnd()));
-  };
-
   const snapTo = ({ x = 0, y = 0 }) => {
     setState((previousState) => reducer(previousState, setSwipe(x, y)));
   };
 
   const wheelable = usePhaseableListener<WheelEvent>(container, {
-    onStart: wheelStart,
-    onMove: wheelMove,
-    onEnd: wheelEnd,
+    onStart: (event) => {
+      const { deltaX, deltaY } = event;
+      setState((previousState) => {
+        const startState = reducer(previousState, setWheelStart([deltaX, deltaY]));
+        if (isSwipeAllowed(startState)) {
+          return startState;
+        }
+        return previousState;
+      });
+    },
+    onMove: (event) => {
+      const { deltaX, deltaY } = event;
+      setState((previousState) => {
+        const moveState = reducer(previousState, setWheelMove([deltaX, deltaY]));
+        if (isSwipeAllowed(moveState)) {
+          return moveState;
+        }
+        return previousState;
+      });
+    },
+    onEnd: () => {
+      setState((previousState) => reducer(previousState, setWheelEnd()));
+    },
     type: 'wheel',
     passive: true,
   });
 
-  const touchable = useEventListener(container, 'touchstart touchmove touchend', delegator);
+  useDragListener(container, {
+    onTouchStart: (event, enableMove) => {
+      const coordinates = get1TouchCoordinates(event);
+      // next state required for knowing when to block swiping.
+      setState((previousState) => {
+        const startState = reducer(previousState, setTouchStart(coordinates));
+        if (isSwipeAllowed(startState)) {
+          enableMove();
+          block();
+          return startState;
+        }
+        return previousState;
+      });
+    },
+    onTouchMove: (event) => {
+      const coordinates = get1TouchCoordinates(event);
+      // next state required for knowing when to block swiping.
+      setState((previousState) => {
+        const moveState = reducer(previousState, setTouchMove(coordinates));
+        if (isSwipeAllowed(moveState)) {
+          return moveState;
+        }
+        return previousState;
+      });
+    },
+    onTouchEnd: (event, disableMove) => {
+      unblock();
+      disableMove();
+      setState((previousState) => {
+        return reducer(previousState, setTouchEnd());
+      });
+    },
+    touch,
+    mouse: false,
+  });
 
   useEffect(() => {
-    const listeners: UseEventListenerReturn[] = [];
     if (wheel) {
-      listeners.push(wheelable);
+      wheelable.attach();
+      return wheelable.detach;
     }
-
-    if (touch) {
-      listeners.push(touchable);
-    }
-
-    listeners.forEach((listener) => {
-      listener.attach();
-    });
-    return () => {
-      listeners.forEach((listener) => {
-        listener.detach();
-      });
-    };
-  }, [touch, touchable, wheel, wheelable]);
+    return undefined;
+  }, [wheel, wheelable]);
 
   return [state, snapTo];
 }
