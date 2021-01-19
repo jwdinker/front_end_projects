@@ -16,9 +16,12 @@
     "react": "^16.8.0"
   },
   "dependencies": {
+    "@jwdinker/get-1-touch-coordinates": "1.0.0",
+    "@jwdinker/get-mouse-coordinates": "1.0.0",
+    "@jwdinker/in-bounds": "1.0.0",
+    "@jwdinker/use-bounding-client-rect": "1.0.0",
     "@jwdinker/use-event-listener": "3.0.3",
-    "@jwdinker/use-ssr": "1.0.0",
-    "@jwdinker/use-timeout": "1.0.0",
+    "@jwdinker/use-interval": "1.0.0",
     "tslib": "^1.10.0"
   }
 }

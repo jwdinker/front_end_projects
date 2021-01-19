@@ -1,81 +1,134 @@
-import { useRef, RefObject } from 'react';
+import * as React from 'react';
 import useEventListener, { UseEventListenerReturn } from '@jwdinker/use-event-listener';
 
-import useTimeout from '@jwdinker/use-timeout';
+import useInterval from '@jwdinker/use-interval';
+import useBoundingClientRect from '@jwdinker/use-bounding-client-rect';
+import get1TouchCoordinates from '@jwdinker/get-1-touch-coordinates';
+import getMouseCoordinates from '@jwdinker/get-mouse-coordinates';
+import { inBounds } from '@jwdinker/in-bounds';
 
-export type HoldableElement = RefObject<HTMLElement | undefined | null>;
+export type HoldableElement = React.RefObject<HTMLElement | undefined | null>;
 
-export type HoldCallback<T> = (event: T) => void;
+export type HoldCallback<T> = () => void;
+
+export type OnThreshold = () => void;
+
+export type OnHolding = (elapsedTime: number) => void;
 
 export interface UseHoldProps {
-  onHold?: HoldCallback<MouseEvent | TouchEvent>;
-  onTouchHold?: HoldCallback<TouchEvent>;
-  onMouseHold?: HoldCallback<MouseEvent>;
-  hold?: number;
+  onThreshold?: OnThreshold;
+  onRelease?: () => void;
+  onHolding?: OnHolding;
+  threshold?: number;
+  touch?: boolean;
+  mouse?: boolean;
+  consolidate?: boolean;
 }
 
-export interface UseHoldReturn {
-  touchable: UseEventListenerReturn;
-  mouseable: UseEventListenerReturn;
-}
+const { useRef, useEffect } = React;
 
 function useHold(
   element: HoldableElement,
-  { hold = 300, onHold = () => {}, onMouseHold = () => {}, onTouchHold = () => {} }: UseHoldProps
-): UseHoldReturn {
-  const _event = useRef<TouchEvent | MouseEvent | undefined>();
+  {
+    threshold = 300,
+    onThreshold = () => {},
+    onHolding = () => {},
+    onRelease = () => {},
+    mouse = true,
+    touch = true,
+    consolidate = false,
+  }: UseHoldProps
+): void {
+  const active = useRef(false);
+  const [rect, updateRect] = useBoundingClientRect(element);
 
-  const execute = () => {
-    const event = _event.current;
-    if (event) {
-      onHold(event);
+  const options = { consolidate };
 
-      const { type } = event;
-      if (type === 'touchstart') {
-        onTouchHold(event as TouchEvent);
+  const [start, stop] = useInterval({
+    interval: threshold,
+    onWait: (elapsed) => {
+      onHolding(elapsed);
+    },
+    onInterval: (time, forceStop) => {
+      forceStop();
+      onThreshold();
+    },
+  });
+
+  const begin = () => {
+    start();
+    active.current = true;
+    updateRect();
+  };
+
+  const handleBounds = (coordinates: number[]) => {
+    const [x, y] = coordinates;
+
+    if (!inBounds({ top: y, left: x, height: 0, width: 0 }, rect)) {
+      stop();
+      onRelease();
+      active.current = false;
+    }
+  };
+
+  const mouseInBounds = (event: unknown) => {
+    if (active.current) {
+      const coordinates = getMouseCoordinates(event as MouseEvent);
+      handleBounds(coordinates);
+    }
+  };
+
+  const touchInBounds = (event: unknown) => {
+    if (active.current) {
+      const coordinates = get1TouchCoordinates(event as TouchEvent, 'client');
+      handleBounds(coordinates);
+    }
+  };
+
+  const _window = typeof window !== 'undefined' ? window : null;
+
+  const touchstart = useEventListener(element, 'touchstart', begin, options);
+  const touchmove = useEventListener(_window, 'touchmove', touchInBounds, options);
+
+  const mousedown = useEventListener(element, 'mousedown', begin, options);
+  const mousemove = useEventListener(_window, 'mousemove', mouseInBounds, options);
+
+  const endable = useEventListener(
+    _window,
+    'mouseup touchend',
+    () => {
+      if (active.current) {
+        active.current = false;
+        onRelease();
+        stop();
       }
+    },
+    options
+  );
 
-      if (type === 'mousedown') {
-        onMouseHold(event as MouseEvent);
-      }
+  useEffect(() => {
+    const listeners: UseEventListenerReturn[] = [];
+    if (mouse) {
+      listeners.push(mousedown, mousemove);
     }
-  };
-  const [start, clear] = useTimeout(execute, hold);
-
-  const touchstart = (event: TouchEvent) => {
-    const { type } = event;
-    if (type === 'touchstart') {
-      _event.current = event;
-      clear();
-      start();
-
-      return;
+    if (touch) {
+      listeners.push(touchstart, touchmove);
     }
 
-    clear();
-  };
-
-  const mousedown = (event: MouseEvent) => {
-    const { type } = event;
-    if (type === 'mousedown') {
-      _event.current = event;
-      clear();
-      start();
-
-      return;
+    if (mouse || touch) {
+      listeners.push(endable);
     }
 
-    clear();
-  };
-  // @ts-ignore
-  const touchable = useEventListener(element, 'touchstart touchmove touchend', touchstart);
-  // @ts-ignore
-  const mouseable = useEventListener(element, 'mousedown mousemove mouseup', mousedown);
+    listeners.forEach((listener) => {
+      listener.attach();
+    });
 
-  return {
-    touchable,
-    mouseable,
-  };
+    return () => {
+      listeners.forEach((listener) => {
+        listener.detach();
+      });
+    };
+  }, [endable, mouse, mousedown, mousemove, touch, touchmove, touchstart]);
 }
 
 export default useHold;
