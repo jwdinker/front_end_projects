@@ -13,9 +13,6 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../../utilities/mouse_helpers"
-    },
-    {
       "path": "../../utilities/touch_helpers"
     },
     {
@@ -23,9 +20,6 @@
     },
     {
       "path": "../../utilities/get_element_or_reference"
-    },
-    {
-      "path": "../../utilities/phase_helpers"
     },
     {
       "path": "../use_drag_listener"
