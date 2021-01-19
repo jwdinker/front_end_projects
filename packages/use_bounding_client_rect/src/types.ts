@@ -1,4 +1,7 @@
-export type DOMRectangleElement = React.RefObject<HTMLElement | null> | null | undefined;
+export type DOMRectangleElement =
+  | React.RefObject<HTMLElement | null | undefined>
+  | null
+  | undefined;
 
 export interface Rectangle {
   top: number;
