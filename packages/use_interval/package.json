@@ -1,0 +1,21 @@
+{
+  "name": "@jwdinker/use-interval",
+  "version": "1.0.0",
+  "description": "A react hook for abstracting set interval",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "browserslist": "> 0.25%, not dead",
+  "scripts": {
+    "clean": "rm -rf ./dist"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "tslib": "^1.10.0"
+  }
+}
